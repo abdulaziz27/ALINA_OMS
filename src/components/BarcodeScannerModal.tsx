@@ -107,7 +107,11 @@ export default function BarcodeScannerModal({
             }
           });
         } catch (e) {
-          console.error("Failed to initialize scanner:", e);
+          if (e instanceof Error && (e.message.includes("aborted") || e.message.includes("abort"))) {
+            console.warn("Scanner initialization aborted safely:", e);
+          } else {
+            console.error("Failed to initialize scanner:", e);
+          }
           if (isMounted) {
             setCameraError("Gagal mempersiapkan pemindaian kamera.");
           }
@@ -121,19 +125,23 @@ export default function BarcodeScannerModal({
         // Prevent uncaught "The operation was aborted" by stopping safely after state updates settle
         setTimeout(() => {
           if (qrScanner) {
-            if (isStreaming || qrScanner.isScanning) {
-              qrScanner.stop()
-                .then(() => {
-                  try { qrScanner?.clear(); } catch (_) {}
-                })
-                .catch(err => {
-                  console.warn("Error stopping scanner during cleanup:", err);
-                });
-            } else {
-              try { qrScanner.clear(); } catch (_) {}
+            try {
+              if (qrScanner.isScanning || isStreaming) {
+                qrScanner.stop()
+                  .then(() => {
+                    try { qrScanner?.clear(); } catch (_) {}
+                  })
+                  .catch(err => {
+                    console.warn("Scanner stopped during cleanup:", err);
+                  });
+              } else {
+                try { qrScanner.clear(); } catch (_) {}
+              }
+            } catch (err) {
+              console.warn("Scanner cleanup warning:", err);
             }
           }
-        }, 500);
+        }, 300);
       };
     }
   }, [isOpen, activeMode]);

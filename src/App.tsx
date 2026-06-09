@@ -387,6 +387,31 @@ const categoryList = [
   "Jilbab Anak"
 ];
 
+const safeLocalStorage = {
+  getItem: (key: string): string | null => {
+    try {
+      return localStorage.getItem(key);
+    } catch (e) {
+      console.warn("localStorage.getItem blocked or failed:", e);
+      return null;
+    }
+  },
+  setItem: (key: string, value: string): void => {
+    try {
+      localStorage.setItem(key, value);
+    } catch (e) {
+      console.warn("localStorage.setItem blocked or failed:", e);
+    }
+  },
+  removeItem: (key: string): void => {
+    try {
+      localStorage.removeItem(key);
+    } catch (e) {
+      console.warn("localStorage.removeItem blocked or failed:", e);
+    }
+  }
+};
+
 export default function App() {
   // Session States
   const [currentUser, setCurrentUser] = useState<{ User_ID?: string; Full_Name: string; Email: string; Role: UserRole; Permissions?: string[] } | null>(null);
@@ -527,8 +552,8 @@ export default function App() {
   // ----------------------------------------------------------------------
   useEffect(() => {
     // Check remembered login Session from storage
-    const storedUser = localStorage.getItem('alina_user');
-    const storedTime = localStorage.getItem('alina_login_time');
+    const storedUser = safeLocalStorage.getItem('alina_user');
+    const storedTime = safeLocalStorage.getItem('alina_login_time');
     
     if (storedUser && storedTime) {
       const parsedTime = Number(storedTime);
@@ -537,7 +562,7 @@ export default function App() {
       if (currentTime - parsedTime < SESSION_TIMEOUT) {
         setCurrentUser(JSON.parse(storedUser));
         // Reset guardian timer
-        localStorage.setItem('alina_login_time', currentTime.toString());
+        safeLocalStorage.setItem('alina_login_time', currentTime.toString());
       } else {
         // Enforce 8-hour auto-logout
         handleLogoutAction();
@@ -553,7 +578,7 @@ export default function App() {
     if (!currentUser) return;
 
     const activityHandler = () => {
-      localStorage.setItem('alina_login_time', Date.now().toString());
+      safeLocalStorage.setItem('alina_login_time', Date.now().toString());
     };
 
     window.addEventListener('mousemove', activityHandler);
@@ -561,7 +586,7 @@ export default function App() {
 
     // Enforce background polling timer every 10 min
     const timer = setInterval(() => {
-      const storedTime = localStorage.getItem('alina_login_time');
+      const storedTime = safeLocalStorage.getItem('alina_login_time');
       if (storedTime) {
         const timeDiff = Date.now() - Number(storedTime);
         if (timeDiff > SESSION_TIMEOUT) {
@@ -730,7 +755,7 @@ export default function App() {
         setShipping(data.shipping || []);
         setActivityLog(data.activityLog || []);
         const serverConfig = data.sheetsConfig;
-        const localSavedConfigStr = localStorage.getItem('alina_sheets_config');
+        const localSavedConfigStr = safeLocalStorage.getItem('alina_sheets_config');
         let finalConfig = serverConfig || { scriptUrl: '', spreadsheetId: '', isLinked: false, autoSync: false };
         
         if (localSavedConfigStr) {
@@ -749,19 +774,19 @@ export default function App() {
               }).catch(err => console.error("Auto-restore sheets config failed", err));
             } else if (serverConfig && serverConfig.isLinked && serverConfig.scriptUrl) {
               // Ensure local storage is in sync with server config
-              localStorage.setItem('alina_sheets_config', JSON.stringify(serverConfig));
+              safeLocalStorage.setItem('alina_sheets_config', JSON.stringify(serverConfig));
             }
           } catch (e) {
             console.error("Failed to parse local sheets config:", e);
           }
         } else if (serverConfig && serverConfig.isLinked && serverConfig.scriptUrl) {
           // If server has it but local doesn't, save it locally
-          localStorage.setItem('alina_sheets_config', JSON.stringify(serverConfig));
+          safeLocalStorage.setItem('alina_sheets_config', JSON.stringify(serverConfig));
         }
         setSheetsConfig(finalConfig);
       }
     } catch (e) {
-      console.error("Failed to connect to backend REST database:", e);
+      console.warn("Failed to connect to backend REST database:", e);
     }
   };
 
@@ -784,8 +809,8 @@ export default function App() {
         setCurrentUser(data.user);
         
         if (isRememberLogin) {
-          localStorage.setItem('alina_user', JSON.stringify(data.user));
-          localStorage.setItem('alina_login_time', Date.now().toString());
+          safeLocalStorage.setItem('alina_user', JSON.stringify(data.user));
+          safeLocalStorage.setItem('alina_login_time', Date.now().toString());
         }
         
         fetchDatabaseState();
@@ -808,8 +833,8 @@ export default function App() {
     } catch (e) {}
 
     setCurrentUser(null);
-    localStorage.removeItem('alina_user');
-    localStorage.removeItem('alina_login_time');
+    safeLocalStorage.removeItem('alina_user');
+    safeLocalStorage.removeItem('alina_login_time');
     setLoginPassword('');
   };
 
@@ -1422,7 +1447,7 @@ export default function App() {
         })
       });
       if (res.ok) {
-        localStorage.setItem('alina_sheets_config', JSON.stringify({ ...cfg, isLinked: true }));
+        safeLocalStorage.setItem('alina_sheets_config', JSON.stringify({ ...cfg, isLinked: true }));
         await fetchDatabaseState();
         return true;
       }
