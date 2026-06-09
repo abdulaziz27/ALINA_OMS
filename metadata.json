@@ -1,0 +1,6 @@
+{
+  "name": "ALINA WMS & OMS",
+  "description": "Enterprise WMS & OMS System for muslimah fashion brands featuring robust SKU, Barcode, Stock Opname, and Sheets integration.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
