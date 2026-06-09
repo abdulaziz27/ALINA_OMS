@@ -9,7 +9,7 @@ import {
   LogOut, AlertTriangle, ShieldCheck, HelpCircle, Activity,
   Lock, Mail, Heart, RefreshCw, Barcode, ClipboardCheck,
   CheckCircle2, Plus, Calendar, Filter, Archive, CheckSquare, Search, BookOpen, Package,
-  ArrowLeft, Trash2, Eye, Printer
+  ArrowLeft, Trash2, Eye, Printer, ArrowDownCircle, ArrowUpCircle, X
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { generateCode128SvgPath } from './barcodeUtils.ts';
@@ -412,7 +412,122 @@ const safeLocalStorage = {
   }
 };
 
+type AppTheme = 'default' | 'ios' | 'ayam' | 'kucing';
+
+const T = (theme: AppTheme) => {
+  const isDefault = theme === 'default';
+  const isIos = theme === 'ios';
+  const isAyam = theme === 'ayam';
+  const isKucing = theme === 'kucing';
+
+  return {
+    id: theme,
+    logo: isDefault ? 'A' : isIos ? '💎' : isAyam ? '🐔' : '🐱',
+    brandName: isDefault 
+      ? 'ALINA ENTERPRISE' 
+      : isIos 
+      ? 'ALINA iOS 26' 
+      : isAyam 
+      ? 'ALINA CHICKEN MODE 🐔' 
+      : 'ALINA MEOW MODE 🐱',
+    logoBg: isIos 
+      ? 'bg-white/90 shadow-sm border border-slate-200/60 text-slate-800' 
+      : isAyam 
+      ? 'bg-gradient-to-tr from-orange-500 to-amber-300 border border-orange-200' 
+      : isKucing 
+      ? 'bg-gradient-to-tr from-amber-800 to-amber-950 border border-amber-700' 
+      : 'bg-gradient-to-tr from-[#EC4899] to-[#F9A8D4]',
+
+    // Primary Text styles
+    text: isIos ? 'text-slate-900' : isAyam ? 'text-orange-600' : isKucing ? 'text-amber-800' : 'text-[#EC4899]',
+    textMuted: isIos ? 'text-slate-500' : isAyam ? 'text-orange-500 font-bold' : isKucing ? 'text-amber-700 font-bold' : 'text-pink-600',
+    textHover: isIos ? 'hover:text-black' : isAyam ? 'hover:text-orange-500' : isKucing ? 'hover:text-amber-700' : 'hover:text-[#EC4899]',
+    bg: isIos ? 'bg-black' : isAyam ? 'bg-orange-600' : isKucing ? 'bg-amber-800' : 'bg-[#EC4899]',
+    bgHover: isIos ? 'hover:bg-gray-900' : isAyam ? 'hover:bg-orange-700' : isKucing ? 'hover:bg-amber-900' : 'hover:bg-pink-600',
+    
+    // Light backgrounds
+    lightBg: isIos ? 'bg-slate-50/70' : isAyam ? 'bg-orange-50/80' : isKucing ? 'bg-amber-50/60' : 'bg-pink-50',
+    lightBgHover: isIos ? 'hover:bg-slate-100' : isAyam ? 'hover:bg-orange-100' : isKucing ? 'hover:bg-amber-100/50' : 'hover:bg-pink-100',
+    lightBgHalf: isIos ? 'bg-slate-100/40' : isAyam ? 'bg-orange-50/40' : isKucing ? 'bg-amber-50/30' : 'bg-pink-50/50',
+    lightBgQuarter: isIos ? 'bg-slate-50/10' : isAyam ? 'bg-orange-50/15' : isKucing ? 'bg-amber-50/10' : 'bg-pink-50/20',
+
+    // Borders
+    border: isIos ? 'border-slate-200/50' : isAyam ? 'border-orange-100' : isKucing ? 'border-amber-200/40' : 'border-pink-100',
+    borderHover: isIos ? 'hover:border-slate-400' : isAyam ? 'hover:border-orange-300' : isKucing ? 'hover:border-amber-300' : 'hover:border-pink-300',
+    borderSolid: isIos ? 'border-slate-200' : isAyam ? 'border-orange-200' : isKucing ? 'border-amber-200' : 'border-pink-200',
+    borderLeftAccent: isIos ? 'border-slate-900' : isAyam ? 'border-orange-600' : isKucing ? 'border-amber-800' : 'border-[#EC4899]',
+    borderFocus: isIos ? 'focus:border-slate-900 focus:ring-slate-900/10' : isAyam ? 'focus:border-orange-500 focus:ring-orange-500/10' : isKucing ? 'focus:border-amber-700 focus:ring-amber-700/10' : 'focus:border-pink-500 focus:ring-pink-500/10',
+
+    // Shadows
+    shadowAccent: isIos ? 'shadow-[0_16px_50px_rgba(0,0,0,0.04)]' : isAyam ? 'shadow-[0_12px_40px_rgba(249,115,22,0.05)]' : isKucing ? 'shadow-[0_12px_40px_rgba(120,53,15,0.04)]' : 'shadow-[0_12px_40px_rgba(236,72,153,0.06)]',
+    ringAccent: isIos ? 'ring-slate-500/5' : isAyam ? 'ring-orange-500/10' : isKucing ? 'ring-amber-800/10' : 'ring-pink-500/10',
+
+    // Header Liquid Glass styling
+    headerBg: isIos
+      ? 'bg-white/70 backdrop-blur-3xl border border-slate-200/40 ring-1 ring-slate-100/50 shadow-xl shadow-slate-900/[0.015]'
+      : isAyam
+      ? 'bg-white/80 backdrop-blur-xl border border-orange-200/60 ring-1 ring-orange-500/15 shadow-[0_12px_40px_rgba(249,115,22,0.05)]'
+      : isKucing
+      ? 'bg-white/80 backdrop-blur-xl border border-amber-200/40 ring-1 ring-amber-800/10 shadow-[0_12px_40px_rgba(120,53,15,0.04)]'
+      : 'bg-white/65 backdrop-blur-xl border border-white/60 ring-1 ring-pink-500/10 shadow-[0_12px_40px_rgba(236,72,153,0.06)]',
+
+    // Main App Background Gradient
+    appBgGradient: isIos 
+      ? 'min-h-screen bg-[#FBFBFD] pb-24 font-sans antialiased text-slate-900 relative'
+      : isAyam
+      ? 'min-h-screen bg-gradient-to-tr from-[#FFFDF9] via-white to-[#FFFBEB] pb-24 font-sans antialiased text-gray-900 relative'
+      : isKucing
+      ? 'min-h-screen bg-gradient-to-tr from-[#FAF9F6] via-white to-[#F5F2EB] pb-24 font-sans antialiased text-zinc-900 relative'
+      : 'min-h-screen bg-gradient-to-tr from-[#FFF8FB] via-white to-[#FCE7F3] pb-24 font-sans antialiased text-gray-900 relative',
+
+    // Banner gradients
+    bannerGradient: isIos
+      ? 'bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 border border-slate-800 shadow-lg'
+      : isAyam
+      ? 'bg-gradient-to-r from-orange-600 via-orange-500 to-amber-500 shadow-md shadow-orange-500/10'
+      : isKucing
+      ? 'bg-gradient-to-r from-stone-900 via-amber-900 to-stone-950 border border-amber-950/20 shadow-lg'
+      : 'bg-gradient-to-r from-[#EC4899] to-[#F9A8D4]',
+
+    bannerText: isIos 
+      ? 'text-[10px] bg-white/10 text-slate-100 font-bold tracking-wide' 
+      : isAyam 
+      ? 'text-[10px] bg-orange-700/40 text-orange-50 font-bold shadow-sm'
+      : isKucing
+      ? 'text-[10px] bg-white/15 text-amber-100 font-bold shadow-sm'
+      : 'text-[10px] bg-white/20 text-white',
+
+    // Buttons
+    buttonSecondary: isIos
+      ? 'bg-white hover:bg-slate-100/70 text-slate-950 border border-slate-200/80 shadow-sm'
+      : isAyam
+      ? 'bg-white hover:bg-orange-50 text-orange-600 border border-orange-200 shadow-sm'
+      : isKucing
+      ? 'bg-white hover:bg-amber-50 text-amber-900 border border-amber-200 shadow-sm'
+      : 'bg-white hover:bg-pink-50 text-[#EC4899] border border-pink-100/60 shadow-sm',
+
+    // Speech and dynamic messages
+    petSpeech: isDefault 
+      ? null 
+      : isIos 
+      ? 'iOS System: Status normal. Haptic engine ready.' 
+      : isAyam 
+      ? 'Petok petok! Mandor berkokok di kandang Alina! 🐔'
+      : 'Ngeong! Kucing alina siap melompat menjaga stok! 🐱🐾',
+
+    deco: isAyam ? '🐔' : isKucing ? '🐱' : null,
+    decoSub: isAyam ? '🐣' : isKucing ? '🐾' : null,
+  };
+};
+
 export default function App() {
+  // Theme state
+  const [appTheme, setAppTheme] = useState<AppTheme>(() => {
+    return (safeLocalStorage.getItem('alina_app_theme') as AppTheme) || 'default';
+  });
+
+  const currentTheme = T(appTheme);
+
   // Session States
   const [currentUser, setCurrentUser] = useState<{ User_ID?: string; Full_Name: string; Email: string; Role: UserRole; Permissions?: string[] } | null>(null);
   const [loginEmail, setLoginEmail] = useState('');
@@ -447,6 +562,7 @@ export default function App() {
   const [isScannerOpen, setIsScannerOpen] = useState(false);
   const [scanCallback, setScanCallback] = useState<(sku: string) => void>(() => {});
   const [scannerTitle, setScannerTitle] = useState("SCAN SKU TAG");
+  const [isScanChoiceOpen, setIsScanChoiceOpen] = useState(false);
 
   // Operational form states
   const [activeStockOpnameMonth, setActiveStockOpnameMonth] = useState("Juni 2026");
@@ -1560,7 +1676,7 @@ export default function App() {
   // Render Login UI if session doesn't exist
   if (!currentUser) {
     return (
-      <div className="min-h-screen bg-gradient-to-tr from-[#FFF8FB] via-white to-[#FCE7F3] flex items-center justify-center p-4 select-none font-sans relative overflow-hidden">
+      <div className="min-h-screen bg-gradient-to-tr from-[#FFF8FB] via-white to-[#FCE7F3] flex items-center justify-center p-4 select-none font-sans relative overflow-hidden" data-theme={appTheme}>
         
         {/* Soft floating dynamic shapes for retro visual richness */}
         <div className="absolute top-10 left-10 w-44 h-44 bg-pink-100 rounded-full mix-blend-multiply filter blur-3xl opacity-60 animate-pulse" />
@@ -1649,14 +1765,7 @@ export default function App() {
             </button>
           </form>
 
-          {/* Quick demo account badges */}
-          <div className="p-3 bg-pink-50/50 rounded-2xl border border-pink-100 text-[10px] text-center space-y-2 text-gray-500">
-            <p className="font-bold text-pink-700">🔐 Sandbox Quick Accounts:</p>
-            <div className="flex justify-around select-all font-mono font-bold text-[9px] text-gray-600">
-              <span className="cursor-pointer" onClick={() => { setLoginEmail('owner@alina.com'); setLoginPassword('owner123'); }}>owner@alina.com (owner123)</span>
-              <span className="cursor-pointer" onClick={() => { setLoginEmail('admin@alina.com'); setLoginPassword('admin123'); }}>admin@alina.com (admin123)</span>
-            </div>
-          </div>
+
 
           <div className="text-center font-mono text-[9px] text-gray-400 flex items-center justify-center gap-1.5">
             ALINA MOSLEM FASHION SYSTEMS <Heart className="w-3 h-3 text-[#EC4899] fill-current" /> UTC-2026
@@ -1667,35 +1776,37 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-white pb-24 font-sans antialiased text-gray-900 relative">
+    <div className={currentTheme.appBgGradient} data-theme={appTheme}>
       
       {/* Floating Minimalist Liquid Glass Header */}
       <header className="sticky top-3 z-40 mx-4 max-w-7xl lg:mx-auto select-none">
-        <div className="bg-white/65 backdrop-blur-xl border border-white/60 ring-1 ring-pink-500/10 shadow-[0_12px_40px_rgba(236,72,153,0.06)] rounded-2xl sm:rounded-[24px] px-4.5 py-2.5 sm:py-3 flex justify-between items-center transition-all duration-300">
+        <div className={`${currentTheme.headerBg} rounded-2xl sm:rounded-[24px] px-4.5 py-2.5 sm:py-3 flex justify-between items-center transition-all duration-300`}>
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#EC4899] to-[#F9A8D4] flex items-center justify-center font-extrabold text-white text-xs shadow-md">
-              A
+            <div className={`w-8 h-8 rounded-full ${currentTheme.logoBg} flex items-center justify-center font-extrabold text-white text-xs shadow-md`}>
+              {currentTheme.logo}
             </div>
             <div className="text-left">
-              <h1 className="text-xs sm:text-sm font-extrabold text-gray-900 tracking-tight leading-none">ALINA ENTERPRISE</h1>
-              <p className="text-[9px] text-[#EC4899] font-black font-mono tracking-wider mt-0.5 uppercase">
-                {currentUser?.Role} PORTAL
+              <h1 className="text-xs sm:text-sm font-extrabold text-gray-900 tracking-tight leading-none">{currentTheme.brandName}</h1>
+              <p className={`text-[9px] ${currentTheme.text} font-black font-mono tracking-wider mt-0.5 uppercase`}>
+                {currentUser?.Role} PORTAL {currentTheme.deco && <span className="inline-block animate-bounce">{currentTheme.deco}</span>}
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="text-right hidden sm:block">
+            <div className="text-right hidden md:block">
               <p className="text-xs font-bold text-gray-950">{currentUser?.Full_Name}</p>
-              <p className="text-[9px] text-gray-400 font-mono">Live Session Active</p>
+              <p className="text-[9px] text-gray-400 font-mono select-none">
+                {currentTheme.petSpeech ? currentTheme.petSpeech : 'Live Session Active'}
+              </p>
             </div>
             
             <button
               onClick={handleLogoutAction}
-              className="bg-white hover:bg-[#EC4899] hover:text-white text-[#EC4899] transition-all font-bold px-3 py-1.5 rounded-xl text-[10px] sm:text-xs flex items-center gap-1.5 border border-pink-100/60 shadow-sm cursor-pointer"
+              className={`${currentTheme.buttonSecondary} transition-all font-bold px-3 py-1.5 rounded-xl text-[10px] sm:text-xs flex items-center gap-1.5 cursor-pointer`}
             >
               <LogOut className="w-3.5 h-3.5" />
-              <span>Sign Out</span>
+              <span className="hidden sm:inline">Sign Out</span>
             </button>
           </div>
         </div>
@@ -1706,29 +1817,37 @@ export default function App() {
         
         {/* Visual Glassmorphic Branding Banner - Only displayed under the Header when the active Tab is Dashboard */}
         {activeTab === 'dashboard' && (
-          <div className="bg-gradient-to-r from-[#EC4899] to-[#F9A8D4] text-white p-6 rounded-[32px] shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4 relative overflow-hidden text-left shadow-md">
+          <div className={`${currentTheme.bannerGradient} text-white p-6 rounded-[32px] shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4 relative overflow-hidden text-left shadow-md`}>
             <div className="space-y-2 max-w-xl z-10">
-              <span className="text-[10px] bg-white/20 px-3 py-1 rounded-full font-bold uppercase tracking-wider">
-                Live Ops Dashboard
+              <span className={`text-[10px] ${currentTheme.bannerText} px-3 py-1 rounded-full font-bold uppercase tracking-wider`}>
+                Live Ops Dashboard {currentTheme.deco && `• ${currentTheme.deco}`}
               </span>
-              <h2 className="text-xl font-extrabold tracking-tight">Assalamu'alaikum, {currentUser?.Full_Name}!</h2>
+              <h2 className="text-xl font-extrabold tracking-tight">
+                Assalamu'alaikum, {currentUser?.Full_Name}! {currentTheme.deco && <span className="inline-block animate-bounce">{currentTheme.deco}</span>}
+              </h2>
               <p className="text-xs text-white/85">
-                Kelola sirkulasi inventaris celamis dan jilbab brand Alina Anda dengan integrasi pencatatan Google Sheets secara langsung.
+                {appTheme === 'ayam' ? (
+                  'Kukuruyuk! Kelola sirkulasi inventaris celamis dan jilbab brand Alina tercinta bersama ayam-ayam hoki pembawa rezeki!'
+                ) : appTheme === 'kucing' ? (
+                  'Meow! Kelola sirkulasi inventaris celamis dan jilbab brand Alina Anda dengan sentuhan cakar ceria pembongkar stok lancar!'
+                ) : appTheme === 'ios' ? (
+                  'Secure Enterprise Architecture. Standardized data mapping via secure channels with integrated live camera logic.'
+                ) : (
+                  'Kelola sirkulasi inventaris celamis dan jilbab brand Alina Anda dengan integrasi pencatatan Google Sheets secara langsung.'
+                )}
               </p>
+              {currentTheme.petSpeech && (
+                <div className="text-[11px] font-mono bg-white/10 text-white px-2.5 py-1 rounded-xl w-fit mt-1.5 flex items-center gap-1.5">
+                  <span className="animate-wiggle">🔔</span>
+                  <span>{currentTheme.petSpeech}</span>
+                </div>
+              )}
             </div>
             <div className="flex gap-2 z-10">
-            {hasPermission('opname') && (
+            {(hasPermission('inventory') || hasPermission('opname')) && (
               <button
-                onClick={() => triggerCameraScanner("Kamera Stock Opname", (scanned) => {
-                  const matched = products.find(p => p.SKU === scanned);
-                  if (matched) {
-                    setActiveTab('opname');
-                    alert(`Penerima barcode cocok: SKU [${scanned}] ${matched.Product_Name}. Dialihkan ke layar Opname.`);
-                  } else {
-                    alert(`SKU [${scanned}] tidak terdaftar di Product Master.`);
-                  }
-                })}
-                className="bg-white text-[#EC4899] font-bold py-2.5 px-4 rounded-xl text-xs hover:bg-pink-50 transition cursor-pointer flex items-center gap-1.5 shadow-sm"
+                onClick={() => setIsScanChoiceOpen(true)}
+                className="bg-white text-slate-900 font-bold py-2.5 px-4 rounded-xl text-xs hover:bg-gray-100 transition cursor-pointer flex items-center gap-1.5 shadow-sm"
               >
                 <Barcode className="w-4 h-4" /> Scan Kamera
               </button>
@@ -1769,6 +1888,23 @@ export default function App() {
               ].filter(item => hasPermission(item.id)).map((item) => {
                 const Icon = item.icon;
                 const isCurrent = activeTab === item.id;
+                
+                // Mascot active decoration map
+                const animalDecorations: Record<string, { ayam: string; kucing: string }> = {
+                  dashboard: { ayam: '🐔', kucing: '🐱' },
+                  products: { ayam: '🥚', kucing: '🧶' },
+                  inventory: { ayam: '🐣', kucing: '🐾' },
+                  opname: { ayam: '🐓', kucing: '🐟' },
+                  orders: { ayam: '🌾', kucing: '🐭' },
+                  shipping: { ayam: '🪶', kucing: '📦' },
+                  reports: { ayam: '🐓📊', kucing: '🐾📈' },
+                  customers: { ayam: '🐤', kucing: '😸' },
+                  users: { ayam: '👨‍🌾', kucing: '🧙‍♂️' },
+                  settings: { ayam: '🪵', kucing: '🥫' }
+                };
+
+                const currentDeco = animalDecorations[item.id];
+
                 return (
                   <motion.button
                     key={item.id}
@@ -1782,12 +1918,24 @@ export default function App() {
                         : 'border-pink-100/50 hover:border-pink-200'
                     }`}
                   >
-                    <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center transition-all duration-200 ${
+                    <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center relative transition-all duration-200 ${
                       isCurrent
                         ? 'bg-[#EC4899] text-white'
                         : 'bg-[#FFF3F8] text-[#EC4899] group-hover:bg-[#EC4899] group-hover:text-white'
                     }`}>
                       <Icon className="w-4 h-4 sm:w-4.5 sm:h-4.5 stroke-[2.2]" />
+                      
+                      {/* Animal Mascot overlay absolute indicator badges */}
+                      {appTheme === 'ayam' && currentDeco && (
+                        <span className="absolute -bottom-1 -right-1 text-[9px] select-none animate-bounce">
+                          {currentDeco.ayam}
+                        </span>
+                      )}
+                      {appTheme === 'kucing' && currentDeco && (
+                        <span className="absolute -bottom-1 -right-1 text-[9px] select-none scale-105">
+                          {currentDeco.kucing}
+                        </span>
+                      )}
                     </div>
                     <span className={`mt-1.5 text-[9px] sm:text-[10px] font-extrabold tracking-tight leading-none line-clamp-1 ${
                       isCurrent ? 'text-[#EC4899]' : 'text-gray-600 group-hover:text-[#EC4899]'
@@ -3715,13 +3863,127 @@ export default function App() {
               </div>
             )}
 
-            {/* 10. SHEETS CONNECTOR SETTINGS */}
+            {/* 10. SHEETS CONNECTOR & THEME SETTINGS */}
             {activeTab === 'settings' && hasPermission('settings') && (
-              <SheetsLinker
-                config={sheetsConfig}
-                onSaveConfig={handleSaveSheetsConfig}
-                onTriggerSync={handleSyncSheetsNow}
-              />
+              <div className="space-y-6 animate-[fadeIn_0.25s_ease-out]">
+                
+                {/* Visual Customizer & Appearance Settings Card */}
+                <div className="bg-white border border-pink-100 p-6 rounded-[32px] shadow-sm text-left space-y-4">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-[#EC4899] animate-pulse" />
+                    <h3 className="font-extrabold text-xs uppercase tracking-widest text-[#EC4899]">
+                      PILIHAN TEMA & TAMPILAN ALINA
+                    </h3>
+                  </div>
+                  <p className="text-xs text-gray-500 font-sans">
+                    Atur visual antarmuka sirkulasi data Alina Anda di sini. Seluruh tema didesain bernuansa merah muda (pink) khas Alina yang menawan dengan detail maskot hoki masing-masing, kecuali edisi iOS minimalis.
+                  </p>
+
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 font-sans pt-2">
+                    {/* Theme Option 1: Default Alina */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setAppTheme('default');
+                        safeLocalStorage.setItem('alina_app_theme', 'default');
+                      }}
+                      className={`p-4 rounded-2xl border-2 text-left transition duration-200 cursor-pointer flex flex-col gap-2 relative overflow-hidden h-full ${
+                        appTheme === 'default'
+                          ? 'border-[#EC4899] bg-pink-50/20 shadow-sm'
+                          : 'border-pink-100/70 hover:border-pink-300 bg-white'
+                      }`}
+                    >
+                      <div className="absolute right-2 top-2 text-2xl opacity-10">🌸</div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-lg">🌸</span>
+                        <h4 className="font-bold text-xs text-gray-900 uppercase tracking-tight">ALINA DEFAULT</h4>
+                      </div>
+                      <p className="text-[10px] text-gray-400">Desain standar Alina Enterprise. Bersih, premium, dan penuh estetika pink yang memikat mata.</p>
+                      {appTheme === 'default' && (
+                        <span className="text-[9px] bg-[#EC4899] text-white px-2 py-0.5 rounded-md font-bold uppercase w-fit font-mono mt-auto">Aktif</span>
+                      )}
+                    </button>
+
+                    {/* Theme Option 2: Clean iOS 26 */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setAppTheme('ios');
+                        safeLocalStorage.setItem('alina_app_theme', 'ios');
+                      }}
+                      className={`p-4 rounded-2xl border-2 text-left transition duration-200 cursor-pointer flex flex-col gap-2 relative overflow-hidden h-full ${
+                        appTheme === 'ios'
+                          ? 'border-gray-900 bg-slate-50/50 shadow-sm'
+                          : 'border-pink-100/70 hover:border-pink-300 bg-white'
+                      }`}
+                    >
+                      <div className="absolute right-2 top-2 text-2xl opacity-10">💎</div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-lg">💎</span>
+                        <h4 className="font-bold text-xs text-slate-800 uppercase tracking-tight">iOS 26 CLEAN</h4>
+                      </div>
+                      <p className="text-[10px] text-gray-400">Liquid glass minimalis dengan sentuhan layout hitam-putih murni layaknya perangkat Apple modern.</p>
+                      {appTheme === 'ios' && (
+                        <span className="text-[9px] bg-slate-900 text-white px-2 py-0.5 rounded-md font-bold uppercase w-fit font-mono mt-auto">Aktif</span>
+                      )}
+                    </button>
+
+                    {/* Theme Option 3: Ayam Emas */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setAppTheme('ayam');
+                        safeLocalStorage.setItem('alina_app_theme', 'ayam');
+                      }}
+                      className={`p-4 rounded-2xl border-2 text-left transition duration-200 cursor-pointer flex flex-col gap-2 relative overflow-hidden h-full ${
+                        appTheme === 'ayam'
+                          ? 'border-[#EC4899] bg-pink-50/20 shadow-sm'
+                          : 'border-pink-100/70 hover:border-pink-300 bg-white'
+                      }`}
+                    >
+                      <div className="absolute right-2 top-2 text-2xl opacity-10">🐔</div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-lg">🐔</span>
+                        <h4 className="font-bold text-xs text-pink-700 uppercase tracking-tight">TEMA AYAM</h4>
+                      </div>
+                      <p className="text-[10px] text-gray-400">Nuansa pink manis Alina dipadu dengan mandor ayam yang berkokok membawa rezeki, plus icon menu bernuansa ayam hoki.</p>
+                      {appTheme === 'ayam' && (
+                        <span className="text-[9px] bg-pink-500 text-white px-2 py-0.5 rounded-md font-bold uppercase w-fit font-mono mt-auto">Aktif 🐔</span>
+                      )}
+                    </button>
+
+                    {/* Theme Option 4: Kucing Beruntung */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setAppTheme('kucing');
+                        safeLocalStorage.setItem('alina_app_theme', 'kucing');
+                      }}
+                      className={`p-4 rounded-2xl border-2 text-left transition duration-200 cursor-pointer flex flex-col gap-2 relative overflow-hidden h-full ${
+                        appTheme === 'kucing'
+                          ? 'border-[#EC4899] bg-pink-50/20 shadow-sm'
+                          : 'border-pink-100/70 hover:border-pink-300 bg-white'
+                      }`}
+                    >
+                      <div className="absolute right-2 top-2 text-2xl opacity-10">🐱</div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-lg">🐱</span>
+                        <h4 className="font-bold text-xs text-pink-700 uppercase tracking-tight">TEMA KUCING</h4>
+                      </div>
+                      <p className="text-[10px] text-gray-400">Sentuhan pink ceria dengan jejak cakar kaki kucing, ikan mas hias, meongan lucu, serta icon menu bercakar imut.</p>
+                      {appTheme === 'kucing' && (
+                        <span className="text-[9px] bg-pink-500 text-white px-2 py-0.5 rounded-md font-bold uppercase w-fit font-mono mt-auto">Aktif 🐱</span>
+                      )}
+                    </button>
+                  </div>
+                </div>
+
+                <SheetsLinker
+                  config={sheetsConfig}
+                  onSaveConfig={handleSaveSheetsConfig}
+                  onTriggerSync={handleSyncSheetsNow}
+                />
+              </div>
             )}
 
           </motion.div>
@@ -4008,6 +4270,90 @@ export default function App() {
       })()}
 
       {/* DYNAMIC SCANN MODAL TARGETS */}
+      {isScanChoiceOpen && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[110] flex items-center justify-center p-4">
+          <div className="bg-white rounded-[32px] w-full max-w-md overflow-hidden shadow-2xl border border-pink-100 p-6 text-left space-y-6 relative animate-[fadeIn_0.15s_ease-out]">
+            <button
+               type="button"
+               onClick={() => setIsScanChoiceOpen(false)}
+               className="absolute top-4 right-4 p-2 rounded-full hover:bg-pink-50 text-gray-400 hover:text-pink-600 transition"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="space-y-1">
+              <span className="text-[10px] bg-pink-50 text-[#EC4899] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider font-mono">
+                Pilih Moda Scan Kamera
+              </span>
+              <h3 className="font-extrabold text-[#EC4899] text-base">ALINE LIVE SCAN SCANNER</h3>
+              <p className="text-xs text-gray-500 font-sans font-medium">
+                Pilih jenis transaksi pergudangan Alina sebelum memindai tag pakaian atau Kode.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 gap-3 font-sans">
+              {/* Option 1: Scan Stock In */}
+              <button
+                type="button"
+                onClick={() => {
+                  setIsScanChoiceOpen(false);
+                  setSelectedTrxType('IN');
+                  triggerCameraScanner("Penerimaan Stock In (Masuk)", (scanned) => {
+                    const matched = products.find(p => p.SKU === scanned);
+                    setSelectedTrxType('IN');
+                    setTrxSku(scanned);
+                    setActiveTab('inventory');
+                    if (matched) {
+                      alert(`Barcode cocok: SKU [${scanned}] ${matched.Product_Name}. Dialihkan ke log Transaksi Stock In.`);
+                    } else {
+                      alert(`SKU [${scanned}] belum terdaftar di master produk, namun telah disalin ke log Transaksi Stock In.`);
+                    }
+                  });
+                }}
+                className="p-4 rounded-2xl border-2 border-emerald-100 hover:border-emerald-500 bg-emerald-50/10 hover:bg-emerald-50/40 text-left transition duration-250 cursor-pointer flex items-center gap-4 group"
+              >
+                <div className="w-12 h-12 rounded-xl bg-emerald-500 text-white flex items-center justify-center group-hover:scale-105 transition shadow-md shadow-emerald-250 flex-shrink-0">
+                  <ArrowDownCircle className="w-6 h-6 stroke-[2]" />
+                </div>
+                <div>
+                  <h4 className="font-extrabold text-sm text-gray-900 leading-tight">SCAN STOCK IN (Barang Masuk)</h4>
+                  <p className="text-[11px] text-gray-500 mt-0.5">Mendaftarkan stok pakaian baru masuk dari konveksi/retur ke gudang.</p>
+                </div>
+              </button>
+
+              {/* Option 2: Scan Stock Out */}
+              <button
+                type="button"
+                onClick={() => {
+                  setIsScanChoiceOpen(false);
+                  setSelectedTrxType('OUT');
+                  triggerCameraScanner("Pengeluaran Stock Out (Keluar)", (scanned) => {
+                    const matched = products.find(p => p.SKU === scanned);
+                    setSelectedTrxType('OUT');
+                    setTrxSku(scanned);
+                    setActiveTab('inventory');
+                    if (matched) {
+                      alert(`Barcode cocok: SKU [${scanned}] ${matched.Product_Name}. Dialihkan ke log Transaksi Stock Out.`);
+                    } else {
+                      alert(`SKU [${scanned}] belum terdaftar di master produk, namun telah disalin ke log Transaksi Stock Out.`);
+                    }
+                  });
+                }}
+                className="p-4 rounded-2xl border-2 border-red-100 hover:border-red-500 bg-red-50/10 hover:bg-red-50/40 text-left transition duration-250 cursor-pointer flex items-center gap-4 group"
+              >
+                <div className="w-12 h-12 rounded-xl bg-red-500 text-white flex items-center justify-center group-hover:scale-105 transition shadow-md shadow-red-250 flex-shrink-0">
+                  <ArrowUpCircle className="w-6 h-6 stroke-[2]" />
+                </div>
+                <div>
+                  <h4 className="font-extrabold text-sm text-gray-900 leading-tight">SCAN STOCK OUT (Barang Keluar)</h4>
+                  <p className="text-[11px] text-gray-500 mt-0.5">Mengurangi stok pakaian karena penjualan/pembagian pesanan.</p>
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <BarcodeScannerModal
         isOpen={isScannerOpen}
         onClose={() => setIsScannerOpen(false)}

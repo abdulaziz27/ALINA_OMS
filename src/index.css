@@ -9,6 +9,356 @@
   }
 }
 
+/* Dynamic iOS Monochrome Theme Overrides to completely purge pink color tones */
+[data-theme="ios"] .text-\[\#EC4899\] {
+  color: #0f172a !important; /* deep slate-900 */
+}
+[data-theme="ios"] .bg-\[\#EC4899\] {
+  background-color: #0f172a !important; /* deep slate-900 shadow */
+}
+[data-theme="ios"] .text-pink-600 {
+  color: #475569 !important;
+}
+[data-theme="ios"] .text-pink-700 {
+  color: #1e293b !important;
+}
+[data-theme="ios"] .text-pink-500 {
+  color: #64748b !important;
+}
+[data-theme="ios"] .text-pink-400 {
+  color: #94a3b8 !important;
+}
+[data-theme="ios"] .bg-\[\#FFF8FB\] {
+  background-color: #f8fafc !important;
+}
+[data-theme="ios"] .bg-\[\#FFF3F8\] {
+  background-color: #f1f5f9 !important;
+}
+[data-theme="ios"] .hover\:bg-\[\#D93B84\]:hover {
+  background-color: #1e293b !important;
+}
+[data-theme="ios"] .hover\:bg-pink-600:hover {
+  background-color: #1e293b !important;
+}
+[data-theme="ios"] .hover\:bg-pink-50:hover {
+  background-color: #f1f5f9 !important;
+}
+[data-theme="ios"] .hover\:bg-pink-100:hover {
+  background-color: #e2e8f0 !important;
+}
+[data-theme="ios"] .bg-pink-50 {
+  background-color: #f8fafc !important;
+}
+[data-theme="ios"] .bg-pink-50\/50 {
+  background-color: rgba(248, 250, 252, 0.82) !important;
+  border-color: #e2e8f0 !important;
+}
+[data-theme="ios"] .bg-pink-50\/40 {
+  background-color: rgba(241, 245, 249, 0.4) !important;
+}
+[data-theme="ios"] .bg-pink-50\/20 {
+  background-color: rgba(241, 245, 249, 0.15) !important;
+}
+[data-theme="ios"] .bg-pink-50\/70 {
+  background-color: rgba(248, 250, 252, 0.9) !important;
+}
+[data-theme="ios"] .bg-pink-100 {
+  background-color: #f1f5f9 !important;
+}
+[data-theme="ios"] .bg-pink-200 {
+  background-color: #e2e8f0 !important;
+}
+[data-theme="ios"] .border-pink-100 {
+  border-color: #e2e8f0 !important;
+}
+[data-theme="ios"] .border-pink-100\/30 {
+  border-color: rgba(226, 232, 240, 0.4) !important;
+}
+[data-theme="ios"] .border-pink-100\/40 {
+  border-color: rgba(226, 232, 240, 0.5) !important;
+}
+[data-theme="ios"] .border-pink-100\/50 {
+  border-color: rgba(226, 232, 240, 0.6) !important;
+}
+[data-theme="ios"] .border-pink-100\/60 {
+  border-color: rgba(226, 232, 240, 0.7) !important;
+}
+[data-theme="ios"] .border-pink-100\/80 {
+  border-color: #cbd5e1 !important;
+}
+[data-theme="ios"] .border-pink-200 {
+  border-color: #cbd5e1 !important;
+}
+[data-theme="ios"] .border-pink-300 {
+  border-color: #94a3b8 !important;
+}
+[data-theme="ios"] .border-pink-400 {
+  border-color: #64748b !important;
+}
+[data-theme="ios"] .border-pink-500 {
+  border-color: #334155 !important;
+}
+[data-theme="ios"] .accent-pink-600,
+[data-theme="ios"] .accent-\[\#EC4899\] {
+  accent-color: #0f172a !important;
+}
+[data-theme="ios"] .focus\:ring-pink-500:focus,
+[data-theme="ios"] .focus\:border-pink-500:focus {
+  --tw-ring-color: rgba(15, 23, 42, 0.1) !important;
+  border-color: #0f172a !important;
+}
+[data-theme="ios"] .from-\[\#FFF8FB\] {
+  --tw-gradient-from: #f1f5f9 !important;
+  --tw-gradient-to: #ffffff !important;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+}
+[data-theme="ios"] .to-\[\#FCE7F3\] {
+  --tw-gradient-to: #e2e8f0 !important;
+}
+[data-theme="ios"] .bg-pink-150 {
+  background-color: #cbd5e1 !important;
+}
+/* Eliminate the background noise bubbles for iOS theme */
+[data-theme="ios"] .mix-blend-multiply {
+  opacity: 0 !important;
+}
+
+/* ========================================================= */
+/* Ayam Theme Overrides: Full Orange and commanding Black     */
+/* ========================================================= */
+[data-theme="ayam"] .text-\[\#EC4899\] {
+  color: #ea580c !important; /* Deep Orange */
+}
+[data-theme="ayam"] .bg-\[\#EC4899\] {
+  background-color: #ea580c !important;
+}
+[data-theme="ayam"] .text-pink-600 {
+  color: #ea580c !important;
+}
+[data-theme="ayam"] .text-pink-700 {
+  color: #111827 !important; /* Commanding Black */
+}
+[data-theme="ayam"] .text-pink-500 {
+  color: #f97316 !important; /* Orange */
+}
+[data-theme="ayam"] .text-pink-400 {
+  color: #4b5563 !important; /* Muted Charcoal Black */
+}
+[data-theme="ayam"] .bg-\[\#FFF8FB\] {
+  background-color: #fffbeb !important;
+}
+[data-theme="ayam"] .bg-\[\#FFF3F8\] {
+  background-color: #fff7ed !important;
+}
+[data-theme="ayam"] .hover\:bg-\[\#D93B84\]:hover {
+  background-color: #111827 !important; /* Sleek Black Hover */
+}
+[data-theme="ayam"] .hover\:bg-pink-600:hover {
+  background-color: #111827 !important;
+}
+[data-theme="ayam"] .hover\:bg-pink-50:hover {
+  background-color: #fff7ed !important;
+}
+[data-theme="ayam"] .hover\:bg-pink-100:hover {
+  background-color: #ffedd5 !important;
+}
+[data-theme="ayam"] .bg-pink-50 {
+  background-color: #fff7ed !important;
+}
+[data-theme="ayam"] .bg-pink-50\/50 {
+  background-color: rgba(254, 243, 199, 0.4) !important;
+  border-color: #fed7aa !important;
+}
+[data-theme="ayam"] .bg-pink-50\/40 {
+  background-color: rgba(254, 243, 199, 0.3) !important;
+}
+[data-theme="ayam"] .bg-pink-50\/20 {
+  background-color: rgba(254, 243, 199, 0.15) !important;
+}
+[data-theme="ayam"] .bg-pink-50\/70 {
+  background-color: rgba(255, 247, 237, 0.8) !important;
+}
+[data-theme="ayam"] .bg-pink-100 {
+  background-color: #ffedd5 !important;
+}
+[data-theme="ayam"] .bg-pink-200 {
+  background-color: #fed7aa !important;
+}
+[data-theme="ayam"] .border-pink-100 {
+  border-color: #ffedd5 !important;
+}
+[data-theme="ayam"] .border-pink-100\/30 {
+  border-color: rgba(254, 215, 170, 0.3) !important;
+}
+[data-theme="ayam"] .border-pink-100\/40 {
+  border-color: rgba(254, 215, 170, 0.4) !important;
+}
+[data-theme="ayam"] .border-pink-100\/50 {
+  border-color: rgba(254, 215, 170, 0.5) !important;
+}
+[data-theme="ayam"] .border-pink-100\/60 {
+  border-color: rgba(254, 215, 170, 0.6) !important;
+}
+[data-theme="ayam"] .border-pink-100\/80 {
+  border-color: #fed7aa !important;
+}
+[data-theme="ayam"] .border-pink-200 {
+  border-color: #111827 !important; /* Bold Black Line accents */
+}
+[data-theme="ayam"] .border-pink-300 {
+  border-color: #f97316 !important;
+}
+[data-theme="ayam"] .border-pink-400 {
+  border-color: #ea580c !important;
+}
+[data-theme="ayam"] .border-pink-500 {
+  border-color: #111827 !important;
+}
+[data-theme="ayam"] .accent-pink-600,
+[data-theme="ayam"] .accent-\[\#EC4899\] {
+  accent-color: #ea580c !important;
+}
+[data-theme="ayam"] .focus\:ring-pink-500:focus,
+[data-theme="ayam"] .focus\:border-pink-500:focus {
+  --tw-ring-color: rgba(234, 88, 12, 0.15) !important;
+  border-color: #ea580c !important;
+}
+[data-theme="ayam"] .from-\[\#FFF8FB\] {
+  --tw-gradient-from: #fffbeb !important;
+  --tw-gradient-to: #ffffff !important;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+}
+[data-theme="ayam"] .to-\[\#FCE7F3\] {
+  --tw-gradient-to: #fff7ed !important;
+}
+[data-theme="ayam"] .bg-pink-150 {
+  background-color: #f97316 !important;
+}
+[data-theme="ayam"] .mix-blend-multiply {
+  mix-blend-mode: multiply !important;
+  opacity: 0.15 !important;
+  background-color: #fcd34d !important; /* yellow-orange glow bubbles */
+}
+
+/* ========================================================= */
+/* Kucing Theme Overrides: Full Charcoal Black and Wood Brown */
+/* ========================================================= */
+[data-theme="kucing"] .text-\[\#EC4899\] {
+  color: #7c2d12 !important; /* Espresso/Amber Brown */
+}
+[data-theme="kucing"] .bg-\[\#EC4899\] {
+  background-color: #111827 !important; /* Bold deep black bg */
+}
+[data-theme="kucing"] .text-pink-600 {
+  color: #7c2d12 !important;
+}
+[data-theme="kucing"] .text-pink-700 {
+  color: #111827 !important; /* Black */
+}
+[data-theme="kucing"] .text-pink-500 {
+  color: #9a3412 !important; /* Dark warm brown */
+}
+[data-theme="kucing"] .text-pink-400 {
+  color: #111827 !important;
+}
+[data-theme="kucing"] .bg-\[\#FFF8FB\] {
+  background-color: #faf9f6 !important;
+}
+[data-theme="kucing"] .bg-\[\#FFF3F8\] {
+  background-color: #f5f2eb !important;
+}
+[data-theme="kucing"] .hover\:bg-\[\#D93B84\]:hover {
+  background-color: #7c2d12 !important; /* Brown hover */
+}
+[data-theme="kucing"] .hover\:bg-pink-600:hover {
+  background-color: #7c2d12 !important;
+}
+[data-theme="kucing"] .hover\:bg-pink-50:hover {
+  background-color: #ebd1c0 !important;
+}
+[data-theme="kucing"] .hover\:bg-pink-100:hover {
+  background-color: #ebd1c0 !important;
+}
+[data-theme="kucing"] .bg-pink-50 {
+  background-color: #fcfbf9 !important;
+}
+[data-theme="kucing"] .bg-pink-50\/50 {
+  background-color: rgba(245, 242, 235, 0.6) !important;
+  border-color: #ebd1c0 !important;
+}
+[data-theme="kucing"] .bg-pink-50\/40 {
+  background-color: rgba(245, 242, 235, 0.4) !important;
+}
+[data-theme="kucing"] .bg-pink-50\/20 {
+  background-color: rgba(245, 242, 235, 0.15) !important;
+}
+[data-theme="kucing"] .bg-pink-50\/70 {
+  background-color: rgba(250, 249, 246, 0.9) !important;
+}
+[data-theme="kucing"] .bg-pink-100 {
+  background-color: #f5f2eb !important;
+}
+[data-theme="kucing"] .bg-pink-200 {
+  background-color: #ebd1c0 !important;
+}
+[data-theme="kucing"] .border-pink-100 {
+  border-color: #ebd1c0 !important;
+}
+[data-theme="kucing"] .border-pink-100\/30 {
+  border-color: rgba(235, 209, 192, 0.3) !important;
+}
+[data-theme="kucing"] .border-pink-100\/40 {
+  border-color: rgba(235, 209, 192, 0.4) !important;
+}
+[data-theme="kucing"] .border-pink-100\/50 {
+  border-color: rgba(235, 209, 192, 0.5) !important;
+}
+[data-theme="kucing"] .border-pink-100\/60 {
+  border-color: rgba(235, 209, 192, 0.6) !important;
+}
+[data-theme="kucing"] .border-pink-100\/80 {
+  border-color: #ebd1c0 !important;
+}
+[data-theme="kucing"] .border-pink-200 {
+  border-color: #7c2d12 !important; /* Brown core accents */
+}
+[data-theme="kucing"] .border-pink-300 {
+  border-color: #111827 !important; /* Black focus border */
+}
+[data-theme="kucing"] .border-pink-400 {
+  border-color: #7c2d12 !important;
+}
+[data-theme="kucing"] .border-pink-500 {
+  border-color: #111827 !important;
+}
+[data-theme="kucing"] .accent-pink-600,
+[data-theme="kucing"] .accent-\[\#EC4899\] {
+  accent-color: #7c2d12 !important;
+}
+[data-theme="kucing"] .focus\:ring-pink-500:focus,
+[data-theme="kucing"] .focus\:border-pink-500:focus {
+  --tw-ring-color: rgba(124, 45, 18, 0.1) !important;
+  border-color: #7c2d12 !important;
+}
+[data-theme="kucing"] .from-\[\#FFF8FB\] {
+  --tw-gradient-from: #fcfbf9 !important;
+  --tw-gradient-to: #ffffff !important;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+}
+[data-theme="kucing"] .to-\[\#FCE7F3\] {
+  --tw-gradient-to: #f5f2eb !important;
+}
+[data-theme="kucing"] .bg-pink-150 {
+  background-color: #7c2d12 !important;
+}
+[data-theme="kucing"] .mix-blend-multiply {
+  mix-blend-mode: multiply !important;
+  opacity: 0.1 !important;
+  background-color: #a16207 !important; /* warm brown cozy light glow */
+}
+
+/* Custom Scrollbars - Completely Hidden across all browsers to keep the design ultra clean */
+
 /* Custom Scrollbars - Completely Hidden across all browsers to keep the design ultra clean */
 * {
   scrollbar-width: none !important; /* Firefox */
