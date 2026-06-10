@@ -23,6 +23,25 @@ const DB_FILE = IS_VERCEL
 
 app.use(express.json({ limit: '10mb' }));
 
+// Vercel Serverless Database Hydration Middleware
+app.use((req, res, next) => {
+  if (IS_VERCEL && req.headers['x-sheets-config']) {
+    try {
+      const cfg = JSON.parse(req.headers['x-sheets-config'] as string);
+      if (cfg && cfg.scriptUrl) {
+         const db = readDatabase();
+         if (!db.sheetsConfig || db.sheetsConfig.scriptUrl !== cfg.scriptUrl) {
+           db.sheetsConfig = cfg;
+           fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2), 'utf8');
+         }
+      }
+    } catch(e) {
+      console.warn("Failed to parse x-sheets-config header", e);
+    }
+  }
+  next();
+});
+
 // Helper to hash password using SHA-256
 function hashPassword(password: string): string {
   return crypto.createHash('sha256').update(password).digest('hex');
@@ -697,8 +716,12 @@ let hasBootstrappedFromSheets = false;
 
 async function readAndPullDatabase(): Promise<typeof DEFAULT_DB> {
   const db = readDatabase();
-  // Only pull automatically on first boot if the link is active AND autoSync is enabled.
-  if (!hasBootstrappedFromSheets && db.sheetsConfig && db.sheetsConfig.isLinked && db.sheetsConfig.autoSync && db.sheetsConfig.scriptUrl) {
+  // On Vercel, we must ALWAYS pull from Sheets on cold boot if linked, because /tmp is wiped.
+  // Locally, we only auto-pull if autoSync is enabled.
+  const shouldPullOnBoot = (!hasBootstrappedFromSheets && db.sheetsConfig && db.sheetsConfig.isLinked && db.sheetsConfig.scriptUrl) && 
+                           (IS_VERCEL || db.sheetsConfig.autoSync);
+  
+  if (shouldPullOnBoot) {
     try {
       console.log("[Sync Engine] Pulling latest state from Google Sheets during initial app boot...");
       hasBootstrappedFromSheets = true; // Mark as bootstrapped regardless of success to prevent loop
@@ -716,7 +739,8 @@ async function readAndPullDatabase(): Promise<typeof DEFAULT_DB> {
 async function saveDatabaseAndSync(data: typeof DEFAULT_DB) {
   try {
     fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2), 'utf8');
-    if (data.sheetsConfig && data.sheetsConfig.isLinked && data.sheetsConfig.autoSync && data.sheetsConfig.scriptUrl) {
+    const shouldPushParams = data.sheetsConfig && data.sheetsConfig.isLinked && data.sheetsConfig.scriptUrl;
+    if (shouldPushParams && (IS_VERCEL || data.sheetsConfig.autoSync)) {
       console.log("[Sync Engine] Synchronizing / pushing state to Google Sheets on mutation...");
       await syncToGoogleSheets(data);
     }
@@ -1584,6 +1608,8 @@ async function startServer() {
   });
 }
 
-startServer();
+if (!IS_VERCEL) {
+  startServer();
+}
 
 export default app;

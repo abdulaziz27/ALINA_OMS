@@ -850,6 +850,16 @@ const customFetch = async function (input: RequestInfo | URL, init?: RequestInit
       return handleOfflineApiRoute(url, init);
     }
     try {
+      // Hydrate Vercel serverless configurations via headers
+      const sc = safeLocalStorage.getItem('alina_sheets_config');
+      if (sc) {
+        init = init || {};
+        init.headers = {
+          ...init.headers,
+          'x-sheets-config': sc
+        };
+      }
+      
       const response = await originalFetch(input, init);
       // If we got a 5xx gateway/internal serverless freeze pattern or a 404, fallback instantly
       if (response.status >= 500 || response.type === 'error') {

@@ -45,7 +45,7 @@
   ],
   "products": [
     {
-      "Product_ID": "PROD-001",
+      "Product_ID": "PROD-003",
       "SKU": "ALN-CSP-0001",
       "Barcode": "ALN-CSP-0001",
       "QR_Code": "ALN-CSP-0001",
@@ -56,12 +56,12 @@
       "Size": "All Size",
       "Cost_Price": 0,
       "Selling_Price": 90000,
-      "Current_Stock": 38,
+      "Current_Stock": 36,
       "Minimum_Stock": 10,
       "Status": "Active"
     },
     {
-      "Product_ID": "PROD-002",
+      "Product_ID": "PROD-004",
       "SKU": "ALN-CRB-0001",
       "Barcode": "ALN-CRB-0001",
       "QR_Code": "ALN-CRB-0001",
@@ -72,12 +72,12 @@
       "Size": "Ekstra Jumbo",
       "Cost_Price": 0,
       "Selling_Price": 90000,
-      "Current_Stock": 131,
+      "Current_Stock": 130,
       "Minimum_Stock": 10,
       "Status": "Active"
     },
     {
-      "Product_ID": "PROD-003",
+      "Product_ID": "PROD-001",
       "SKU": "ALN-CEL-0001",
       "Barcode": "ALN-CEL-0001",
       "QR_Code": "ALN-CEL-0001",
@@ -89,6 +89,22 @@
       "Cost_Price": 45000,
       "Selling_Price": 90000,
       "Current_Stock": 11,
+      "Minimum_Stock": 10,
+      "Status": "Active"
+    },
+    {
+      "Product_ID": "PROD-002",
+      "SKU": "ALN-JLB-0001",
+      "Barcode": "ALN-JLB-0001",
+      "QR_Code": "ALN-JLB-0001",
+      "Product_Name": "JILBAB ANAK JILBAB ANAK 1 (LIGHT CREAM)",
+      "Category": "Jilbab Anak",
+      "Variant": "Jilbab Anak 1",
+      "Color": "Light Cream",
+      "Size": "Jilbab Anak 1",
+      "Cost_Price": 3123,
+      "Selling_Price": 123123,
+      "Current_Stock": 43,
       "Minimum_Stock": 10,
       "Status": "Active"
     }
@@ -135,10 +151,61 @@
       "Status": "Active"
     }
   ],
-  "stockIn": [],
-  "stockOut": [],
+  "stockIn": [
+    {
+      "Transaction_ID": "STK-IN-0002",
+      "Date": "2026-06-10T09:39:18.073Z",
+      "SKU": "ALN-CSP-0001",
+      "Product_Name": "CELAMIS SHORT PANTS ALL SIZE (HIJAU MINT)",
+      "Qty": 1,
+      "Notes": ""
+    },
+    {
+      "Transaction_ID": "STK-IN-0001",
+      "Date": "2026-06-10T09:38:58.371Z",
+      "SKU": "ALN-CSP-0001",
+      "Product_Name": "CELAMIS SHORT PANTS ALL SIZE (HIJAU MINT)",
+      "Qty": -1,
+      "Notes": ""
+    }
+  ],
+  "stockOut": [
+    {
+      "Transaction_ID": "STK-OUT-0001",
+      "Date": "2026-06-10T09:39:37.107Z",
+      "SKU": "ALN-CSP-0001",
+      "Product_Name": "CELAMIS SHORT PANTS ALL SIZE (HIJAU MINT)",
+      "Customer": "Rania Hijab Store",
+      "Qty": 2,
+      "Notes": ""
+    }
+  ],
   "stockOpname": [],
   "orders": [
+    {
+      "Order_Number": "ORD-20260610-0007",
+      "Order_Date": "2026-06-10T09:38:21.295Z",
+      "Customer": "Shopee Mall Order",
+      "Channel": "Shopee",
+      "SKU": "ALN-JLB-0001",
+      "Product": "JILBAB ANAK JILBAB ANAK 1 (LIGHT CREAM)",
+      "Qty": 1,
+      "Price": 65000,
+      "Total": 65000,
+      "Status": "New Order"
+    },
+    {
+      "Order_Number": "ORD-20260610-0007",
+      "Order_Date": "2026-06-10T09:38:21.295Z",
+      "Customer": "Shopee Mall Order",
+      "Channel": "Shopee",
+      "SKU": "ALN-CRB-0001",
+      "Product": "CELAMIS RIB EKSTRA JUMBO (COKTU)",
+      "Qty": 1,
+      "Price": 105000,
+      "Total": 105000,
+      "Status": "New Order"
+    },
     {
       "Order_Number": "ORD-20260610-0006",
       "Order_Date": "2026-06-10T09:22:08.872Z",
@@ -238,6 +305,78 @@
   ],
   "shipping": [],
   "activityLog": [
+    {
+      "Log_ID": "LOG-381874-200",
+      "User_Name": "Alina Owner",
+      "User_Role": "OWNER",
+      "Activity": "Stock Out: -2 [Return to Konveksi - Reject] for SKU ALN-CSP-0001 (CELAMIS SHORT PANTS ALL SIZE (HIJAU MINT))",
+      "Module": "WMS",
+      "Timestamp": "2026-06-10T09:39:41.874Z",
+      "Device": "Web Client"
+    },
+    {
+      "Log_ID": "LOG-364356-451",
+      "User_Name": "Alina Owner",
+      "User_Role": "OWNER",
+      "Activity": "Stock In: +1 [Konveksi - Good] for SKU ALN-CSP-0001 (CELAMIS SHORT PANTS ALL SIZE (HIJAU MINT))",
+      "Module": "WMS",
+      "Timestamp": "2026-06-10T09:39:24.356Z",
+      "Device": "Web Client"
+    },
+    {
+      "Log_ID": "LOG-341843-871",
+      "User_Name": "Alina Owner",
+      "User_Role": "OWNER",
+      "Activity": "Stock In: +-1 [Return - Good] for SKU ALN-CSP-0001 (CELAMIS SHORT PANTS ALL SIZE (HIJAU MINT))",
+      "Module": "WMS",
+      "Timestamp": "2026-06-10T09:39:01.843Z",
+      "Device": "Web Client"
+    },
+    {
+      "Log_ID": "LOG-305095-169",
+      "User_Name": "Alina Owner",
+      "User_Role": "OWNER",
+      "Activity": "Created sales order ORD-20260610-0007 with 2 items, channel: Shopee",
+      "Module": "OMS",
+      "Timestamp": "2026-06-10T09:38:25.095Z",
+      "Device": "Web Client"
+    },
+    {
+      "Log_ID": "LOG-282132-769",
+      "User_Name": "Alina Owner",
+      "User_Role": "OWNER",
+      "Activity": "Deleted product SKU: ALN-JLB-0002",
+      "Module": "Product",
+      "Timestamp": "2026-06-10T09:38:02.132Z",
+      "Device": "Web Client"
+    },
+    {
+      "Log_ID": "LOG-257541-639",
+      "User_Name": "Alina Owner",
+      "User_Role": "OWNER",
+      "Activity": "Created product SKU: ALN-JLB-0002",
+      "Module": "Product",
+      "Timestamp": "2026-06-10T09:37:37.541Z",
+      "Device": "Web Client"
+    },
+    {
+      "Log_ID": "LOG-253801-34",
+      "User_Name": "Alina Owner",
+      "User_Role": "OWNER",
+      "Activity": "Created product SKU: ALN-JLB-0001",
+      "Module": "Product",
+      "Timestamp": "2026-06-10T09:37:33.801Z",
+      "Device": "Web Client"
+    },
+    {
+      "Log_ID": "LOG-223213-574",
+      "User_Name": "Alina Owner",
+      "User_Role": "OWNER",
+      "Activity": "Created product SKU: ALN-JLB-0001",
+      "Module": "Product",
+      "Timestamp": "2026-06-10T09:37:03.213Z",
+      "Device": "Web Client"
+    },
     {
       "Log_ID": "LOG-093016-955",
       "User_Name": "Alina Owner",
