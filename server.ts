@@ -1156,6 +1156,13 @@ app.post('/api/users', (req, res) => {
 // VITE OR STATIC SERVING MIDDLEWARE
 // ----------------------------------------------------------------------
 async function startServer() {
+  // Jika berjalan pada ekosistem Vercel Serverless, biarkan router Vercel melayani static files,
+  // Express hanya berperan sebagai API gateway mikro tanpa memblokir port (prevent port listen)
+  if (process.env.VERCEL) {
+    console.log("ALINA running in Vercel Serverless environment.");
+    return;
+  }
+
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
       server: { middlewareMode: true },
@@ -1176,3 +1183,5 @@ async function startServer() {
 }
 
 startServer();
+
+export default app;
