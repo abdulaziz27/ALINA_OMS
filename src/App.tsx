@@ -32,6 +32,8 @@ const DEFAULT_OFFLINE_DB = {
       User_ID: "USR-001",
       Full_Name: "Alina Owner",
       Email: "owner@alina.com",
+      Password_Hash: "c570e667306851a91d3068d3daaeb637a292d2f2130b202345cff7f5d69b4bc2", // HIJxF1N4
+      Password: "HIJxF1N4",
       Role: "OWNER",
       Status: "Active",
       Last_Login: "2026-06-08T07:40:00Z",
@@ -42,6 +44,8 @@ const DEFAULT_OFFLINE_DB = {
       User_ID: "USR-002",
       Full_Name: "Admin Operasional",
       Email: "admin@alina.com",
+      Password_Hash: "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9", // admin123
+      Password: "admin123",
       Role: "ADMIN",
       Status: "Active",
       Last_Login: "2026-06-08T07:30:00Z",
