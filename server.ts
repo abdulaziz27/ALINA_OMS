@@ -417,8 +417,9 @@ async function pullFromGoogleSheets(db: any, throwOnError: boolean = false): Pro
     
     // Safety lock: if a push happened while this fetch was executing or if it's very recent, discard this read 
     // because Google Sheets might return stale data, and we don't want to overwrite our fresh local database!
-    if (pullStartTime <= syncLockTimestamp) {
-      console.log(`[Sync Engine] Discarding pulled Google Sheets data (stale). A push occurred after this pull request was initiated!`);
+    // Added a 25-second buffer because Apps Script writes are not instantly coherent.
+    if (pullStartTime <= syncLockTimestamp + 25000) {
+      console.log(`[Sync Engine] Discarding pulled Google Sheets data (stale/recent push). A push occurred recently!`);
       return false;
     }
     
@@ -495,7 +496,7 @@ async function pullFromGoogleSheets(db: any, throwOnError: boolean = false): Pro
       modified = true;
     }
 
-    if (data.Stock_In && Array.isArray(data.Stock_In)) {
+    if (data.Stock_In && Array.isArray(data.Stock_In) && data.Stock_In.length > 0) {
       db.stockIn = data.Stock_In.filter((s: any) => s.Transaction_ID || s.SKU).map((s: any) => ({
         Transaction_ID: s.Transaction_ID || '',
         Date: s.Date || '',
@@ -507,7 +508,7 @@ async function pullFromGoogleSheets(db: any, throwOnError: boolean = false): Pro
       modified = true;
     }
 
-    if (data.Stock_Out && Array.isArray(data.Stock_Out)) {
+    if (data.Stock_Out && Array.isArray(data.Stock_Out) && data.Stock_Out.length > 0) {
       db.stockOut = data.Stock_Out.filter((s: any) => s.Transaction_ID || s.SKU).map((s: any) => ({
         Transaction_ID: s.Transaction_ID || '',
         Date: s.Date || '',
@@ -520,7 +521,7 @@ async function pullFromGoogleSheets(db: any, throwOnError: boolean = false): Pro
       modified = true;
     }
 
-    if (data.Stock_Opname && Array.isArray(data.Stock_Opname)) {
+    if (data.Stock_Opname && Array.isArray(data.Stock_Opname) && data.Stock_Opname.length > 0) {
       db.stockOpname = data.Stock_Opname.filter((s: any) => s.Opname_ID || s.SKU).map((s: any) => ({
         Opname_ID: s.Opname_ID || '',
         Month: s.Month || '',
@@ -534,7 +535,7 @@ async function pullFromGoogleSheets(db: any, throwOnError: boolean = false): Pro
       modified = true;
     }
 
-    if (data.Orders && Array.isArray(data.Orders)) {
+    if (data.Orders && Array.isArray(data.Orders) && data.Orders.length > 0) {
       db.orders = data.Orders.filter((o: any) => o.Order_Number || o.Customer).map((o: any) => ({
         Order_Number: o.Order_Number || '',
         Order_Date: o.Order_Date || '',
@@ -550,7 +551,7 @@ async function pullFromGoogleSheets(db: any, throwOnError: boolean = false): Pro
       modified = true;
     }
 
-    if (data.Shipping && Array.isArray(data.Shipping)) {
+    if (data.Shipping && Array.isArray(data.Shipping) && data.Shipping.length > 0) {
       db.shipping = data.Shipping.filter((s: any) => s.Tracking_Number || s.Order_Number).map((s: any) => ({
         Tracking_Number: s.Tracking_Number || '',
         Courier: s.Courier || '',

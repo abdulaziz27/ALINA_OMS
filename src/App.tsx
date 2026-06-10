@@ -1929,34 +1929,16 @@ export default function App() {
         
         setSheetsConfig(finalConfig);
 
-        // Direct Client-to-Sheets Real-Time Sync:
-        // If connected, fetch the live state directly from the Google Apps Script Web App url
-        if (finalConfig.isLinked && finalConfig.scriptUrl) {
-          const success = await pullDirectlyFromGoogleSheetsOnClient(finalConfig.scriptUrl);
-          // If direct Google Sheets fetch fails (e.g. rate limit / CORS delay / first load), fall back to server's db state
-          if (!success) {
-            setUsers(data.users || []);
-            setProducts(data.products || []);
-            setCustomers(data.customers || []);
-            setStockIn(data.stockIn || []);
-            setStockOut(data.stockOut || []);
-            setStockOpname(data.stockOpname || []);
-            setOrders(data.orders || []);
-            setShipping(data.shipping || []);
-            setActivityLog(data.activityLog || []);
-          }
-        } else {
-          // Sheets is not linked: standard local backend mode
-          setUsers(data.users || []);
-          setProducts(data.products || []);
-          setCustomers(data.customers || []);
-          setStockIn(data.stockIn || []);
-          setStockOut(data.stockOut || []);
-          setStockOpname(data.stockOpname || []);
-          setOrders(data.orders || []);
-          setShipping(data.shipping || []);
-          setActivityLog(data.activityLog || []);
-        }
+        // Always trust the local Express backend's data as the primary source of truth if it responds successfully
+        setUsers(data.users || []);
+        setProducts(data.products || []);
+        setCustomers(data.customers || []);
+        setStockIn(data.stockIn || []);
+        setStockOut(data.stockOut || []);
+        setStockOpname(data.stockOpname || []);
+        setOrders(data.orders || []);
+        setShipping(data.shipping || []);
+        setActivityLog(data.activityLog || []);
       }
     } catch (e) {
       console.warn("Failed to connect to backend REST database:", e);
@@ -3242,9 +3224,9 @@ export default function App() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {customers.map((c) => (
+                  {customers.map((c, idx) => (
                     <div 
-                      key={c.Customer_ID}
+                      key={`${c.Customer_ID}-${idx}`}
                       className="bg-white border border-pink-100 p-5 rounded-[24px] shadow-sm hover:border-pink-300 transition-all flex flex-col justify-between"
                     >
                       <div className="space-y-3">
@@ -3454,11 +3436,11 @@ export default function App() {
                                     );
                                   }
 
-                                  return filtered.map((p) => {
+                                  return filtered.map((p, idx) => {
                                     const isSelected = trxSku === p.SKU;
                                     return (
                                       <button
-                                        key={p.SKU}
+                                        key={`${p.SKU}-${idx}`}
                                         type="button"
                                         onClick={() => {
                                           setTrxSku(p.SKU);
@@ -3512,8 +3494,8 @@ export default function App() {
                           onChange={(e) => setTrxCustomer(e.target.value)}
                           className="w-full bg-white border border-pink-100 rounded-xl py-2 px-3 focus:outline-none"
                         >
-                          {customers.map((c) => (
-                            <option key={c.Customer_ID} value={c.Customer_Name}>{c.Customer_Name}</option>
+                          {customers.map((c, idx) => (
+                            <option key={`${c.Customer_ID}-${idx}`} value={c.Customer_Name}>{c.Customer_Name}</option>
                           ))}
                         </select>
                       </div>
@@ -4016,8 +3998,8 @@ export default function App() {
                           onChange={(e) => setOrdCustomer(e.target.value)}
                           className="w-full bg-white border border-pink-100 rounded-xl py-2 px-3 focus:outline-none"
                         >
-                          {customers.map((c) => (
-                            <option key={c.Customer_ID} value={c.Customer_Name}>
+                          {customers.map((c, idx) => (
+                            <option key={`${c.Customer_ID}-${idx}`} value={c.Customer_Name}>
                               {c.Customer_Name} ({c.Customer_Type})
                             </option>
                           ))}
@@ -4054,8 +4036,8 @@ export default function App() {
                             onChange={(e) => setOrdCategory(e.target.value)}
                             className="w-full bg-white border border-pink-100 rounded-xl py-2 px-3 focus:outline-none text-xs"
                           >
-                            {availableCategories.map((cat) => (
-                              <option key={cat} value={cat}>{cat}</option>
+                            {availableCategories.map((cat, idx) => (
+                              <option key={`${cat}-${idx}`} value={cat}>{cat}</option>
                             ))}
                           </select>
                         </div>
@@ -4068,8 +4050,8 @@ export default function App() {
                             onChange={(e) => setOrdVariant(e.target.value)}
                             className="w-full bg-white border border-pink-100 rounded-xl py-2 px-3 focus:outline-none text-xs"
                           >
-                            {availableVariants.map((v) => (
-                              <option key={v} value={v}>{v}</option>
+                            {availableVariants.map((v, idx) => (
+                              <option key={`${v}-${idx}`} value={v}>{v}</option>
                             ))}
                           </select>
                         </div>
@@ -4077,11 +4059,11 @@ export default function App() {
                         <div className="space-y-1">
                           <label className="font-bold text-gray-600 block uppercase">Pilihan Warna (Stok Ready)</label>
                           <div className="flex flex-wrap gap-1.5 py-1 max-h-24 overflow-y-auto">
-                            {availableColorPresets.map((colorObj) => {
+                            {availableColorPresets.map((colorObj, idx) => {
                               const isSelected = ordColor === colorObj.name;
                               return (
                                 <button
-                                  key={colorObj.name}
+                                  key={`${colorObj.name}-${idx}`}
                                   type="button"
                                   onClick={() => setOrdColor(colorObj.name)}
                                   className={`flex items-center gap-1 px-2 py-1 rounded-full border text-[10px] font-bold transition ${
@@ -4299,7 +4281,7 @@ export default function App() {
                                   else if (o.Channel === 'Distributor') channelClass = "bg-amber-50 text-amber-600 border border-amber-100";
 
                                   return (
-                                    <tr key={o.Order_Number || `order-${idxO}`} className="hover:bg-[#FFF8FB] text-gray-750 font-medium border-b border-pink-50/50 transition duration-150">
+                                    <tr key={`${o.Order_Number}-${idxO}`} className="hover:bg-[#FFF8FB] text-gray-750 font-medium border-b border-pink-50/50 transition duration-150">
                                       <td className="py-3 px-3 align-top min-w-[150px]">
                                         <strong className="text-gray-900 text-xs tracking-tight block font-extrabold cursor-pointer hover:underline hover:text-[#EC4899] transition" onClick={() => setActiveDetailOrderNum(o.Order_Number)}>
                                           {o.Order_Number}
@@ -4440,7 +4422,7 @@ export default function App() {
                               else if (o.Channel === 'Distributor') channelClass = "bg-amber-50 text-amber-600 border border-amber-100";
 
                               return (
-                                <div key={`mobile-${o.Order_Number || idxO}`} className="bg-white border border-pink-100 rounded-2xl p-4 space-y-3.5 shadow-sm hover:border-pink-300 transition duration-150">
+                                <div key={`mobile-${o.Order_Number}-${idxO}`} className="bg-white border border-pink-100 rounded-2xl p-4 space-y-3.5 shadow-sm hover:border-pink-300 transition duration-150">
                                   {/* Header: Order Number & Channel */}
                                   <div className="flex justify-between items-start">
                                     <div>
@@ -4611,7 +4593,7 @@ export default function App() {
                               }
                             });
                             return readyGrouped.map((o, idxRg) => (
-                              <option key={o.Order_Number || `rg-${idxRg}`} value={o.Order_Number}>
+                              <option key={`${o.Order_Number}-${idxRg}`} value={o.Order_Number}>
                                 [{o.Order_Number}] {o.Customer} ({o.Qty} Pcs)
                               </option>
                             ));
@@ -4835,10 +4817,10 @@ export default function App() {
                     <h4 className="font-bold text-xs uppercase tracking-wider text-gray-700">Penjualan per Channel Distribusi</h4>
                     
                     <div className="space-y-3">
-                      {categoryList.map((cat) => {
+                      {categoryList.map((cat, idx) => {
                         const count = products.filter(p => p.Category === cat).length;
                         return (
-                          <div key={cat} className="space-y-1 text-xs">
+                          <div key={`${cat}-${idx}`} className="space-y-1 text-xs">
                             <div className="flex justify-between items-center font-bold text-gray-700">
                               <span>{cat}</span>
                               <span className="font-mono text-gray-400">{count} SKU aktif</span>
@@ -4905,8 +4887,8 @@ export default function App() {
 
                 {/* User listings */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {users.map((u) => (
-                    <div key={u.User_ID} className="bg-white border border-pink-100 p-5 rounded-[24px] shadow-sm flex flex-col justify-between gap-4">
+                  {users.map((u, idx) => (
+                    <div key={`${u.User_ID}-${idx}`} className="bg-white border border-pink-100 p-5 rounded-[24px] shadow-sm flex flex-col justify-between gap-4">
                       <div className="space-y-4">
                         <div className="flex justify-between items-start">
                           <div>
@@ -4936,8 +4918,8 @@ export default function App() {
                             ) : !u.Permissions || u.Permissions.length === 0 ? (
                               <span className="text-[9px] bg-gray-100 text-gray-500 font-bold px-2 py-0.5 rounded-full border border-gray-200">Semua Akses (Staff Default)</span>
                             ) : (
-                              u.Permissions.map(p => (
-                                <span key={p} className="text-[9px] bg-pink-50 text-pink-600 font-bold px-1.5 py-0.5 rounded border border-pink-100">
+                              u.Permissions.map((p, idxP) => (
+                                <span key={`${p}-${idxP}`} className="text-[9px] bg-pink-50 text-pink-600 font-bold px-1.5 py-0.5 rounded border border-pink-100">
                                   {p === 'dashboard' ? 'Dashboard' :
                                    p === 'products' ? 'Catalog' :
                                    p === 'inventory' ? 'Stock Trx' :
@@ -5897,11 +5879,11 @@ export default function App() {
                         { id: 'reports', label: 'Reports (Finansial)' },
                         { id: 'customers', label: 'Customers (Pelanggan)' },
                         { id: 'settings', label: 'Sheets Connection' },
-                      ].map((mod) => {
+                      ].map((mod, idx) => {
                         const curPerms = editingUser.Permissions || ["dashboard", "products", "inventory", "opname", "orders", "shipping", "reports", "customers", "settings"];
                         const isChecked = curPerms.includes(mod.id);
                         return (
-                          <label key={mod.id} className="flex items-center gap-2 cursor-pointer text-[11px] text-gray-750 hover:text-black font-bold">
+                          <label key={`${mod.id}-${idx}`} className="flex items-center gap-2 cursor-pointer text-[11px] text-gray-750 hover:text-black font-bold">
                             <input
                               type="checkbox"
                               checked={isChecked}
