@@ -45,7 +45,7 @@
   ],
   "products": [
     {
-      "Product_ID": "PROD-003",
+      "Product_ID": "PROD-001",
       "SKU": "ALN-CSP-0001",
       "Barcode": "ALN-CSP-0001",
       "QR_Code": "ALN-CSP-0001",
@@ -61,7 +61,7 @@
       "Status": "Active"
     },
     {
-      "Product_ID": "PROD-004",
+      "Product_ID": "PROD-002",
       "SKU": "ALN-CRB-0001",
       "Barcode": "ALN-CRB-0001",
       "QR_Code": "ALN-CRB-0001",
@@ -72,7 +72,23 @@
       "Size": "Ekstra Jumbo",
       "Cost_Price": 0,
       "Selling_Price": 90000,
-      "Current_Stock": 133,
+      "Current_Stock": 131,
+      "Minimum_Stock": 10,
+      "Status": "Active"
+    },
+    {
+      "Product_ID": "PROD-003",
+      "SKU": "ALN-CEL-0001",
+      "Barcode": "ALN-CEL-0001",
+      "QR_Code": "ALN-CEL-0001",
+      "Product_Name": "CELAMIS REGULAR JUMBO (COKTU)",
+      "Category": "Celamis Regular",
+      "Variant": "Jumbo",
+      "Color": "Coktu",
+      "Size": "Jumbo",
+      "Cost_Price": 45000,
+      "Selling_Price": 90000,
+      "Current_Stock": 11,
       "Minimum_Stock": 10,
       "Status": "Active"
     }
@@ -123,6 +139,30 @@
   "stockOut": [],
   "stockOpname": [],
   "orders": [
+    {
+      "Order_Number": "ORD-20260610-0006",
+      "Order_Date": "2026-06-10T09:22:08.872Z",
+      "Customer": "Aisyah Marketer",
+      "Channel": "Marketer",
+      "SKU": "ALN-CEL-0001",
+      "Product": "CELAMIS REGULAR JUMBO (COKTU)",
+      "Qty": 2,
+      "Price": 75000,
+      "Total": 150000,
+      "Status": "New Order"
+    },
+    {
+      "Order_Number": "ORD-20260610-0006",
+      "Order_Date": "2026-06-10T09:22:08.872Z",
+      "Customer": "Aisyah Marketer",
+      "Channel": "Marketer",
+      "SKU": "ALN-CRB-0001",
+      "Product": "CELAMIS RIB EKSTRA JUMBO (COKTU)",
+      "Qty": 2,
+      "Price": 87500,
+      "Total": 175000,
+      "Status": "New Order"
+    },
     {
       "Order_Number": "ORD-20260610-0005",
       "Order_Date": "2026-06-10T09:14:09.600Z",
@@ -198,6 +238,42 @@
   ],
   "shipping": [],
   "activityLog": [
+    {
+      "Log_ID": "LOG-093016-955",
+      "User_Name": "Alina Owner",
+      "User_Role": "OWNER",
+      "Activity": "Created product SKU: ALN-KDS-0001",
+      "Module": "Product",
+      "Timestamp": "2026-06-10T09:34:53.016Z",
+      "Device": "Web Client"
+    },
+    {
+      "Log_ID": "LOG-749929-601",
+      "User_Name": "Alina Owner",
+      "User_Role": "OWNER",
+      "Activity": "Configured Google Sheets connection",
+      "Module": "System",
+      "Timestamp": "2026-06-10T09:29:09.929Z",
+      "Device": "Web Client"
+    },
+    {
+      "Log_ID": "LOG-333254-784",
+      "User_Name": "Alina Owner",
+      "User_Role": "OWNER",
+      "Activity": "Created sales order ORD-20260610-0006 with 2 items, channel: Marketer",
+      "Module": "OMS",
+      "Timestamp": "2026-06-10T09:22:13.254Z",
+      "Device": "Web Client"
+    },
+    {
+      "Log_ID": "LOG-274181-182",
+      "User_Name": "Alina Owner",
+      "User_Role": "OWNER",
+      "Activity": "Created product SKU: ALN-CEL-0001",
+      "Module": "Product",
+      "Timestamp": "2026-06-10T09:21:14.181Z",
+      "Device": "Web Client"
+    },
     {
       "Log_ID": "LOG-136199-223",
       "User_Name": "Alina Owner",

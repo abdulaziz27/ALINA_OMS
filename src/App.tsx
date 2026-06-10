@@ -1912,7 +1912,8 @@ export default function App() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                   ...finalConfig,
-                  user: { name: 'System Auto-Restore', role: 'OWNER' }
+                  user: { name: 'System Auto-Restore', role: 'OWNER' },
+                  isRestore: true
                 })
               }).catch(err => console.error("Auto-restore sheets config failed", err));
             } else if (serverConfig && serverConfig.isLinked && serverConfig.scriptUrl) {

@@ -343,6 +343,33 @@ function readDatabase() {
       }
     }
     
+    // Dedup Product_IDs to fix PROD-003 duplicates
+    if (parsed.products && Array.isArray(parsed.products)) {
+      const seenIds = new Set();
+      const duplicates: any[] = [];
+      let hasDups = false;
+      parsed.products.forEach((p: any) => {
+        if (!p.Product_ID || seenIds.has(p.Product_ID)) {
+          duplicates.push(p);
+          hasDups = true;
+        } else {
+          seenIds.add(p.Product_ID);
+        }
+      });
+      let nextId = 1;
+      duplicates.forEach((p: any) => {
+        while(seenIds.has(`PROD-${String(nextId).padStart(3, '0')}`)) {
+          nextId++;
+        }
+        p.Product_ID = `PROD-${String(nextId).padStart(3, '0')}`;
+        seenIds.add(p.Product_ID);
+      });
+      if (hasDups) {
+        fs.writeFileSync(DB_FILE, JSON.stringify(parsed, null, 2), 'utf8');
+        console.log("Auto-healed duplicate Product_IDs in db.json");
+      }
+    }
+    
     return parsed;
   } catch (error) {
     console.error("Failed to read database file:", error);
@@ -396,7 +423,11 @@ async function syncToGoogleSheets(db: any): Promise<boolean> {
       return false;
     }
   } catch (error) {
-    console.error("Failed to post sync to Google Sheets script:", error);
+    if (error && (error.cause?.code === 'ECONNRESET' || error.cause?.code === 'ENOTFOUND')) {
+      console.warn("Background push to Google Sheets skipped: Network unreachable.");
+    } else {
+      console.error("Failed to post sync to Google Sheets script:", error);
+    }
     pendingPush = true;
     return false;
   }
@@ -485,6 +516,24 @@ async function pullFromGoogleSheets(db: any, throwOnError: boolean = false): Pro
       }));
       
       if (validProducts.length > 0) {
+        // Enforce unique Product_IDs
+        const seenIds = new Set();
+        const duplicates: any[] = [];
+        validProducts.forEach((p: any) => {
+          if (!p.Product_ID || seenIds.has(p.Product_ID)) {
+            duplicates.push(p);
+          } else {
+            seenIds.add(p.Product_ID);
+          }
+        });
+        let nextId = 1;
+        duplicates.forEach((p: any) => {
+          while(seenIds.has(`PROD-${String(nextId).padStart(3, '0')}`)) {
+            nextId++;
+          }
+          p.Product_ID = `PROD-${String(nextId).padStart(3, '0')}`;
+          seenIds.add(p.Product_ID);
+        });
         db.products = validProducts;
         modified = true;
       } else {
@@ -613,7 +662,11 @@ async function pullFromGoogleSheets(db: any, throwOnError: boolean = false): Pro
     }
     return false;
   } catch (error) {
-    console.error("Failed to pull from Google Sheets:", error);
+    if (error && (error.cause?.code === 'ECONNRESET' || error.cause?.code === 'ENOTFOUND')) {
+      console.warn("Background pull from Google Sheets skipped: Network unreachable (ECONNRESET/ENOTFOUND).");
+    } else {
+      console.error("Failed to pull from Google Sheets:", error);
+    }
     if (throwOnError) {
       throw error;
     }
@@ -1324,8 +1377,9 @@ app.post('/api/shipping', async (req, res) => {
 
 // 9. CONFIGURATION & SHEET SYNCHRONIZATION
 app.post('/api/settings/sheets-config', async (req, res) => {
-  const { scriptUrl, spreadsheetId, autoSync, customLogoUrl, user } = req.body;
-  const db = await readAndPullDatabase();
+  const { scriptUrl, spreadsheetId, autoSync, customLogoUrl, user, isRestore } = req.body;
+  // Read local DB without pulling (since config isn't set yet or might be wrong)
+  const db = readDatabase();
   
   db.sheetsConfig = {
     scriptUrl: scriptUrl || "",
@@ -1335,17 +1389,28 @@ app.post('/api/settings/sheets-config', async (req, res) => {
     customLogoUrl: customLogoUrl || ""
   };
 
-  await saveDatabaseAndSync(db);
-  
-  // Instantly trigger an initial background pull to load pre-existing sheets database
+  // Save the new config locally FIRST
+  fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2), 'utf8');
+
+  // CRITICAL: We MUST PULL from Google Sheets first to avoid overwriting remote data 
+  // with our potentially empty/bundled local database (especially on Vercel cold starts).
   if (db.sheetsConfig.isLinked) {
-    pullFromGoogleSheets(db).then((pulled) => {
+    try {
+      console.log(`[Sync Engine] Fetching initial data from Google Sheets before any pushes...`);
+      const pulled = await pullFromGoogleSheets(db, true);
       if (pulled) {
-        console.log("Initial background pull complete: loaded pre-existing Google Sheets data");
+        console.log("Successfully loaded pre-existing Google Sheets data on link!");
       }
-    }).catch(err => {
-      console.error("Initial sheets-config background pull error:", err);
-    });
+      
+      // Only push back if this wasn't an auto-restore, and if autoSync is enabled
+      if (!isRestore && db.sheetsConfig.autoSync) {
+         const latestDb = readDatabase(); // get the newly pulled data
+         await syncToGoogleSheets(latestDb);
+      }
+      
+    } catch (err) {
+      console.error("Initial sheets-config pull error:", err);
+    }
   }
 
   appendAuditLog(user && user.name ? user.name : "System", user && user.role ? user.role : "ADMIN", `Configured Google Sheets connection`, 'System');
