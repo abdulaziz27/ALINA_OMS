@@ -352,6 +352,7 @@ function readDatabase() {
 
 // Lock to prevent stale pulls from Google Sheets
 let syncLockTimestamp = 0;
+let pendingPush = false;
 
 async function syncToGoogleSheets(db: any): Promise<boolean> {
   if (!db.sheetsConfig || !db.sheetsConfig.isLinked || !db.sheetsConfig.scriptUrl) {
@@ -387,19 +388,28 @@ async function syncToGoogleSheets(db: any): Promise<boolean> {
     
     if (response.ok) {
       console.log("Successfully synchronized with Google Sheets!");
+      pendingPush = false;
       return true;
     } else {
       console.error(`Failed to sync with Google Sheets, response status: ${response.status}`);
+      pendingPush = true;
       return false;
     }
   } catch (error) {
     console.error("Failed to post sync to Google Sheets script:", error);
+    pendingPush = true;
     return false;
   }
 }
 
 async function pullFromGoogleSheets(db: any, throwOnError: boolean = false): Promise<boolean> {
   if (!db.sheetsConfig || !db.sheetsConfig.isLinked || !db.sheetsConfig.scriptUrl) {
+    return false;
+  }
+  
+  if (pendingPush) {
+    console.log(`[Sync Engine] Pending local pushes exist. Aborting pull to prevent overwriting local data with stale remote data.`);
+    syncToGoogleSheets(db).catch(e => console.error("Retry background push failed:", e));
     return false;
   }
   

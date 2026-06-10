@@ -7,7 +7,7 @@
       "Password_Hash": "c570e667306851a91d3068d3daaeb637a292d2f2130b202345cff7f5d69b4bc2",
       "Role": "OWNER",
       "Status": "Active",
-      "Last_Login": "2026-06-10T01:52:52.656Z",
+      "Last_Login": "2026-06-10T09:18:23.059Z",
       "Created_Date": "2026-01-01T00:00:00Z",
       "Permissions": [
         "dashboard",
@@ -45,38 +45,6 @@
   ],
   "products": [
     {
-      "Product_ID": "PROD-001",
-      "SKU": "ALN-CEL-0001",
-      "Barcode": "ALN-CEL-0001",
-      "QR_Code": "ALN-CEL-0001",
-      "Product_Name": "CELAMIS REGULAR ALL SIZE (COKSU)",
-      "Category": "Celamis Regular",
-      "Variant": "All Size",
-      "Color": "Coksu",
-      "Size": "All Size",
-      "Cost_Price": 0,
-      "Selling_Price": 89000,
-      "Current_Stock": 0,
-      "Minimum_Stock": 10,
-      "Status": "Active"
-    },
-    {
-      "Product_ID": "PROD-002",
-      "SKU": "ALN-CEL-0002",
-      "Barcode": "ALN-CEL-0002",
-      "QR_Code": "ALN-CEL-0002",
-      "Product_Name": "CELAMIS REGULAR ALL SIZE (NAVY)",
-      "Category": "Celamis Regular",
-      "Variant": "All Size",
-      "Color": "Navy",
-      "Size": "All Size",
-      "Cost_Price": 0,
-      "Selling_Price": 123123,
-      "Current_Stock": 124,
-      "Minimum_Stock": 10,
-      "Status": "Active"
-    },
-    {
       "Product_ID": "PROD-003",
       "SKU": "ALN-CSP-0001",
       "Barcode": "ALN-CSP-0001",
@@ -88,7 +56,23 @@
       "Size": "All Size",
       "Cost_Price": 0,
       "Selling_Price": 90000,
-      "Current_Stock": 51,
+      "Current_Stock": 38,
+      "Minimum_Stock": 10,
+      "Status": "Active"
+    },
+    {
+      "Product_ID": "PROD-004",
+      "SKU": "ALN-CRB-0001",
+      "Barcode": "ALN-CRB-0001",
+      "QR_Code": "ALN-CRB-0001",
+      "Product_Name": "CELAMIS RIB EKSTRA JUMBO (COKTU)",
+      "Category": "Celamis Rib",
+      "Variant": "Ekstra Jumbo",
+      "Color": "Coktu",
+      "Size": "Ekstra Jumbo",
+      "Cost_Price": 0,
+      "Selling_Price": 90000,
+      "Current_Stock": 133,
       "Minimum_Stock": 10,
       "Status": "Active"
     }
@@ -140,6 +124,42 @@
   "stockOpname": [],
   "orders": [
     {
+      "Order_Number": "ORD-20260610-0005",
+      "Order_Date": "2026-06-10T09:14:09.600Z",
+      "Customer": "Shopee Mall Order",
+      "Channel": "Shopee",
+      "SKU": "ALN-CSP-0001",
+      "Product": "CELAMIS SHORT PANTS ALL SIZE (HIJAU MINT)",
+      "Qty": 13,
+      "Price": 85000,
+      "Total": 1105000,
+      "Status": "New Order"
+    },
+    {
+      "Order_Number": "ORD-20260610-0005",
+      "Order_Date": "2026-06-10T09:14:09.601Z",
+      "Customer": "Shopee Mall Order",
+      "Channel": "Shopee",
+      "SKU": "ALN-CEL-0002",
+      "Product": "CELAMIS REGULAR ALL SIZE (NAVY)",
+      "Qty": 1,
+      "Price": 85000,
+      "Total": 85000,
+      "Status": "New Order"
+    },
+    {
+      "Order_Number": "ORD-20260610-0004",
+      "Order_Date": "2026-06-10T08:42:49.244Z",
+      "Customer": "Aisyah Marketer",
+      "Channel": "Marketer",
+      "SKU": "ALN-CEL-0002",
+      "Product": "CELAMIS REGULAR ALL SIZE (NAVY)",
+      "Qty": 13,
+      "Price": 57500,
+      "Total": 747500,
+      "Status": "New Order"
+    },
+    {
       "Order_Number": "ORD-20260610-0003",
       "Order_Date": "2026-06-10T08:13:31.459Z",
       "Customer": "Test Customer",
@@ -178,6 +198,69 @@
   ],
   "shipping": [],
   "activityLog": [
+    {
+      "Log_ID": "LOG-136199-223",
+      "User_Name": "Alina Owner",
+      "User_Role": "OWNER",
+      "Activity": "Deleted product SKU: ALN-CEL-0002",
+      "Module": "Product",
+      "Timestamp": "2026-06-10T09:18:56.199Z",
+      "Device": "Web Client"
+    },
+    {
+      "Log_ID": "LOG-126612-640",
+      "User_Name": "Alina Owner",
+      "User_Role": "OWNER",
+      "Activity": "Deleted product SKU: ALN-CEL-0001",
+      "Module": "Product",
+      "Timestamp": "2026-06-10T09:18:46.612Z",
+      "Device": "Web Client"
+    },
+    {
+      "Log_ID": "LOG-103060-262",
+      "User_Name": "Alina Owner",
+      "User_Role": "OWNER",
+      "Activity": "Logged in successfully",
+      "Module": "Security",
+      "Timestamp": "2026-06-10T09:18:23.060Z",
+      "Device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"
+    },
+    {
+      "Log_ID": "LOG-088236-309",
+      "User_Name": "Admin Operasional",
+      "User_Role": "ADMIN",
+      "Activity": "Logged out",
+      "Module": "Security",
+      "Timestamp": "2026-06-10T09:18:08.236Z",
+      "Device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"
+    },
+    {
+      "Log_ID": "LOG-914434-660",
+      "User_Name": "Admin Operasional",
+      "User_Role": "ADMIN",
+      "Activity": "Created product SKU: ALN-CRB-0001",
+      "Module": "Product",
+      "Timestamp": "2026-06-10T09:15:14.434Z",
+      "Device": "Web Client"
+    },
+    {
+      "Log_ID": "LOG-854351-700",
+      "User_Name": "Admin Operasional",
+      "User_Role": "ADMIN",
+      "Activity": "Created sales order ORD-20260610-0005 with 2 items, channel: Shopee",
+      "Module": "OMS",
+      "Timestamp": "2026-06-10T09:14:14.351Z",
+      "Device": "Web Client"
+    },
+    {
+      "Log_ID": "LOG-972612-501",
+      "User_Name": "Admin Operasional",
+      "User_Role": "ADMIN",
+      "Activity": "Created sales order ORD-20260610-0004 with 1 items, channel: Marketer",
+      "Module": "OMS",
+      "Timestamp": "2026-06-10T08:42:52.612Z",
+      "Device": "Web Client"
+    },
     {
       "Log_ID": "LOG-214301-443",
       "User_Name": "System",
