@@ -203,10 +203,10 @@ export default function ProductForm({
   const [variant, setVariant] = useState('');
   const [color, setColor] = useState('');
   const [size, setSize] = useState('All Size');
-  const [costPrice, setCostPrice] = useState(0);
-  const [sellingPrice, setSellingPrice] = useState(0);
-  const [minStock, setMinStock] = useState(10);
-  const [currentStock, setCurrentStock] = useState(0);
+  const [costPrice, setCostPrice] = useState<number | string>('');
+  const [sellingPrice, setSellingPrice] = useState<number | string>('');
+  const [minStock, setMinStock] = useState<number | string>(10);
+  const [currentStock, setCurrentStock] = useState<number | string>('');
   const [status, setStatus] = useState<'Active' | 'Discontinued'>('Active');
   
   // Notification State
@@ -275,10 +275,10 @@ export default function ProductForm({
     setProdName('CELAMIS REGULAR ALL SIZE (HITAM)');
     setCategory('Celamis Regular');
     setColor('Hitam');
-    setCostPrice(20000);
-    setSellingPrice(40000);
+    setCostPrice('');
+    setSellingPrice('');
     setMinStock(10);
-    setCurrentStock(0);
+    setCurrentStock('');
     setStatus('Active');
   };
 
@@ -332,10 +332,10 @@ export default function ProductForm({
 
     const success = await onSaveProduct(payload, isCreatingNew, selectedProduct?.Product_ID);
     if (success) {
-      triggerNotif('success', isCreatingNew ? 'Produk berhasil dibuat' : 'Produk berhasil diperbarui');
       handleCloseModal();
+      alert('Data sudah tersimpan');
     } else {
-      triggerNotif('error', 'Gagal menyimpan produk. SKU mungkin sudah terdaftar.');
+      alert('Gagal menyimpan produk. SKU mungkin sudah terdaftar.');
     }
   };
 
@@ -582,11 +582,11 @@ export default function ProductForm({
               </tr>
             </thead>
             <tbody className="divide-y divide-pink-50/50">
-              {filteredProducts.map((p) => {
+              {filteredProducts.map((p, idx) => {
                 const urgent = p.Current_Stock <= p.Minimum_Stock;
                 return (
                   <tr 
-                    key={p.Product_ID}
+                    key={p.Product_ID || p.SKU || `prod-${idx}`}
                     onClick={() => handleSelectProduct(p)}
                     className={`hover:bg-[#FFF8FB] transition-colors cursor-pointer ${
                       selectedProduct?.Product_ID === p.Product_ID ? 'bg-pink-50/70 font-semibold shadow-inner' : ''
@@ -648,11 +648,11 @@ export default function ProductForm({
 
         {/* Mobile View: High Quality Cards (eliminates horizontal overflow) */}
         <div className="grid grid-cols-1 gap-3.5 md:hidden max-h-[550px] overflow-y-auto pr-1">
-          {filteredProducts.map((p) => {
+          {filteredProducts.map((p, idx) => {
             const urgent = p.Current_Stock <= p.Minimum_Stock;
             return (
               <div 
-                key={p.Product_ID}
+                key={p.Product_ID || p.SKU || `prod-mobile-${idx}`}
                 onClick={() => handleSelectProduct(p)}
                 className={`bg-white border rounded-2xl p-4.5 transition-all text-left flex flex-col gap-3.5 relative shadow-sm cursor-pointer ${
                   selectedProduct?.Product_ID === p.Product_ID 
@@ -876,7 +876,7 @@ export default function ProductForm({
                         required
                         disabled={currentUser?.Role !== 'OWNER'}
                         value={costPrice}
-                        onChange={(e) => setCostPrice(Math.max(0, Number(e.target.value)))}
+                        onChange={(e) => setCostPrice(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                         className="w-full bg-white border border-pink-100 rounded-xl py-2 px-3 focus:outline-none font-mono text-gray-800 text-xs disabled:bg-gray-100 disabled:text-gray-400"
                       />
                     </div>
@@ -887,7 +887,7 @@ export default function ProductForm({
                       type="number"
                       required
                       value={sellingPrice}
-                      onChange={(e) => setSellingPrice(Math.max(0, Number(e.target.value)))}
+                      onChange={(e) => setSellingPrice(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                       className="w-full bg-white border border-pink-100 rounded-xl py-2 px-3 focus:outline-none font-mono text-gray-900 font-bold text-xs focus:border-pink-500"
                     />
                   </div>
@@ -903,7 +903,7 @@ export default function ProductForm({
                     required
                     disabled={!isCreatingNew} // WMS rules dictate modifications through Stock-In / Opname
                     value={currentStock}
-                    onChange={(e) => setCurrentStock(Math.max(0, Number(e.target.value)))}
+                    onChange={(e) => setCurrentStock(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                     className="w-full bg-white disabled:bg-pink-100/30 border border-pink-100 rounded-xl py-2 px-3 focus:outline-none text-xs focus:border-pink-500"
                   />
                 </div>
@@ -928,7 +928,7 @@ export default function ProductForm({
                     type="number"
                     required
                     value={minStock}
-                    onChange={(e) => setMinStock(Math.max(0, Number(e.target.value)))}
+                    onChange={(e) => setMinStock(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                     className="w-32 bg-white border border-amber-200 rounded-xl py-2 px-3 focus:outline-none text-xs focus:border-amber-500 font-mono text-gray-800"
                   />
                   <p className="text-[10px] text-amber-800 leading-relaxed">

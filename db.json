@@ -1,0 +1,199 @@
+{
+  "users": [
+    {
+      "User_ID": "USR-001",
+      "Full_Name": "Alina Owner",
+      "Email": "owner@alina.com",
+      "Password_Hash": "c570e667306851a91d3068d3daaeb637a292d2f2130b202345cff7f5d69b4bc2",
+      "Role": "OWNER",
+      "Status": "Active",
+      "Last_Login": "2026-06-10T01:52:52.656Z",
+      "Created_Date": "2026-01-01T00:00:00Z",
+      "Permissions": [
+        "dashboard",
+        "products",
+        "inventory",
+        "opname",
+        "orders",
+        "shipping",
+        "reports",
+        "customers",
+        "settings"
+      ]
+    },
+    {
+      "User_ID": "USR-002",
+      "Full_Name": "Admin Operasional",
+      "Email": "admin@alina.com",
+      "Password_Hash": "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9",
+      "Role": "ADMIN",
+      "Status": "Active",
+      "Last_Login": "2026-06-10T03:48:59.195Z",
+      "Created_Date": "2026-01-02T00:00:00Z",
+      "Permissions": [
+        "dashboard",
+        "products",
+        "inventory",
+        "opname",
+        "orders",
+        "shipping",
+        "reports",
+        "customers",
+        "settings"
+      ]
+    }
+  ],
+  "products": [
+    {
+      "Product_ID": "PROD-001",
+      "SKU": "ALN-CEL-0001",
+      "Barcode": "ALN-CEL-0001",
+      "QR_Code": "ALN-CEL-0001",
+      "Product_Name": "CELAMIS REGULAR ALL SIZE (COKSU)",
+      "Category": "Celamis Regular",
+      "Variant": "All Size",
+      "Color": "Coksu",
+      "Size": "All Size",
+      "Cost_Price": 0,
+      "Selling_Price": 89000,
+      "Current_Stock": 14,
+      "Minimum_Stock": 10,
+      "Status": "Active"
+    },
+    {
+      "Product_ID": "PROD-002",
+      "SKU": "TEST-001",
+      "Barcode": "TEST-001",
+      "QR_Code": "TEST-001",
+      "Product_Name": "TEST DATA",
+      "Category": "A",
+      "Variant": "B",
+      "Color": "C",
+      "Size": "D",
+      "Cost_Price": 1000,
+      "Selling_Price": 2000,
+      "Current_Stock": 5,
+      "Minimum_Stock": 2,
+      "Status": "Active"
+    }
+  ],
+  "customers": [
+    {
+      "Customer_ID": "CUST-001",
+      "Customer_Name": "Rania Hijab Store",
+      "Customer_Type": "Reseller",
+      "Phone": 81234567890,
+      "Email": "rania@gmail.com",
+      "Address": "Kebayoran Baru No 12",
+      "City": "Jakarta Selatan",
+      "Status": "Active"
+    },
+    {
+      "Customer_ID": "CUST-002",
+      "Customer_Name": "Zahra Agen Busana",
+      "Customer_Type": "Agen",
+      "Phone": 82345678901,
+      "Email": "zahra.agen@yahoo.com",
+      "Address": "Ahmad Yani No. 99",
+      "City": "Bandung",
+      "Status": "Active"
+    },
+    {
+      "Customer_ID": "CUST-003",
+      "Customer_Name": "Aisyah Marketer",
+      "Customer_Type": "Marketer",
+      "Phone": 83456789012,
+      "Email": "aisyah_market@gmail.com",
+      "Address": "Kaliurang KM 7",
+      "City": "Yogyakarta",
+      "Status": "Active"
+    },
+    {
+      "Customer_ID": "CUST-004",
+      "Customer_Name": "Shopee Mall Order",
+      "Customer_Type": "Shopee",
+      "Phone": 8999999999,
+      "Email": "shopee@alina.com",
+      "Address": "Gudang Transit Shopee",
+      "City": "Jakarta Barat",
+      "Status": "Active"
+    }
+  ],
+  "stockIn": [],
+  "stockOut": [],
+  "stockOpname": [],
+  "orders": [],
+  "shipping": [],
+  "activityLog": [
+    {
+      "Log_ID": "LOG-404683-361",
+      "User_Name": "System",
+      "User_Role": "OWNER",
+      "Activity": "Created product SKU: TEST-001",
+      "Module": "Product",
+      "Timestamp": "2026-06-10T06:53:24.683Z",
+      "Device": "Web Client"
+    },
+    {
+      "Log_ID": "LOG-898621-390",
+      "User_Name": "Admin Operasional",
+      "User_Role": "ADMIN",
+      "Activity": "Created product SKU: ALN-CEL-0001",
+      "Module": "Product",
+      "Timestamp": "2026-06-10T06:44:58.621Z",
+      "Device": "Web Client"
+    },
+    {
+      "Log_ID": "LOG-869662-585",
+      "User_Name": "Admin Operasional",
+      "User_Role": "ADMIN",
+      "Activity": "Created product SKU: ALN-CEL-0001",
+      "Module": "Product",
+      "Timestamp": "2026-06-10T06:44:29.662Z",
+      "Device": "Web Client"
+    },
+    {
+      "Log_ID": "LOG-467932-929",
+      "User_Name": "Admin Operasional",
+      "User_Role": "ADMIN",
+      "Activity": "Created product SKU: ALN-CRB-0001",
+      "Module": "Product",
+      "Timestamp": "2026-06-10T06:37:47.932Z",
+      "Device": "Web Client"
+    },
+    {
+      "Log_ID": "LOG-405379-730",
+      "User_Name": "Admin Operasional",
+      "User_Role": "ADMIN",
+      "Activity": "Created product SKU: ALN-CEL-0002",
+      "Module": "Product",
+      "Timestamp": "2026-06-10T05:30:05.379Z",
+      "Device": "Web Client"
+    },
+    {
+      "Log_ID": "LOG-404043-487",
+      "User_Name": "Admin Operasional",
+      "User_Role": "ADMIN",
+      "Activity": "Created product SKU: ALN-CEL-0002",
+      "Module": "Product",
+      "Timestamp": "2026-06-10T05:30:04.043Z",
+      "Device": "Web Client"
+    },
+    {
+      "Log_ID": "LOG-392359-451",
+      "User_Name": "Admin Operasional",
+      "User_Role": "ADMIN",
+      "Activity": "Created product SKU: ALN-CEL-0001",
+      "Module": "Product",
+      "Timestamp": "2026-06-10T05:29:52.359Z",
+      "Device": "Web Client"
+    }
+  ],
+  "sheetsConfig": {
+    "scriptUrl": "https://script.google.com/macros/s/AKfycbzB0m5Ptya4PyhEc9oGPgKayVKP-W-uMIIfc1L6bMz3kuG0lf1t8INYrJ4z2q2aKuwqJg/exec",
+    "spreadsheetId": "AKfycbzB0m5Ptya4PyhEc9oGPgKayVKP-W-uMIIfc1L6bMz3kuG0lf1t8INYrJ4z2q2aKuwqJg",
+    "isLinked": true,
+    "autoSync": true,
+    "customLogoUrl": ""
+  }
+}

@@ -2653,13 +2653,17 @@ export default function App() {
         })
       });
 
+      const data = await res.json().catch(() => ({}));
       if (res.ok) {
-        const data = await res.json();
         await fetchDatabaseState();
         return { success: true, message: data.message };
+      } else {
+        return { success: false, message: data.error || "Gagal menyinkronkan data dengan Google Sheets." };
       }
-    } catch (e) {}
-    return { success: false, message: "Server connection failed." };
+    } catch (e) {
+      console.error(e);
+      return { success: false, message: "Koneksi ke server backend gagal atau tidak merespons." };
+    }
   };
 
   // User Administration Save (Owner)
@@ -3159,8 +3163,8 @@ export default function App() {
                     </h4>
                     
                     <div className="divide-y divide-pink-50 max-h-56 overflow-y-auto">
-                      {products.filter(p => p.Current_Stock <= p.Minimum_Stock).map(p => (
-                        <div key={p.SKU} className="py-2.5 flex justify-between items-center text-xs">
+                      {products.filter(p => p.Current_Stock <= p.Minimum_Stock).map((p, pIdx) => (
+                        <div key={p.SKU || `warn-prod-${pIdx}`} className="py-2.5 flex justify-between items-center text-xs">
                           <div>
                             <p className="font-bold text-gray-900">{p.Product_Name}</p>
                             <p className="text-[10px] font-mono text-gray-400">SKU: {p.SKU} | Kategori: {p.Category}</p>
@@ -3672,8 +3676,8 @@ export default function App() {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-pink-50/50">
-                        {stockIn.map((item) => (
-                          <tr key={item.Transaction_ID} className="hover:bg-[#FFF8FB] text-gray-700">
+                        {stockIn.map((item, idxx) => (
+                          <tr key={item.Transaction_ID || `stkin-${idxx}`} className="hover:bg-[#FFF8FB] text-gray-700">
                             <td className="py-2.5 px-1 font-mono text-[9px] text-[#EC4899]">
                               <strong>{item.Transaction_ID}</strong>
                               <div>{new Date(item.Date).toLocaleDateString()}</div>
@@ -3719,8 +3723,8 @@ export default function App() {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-pink-50/50">
-                        {stockOut.map((item) => (
-                          <tr key={item.Transaction_ID} className="hover:bg-[#FFF8FB] text-gray-700">
+                        {stockOut.map((item, idxx) => (
+                          <tr key={item.Transaction_ID || `stkout-${idxx}`} className="hover:bg-[#FFF8FB] text-gray-700">
                             <td className="py-2.5 px-1 font-mono text-[9px] text-red-500">
                               <strong>{item.Transaction_ID}</strong>
                               <div>{new Date(item.Date).toLocaleDateString()}</div>
@@ -3808,7 +3812,7 @@ export default function App() {
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-pink-50/50">
-                          {products.map((p) => {
+                          {products.map((p, idxP) => {
                             const userVal = opnameQuantities[p.SKU] !== undefined ? opnameQuantities[p.SKU] : '';
                             
                             // Check if historically did opname for this Month
@@ -3837,7 +3841,7 @@ export default function App() {
                             }
 
                             return (
-                              <tr key={p.SKU} className="hover:bg-[#FFF8FB] text-gray-750 font-medium">
+                              <tr key={p.SKU || `opn-${idxP}`} className="hover:bg-[#FFF8FB] text-gray-750 font-medium">
                                 <td className="py-3 px-2">
                                   <div className="font-bold text-gray-900">{p.Product_Name}</div>
                                   <div className="text-[10px] font-mono text-[#EC4899]">{p.SKU}</div>
@@ -3890,7 +3894,7 @@ export default function App() {
 
                     {/* 2. MOBILE VIEW: CARDS THAT DO NOT STRETCH OR NEED SCROLLING */}
                     <div className="block md:hidden space-y-4">
-                      {products.map((p) => {
+                      {products.map((p, idxP) => {
                         const userVal = opnameQuantities[p.SKU] !== undefined ? opnameQuantities[p.SKU] : '';
                         
                         // Check if historically did opname for this Month
@@ -3919,7 +3923,7 @@ export default function App() {
                         }
 
                         return (
-                          <div key={p.SKU} className="bg-white border border-pink-100 rounded-2xl p-4 space-y-3.5 shadow-sm hover:border-pink-300 transition duration-150 text-xs">
+                          <div key={`mobile-opname-${p.SKU || idxP}`} className="bg-white border border-pink-100 rounded-2xl p-4 space-y-3.5 shadow-sm hover:border-pink-300 transition duration-150 text-xs">
                             {/* Product Info */}
                             <div>
                               <div className="font-extrabold text-[#111827] text-sm leading-tight">{p.Product_Name}</div>
@@ -4274,7 +4278,7 @@ export default function App() {
                                 </tr>
                               </thead>
                               <tbody className="divide-y divide-pink-50/50">
-                                {sortedGrouped.map((o) => {
+                                {sortedGrouped.map((o, idxO) => {
                                   // Visual status pill classes
                                   let statClass = "bg-gray-100 text-gray-700";
                                   if (o.Status === 'New Order') statClass = "bg-amber-100 text-amber-700 font-extrabold pb-0.5 px-2.5 rounded-full";
@@ -4295,7 +4299,7 @@ export default function App() {
                                   else if (o.Channel === 'Distributor') channelClass = "bg-amber-50 text-amber-600 border border-amber-100";
 
                                   return (
-                                    <tr key={o.Order_Number} className="hover:bg-[#FFF8FB] text-gray-750 font-medium border-b border-pink-50/50 transition duration-150">
+                                    <tr key={o.Order_Number || `order-${idxO}`} className="hover:bg-[#FFF8FB] text-gray-750 font-medium border-b border-pink-50/50 transition duration-150">
                                       <td className="py-3 px-3 align-top min-w-[150px]">
                                         <strong className="text-gray-900 text-xs tracking-tight block font-extrabold cursor-pointer hover:underline hover:text-[#EC4899] transition" onClick={() => setActiveDetailOrderNum(o.Order_Number)}>
                                           {o.Order_Number}
@@ -4415,7 +4419,7 @@ export default function App() {
 
                           {/* 2. MOBILE VIEW: FULLY RESPONSIVE AND STACKED CARD ELEMENTS (NO SIDEWAYS SCROLL) */}
                           <div className="block md:hidden space-y-3">
-                            {sortedGrouped.map((o) => {
+                            {sortedGrouped.map((o, idxO) => {
                               // Visual status pill classes
                               let statClass = "bg-gray-100 text-gray-700";
                               if (o.Status === 'New Order') statClass = "bg-amber-100 text-amber-700 font-extrabold px-2.5 py-0.5 rounded-full text-[9px]";
@@ -4436,7 +4440,7 @@ export default function App() {
                               else if (o.Channel === 'Distributor') channelClass = "bg-amber-50 text-amber-600 border border-amber-100";
 
                               return (
-                                <div key={o.Order_Number} className="bg-white border border-pink-100 rounded-2xl p-4 space-y-3.5 shadow-sm hover:border-pink-300 transition duration-150">
+                                <div key={`mobile-${o.Order_Number || idxO}`} className="bg-white border border-pink-100 rounded-2xl p-4 space-y-3.5 shadow-sm hover:border-pink-300 transition duration-150">
                                   {/* Header: Order Number & Channel */}
                                   <div className="flex justify-between items-start">
                                     <div>
@@ -4590,11 +4594,28 @@ export default function App() {
                           className="w-full bg-white border border-pink-100 rounded-xl py-2 px-3 focus:outline-none focus:border-pink-500"
                         >
                           <option value="">-- PILIH ORDER NOMOR --</option>
-                          {orders.filter(o => o.Status === 'Ready To Ship').map((o) => (
-                            <option key={o.Order_Number} value={o.Order_Number}>
-                              [{o.Order_Number}] {o.Customer} ({o.Qty} pcs)
-                            </option>
-                          ))}
+                          {(() => {
+                            const seen = new Set();
+                            const readyGrouped: { Order_Number: string; Customer: string; Qty: number }[] = [];
+                            orders.filter(o => o.Status === 'Ready To Ship').forEach(o => {
+                              if (!seen.has(o.Order_Number)) {
+                                seen.add(o.Order_Number);
+                                const totalQty = orders
+                                  .filter(item => item.Order_Number === o.Order_Number)
+                                  .reduce((sum, item) => sum + item.Qty, 0);
+                                readyGrouped.push({
+                                  Order_Number: o.Order_Number,
+                                  Customer: o.Customer,
+                                  Qty: totalQty
+                                });
+                              }
+                            });
+                            return readyGrouped.map((o, idxRg) => (
+                              <option key={o.Order_Number || `rg-${idxRg}`} value={o.Order_Number}>
+                                [{o.Order_Number}] {o.Customer} ({o.Qty} Pcs)
+                              </option>
+                            ));
+                          })()}
                         </select>
                       </div>
 
@@ -4659,8 +4680,8 @@ export default function App() {
                       {shipping.length === 0 ? (
                         <div className="text-center py-8 text-gray-400 text-xs">Belum ada pengiriman aktif.</div>
                       ) : (
-                        shipping.map((s) => (
-                          <div key={s.Order_Number} className="bg-white border border-pink-50 rounded-2xl p-4 hover:shadow-sm transition space-y-2.5 text-xs text-[#111827]">
+                        shipping.map((s, idx) => (
+                          <div key={`${s.Tracking_Number || s.Order_Number}-${idx}`} className="bg-white border border-pink-50 rounded-2xl p-4 hover:shadow-sm transition space-y-2.5 text-xs text-[#111827]">
                             <div className="flex justify-between items-start gap-2">
                               <div>
                                 <span className="font-mono text-xs font-bold text-[#EC4899] block">
@@ -4766,9 +4787,9 @@ export default function App() {
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {restockForecastList.map((itm) => (
+                    {restockForecastList.map((itm, idx) => (
                       <div 
-                        key={itm.sku}
+                        key={`${itm.sku}-${idx}`}
                         className="bg-gradient-to-tr from-[#FFF8FB] to-white border-l-4 border-[#EC4899] p-4 rounded-r-2xl shadow-sm space-y-3"
                       >
                         <div className="flex justify-between items-start">
@@ -4836,8 +4857,8 @@ export default function App() {
                     <h4 className="font-bold text-xs uppercase tracking-wider text-gray-700">SISTEM AUDIT ACTIVITY LOG</h4>
                     
                     <div className="divide-y divide-gray-50 max-h-60 overflow-y-auto font-mono text-[9px] text-gray-500 pr-1">
-                      {activityLog.map((log) => (
-                        <div key={log.Log_ID} className="py-2 space-y-0.5">
+                      {activityLog.map((log, idx) => (
+                        <div key={`${log.Log_ID || 'audit'}-${idx}`} className="py-2 space-y-0.5">
                           <div className="flex justify-between text-gray-900 font-bold">
                             <span>[{log.Module}] {log.User_Name} ({log.User_Role})</span>
                             <span className="text-gray-400">{new Date(log.Timestamp).toLocaleTimeString()}</span>
@@ -5381,9 +5402,11 @@ export default function App() {
         const totalQty = relatedItems.reduce((acc, item) => acc + item.Qty, 0);
         
         // Find activity logs mentioning this order number
-        const logs = activityLog.filter(log => 
-          log.Message.toLowerCase().includes(activeDetailOrderNum.toLowerCase())
-        );
+        const logs = activityLog.filter(log => {
+          const detailStr = activeDetailOrderNum.toLowerCase();
+          const activityStr = (log.Activity || "").toLowerCase();
+          return activityStr.includes(detailStr);
+        });
 
         let statClass = "bg-gray-100 text-gray-700";
         if (rep.Status === 'New Order') statClass = "bg-amber-100 text-amber-700 font-bold px-2 py-0.5 rounded";
@@ -5493,14 +5516,14 @@ export default function App() {
                     <p className="text-gray-400 italic text-[10px]">Belum ada catatan aktivitas untuk pesanan ini.</p>
                   ) : (
                     <div className="border-l border-pink-100 pl-3.5 space-y-3 py-1 text-left">
-                      {logs.map((log) => (
-                        <div key={log.Log_ID} className="relative">
+                      {logs.map((log, idx) => (
+                        <div key={`${log.Log_ID || 'detail-log'}-${idx}`} className="relative">
                           <div className="absolute -left-[19.5px] top-1 w-2 h-2 rounded-full bg-[#EC4899] ring-4 ring-pink-50" />
                           <span className="text-[9px] font-mono font-bold bg-[#FFF3F8] text-[#EC4899] px-1.5 py-0.5 rounded inline-block mb-1">
-                            {log.Source} | {new Date(log.Timestamp).toLocaleString()}
+                            {log.Module || 'WMS'} | {new Date(log.Timestamp).toLocaleString('id-ID')}
                           </span>
-                          <p className="text-gray-800 text-[11px] font-semibold">{log.Message}</p>
-                          <span className="text-[9px] text-gray-400 font-medium">Petugas: {log.Operator} ({log.Role})</span>
+                          <p className="text-gray-800 text-[11px] font-semibold">{log.Activity}</p>
+                          <span className="text-[9px] text-gray-400 font-medium">Petugas: {log.User_Name} ({log.User_Role})</span>
                         </div>
                       ))}
                     </div>

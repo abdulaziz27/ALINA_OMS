@@ -33,6 +33,7 @@ export default function SheetsLinker({
   
   const [loading, setLoading] = useState(false);
   const [syncResponse, setSyncResponse] = useState<string | null>(null);
+  const [syncError, setSyncError] = useState<boolean>(false);
   const [copied, setCopied] = useState(false);
 
   const googleAppsScriptCode = `/**
@@ -113,12 +114,20 @@ function writeTableDirect(ss, sheetName, list) {
     var row = [];
     for (var j = 0; j < headers.length; j++) {
       var val = item[headers[j]];
-      row.push(typeof val === 'object' ? JSON.stringify(val) : val);
+      if (val === undefined || val === null) {
+        val = "";
+      } else if (typeof val === 'object') {
+        val = JSON.stringify(val);
+      }
+      row.push(val);
     }
     values.push(row);
   }
   
-  sheet.getRange(2, 1, values.length, headers.length).setValues(values);
+  if (values.length > 0) {
+    sheet.getRange(2, 1, values.length, headers.length).setValues(values);
+  }
+  SpreadsheetApp.flush();
 }`;
 
   const handleCopyCode = () => {
@@ -143,6 +152,7 @@ function writeTableDirect(ss, sheetName, list) {
     if (success) {
       setShowSuccessModal(true);
       setSyncResponse("Koneksi Google Sheets berhasil dihubungkan! Setiap transaksi/update sistem akan disinkronisasikan otomatis.");
+      setSyncError(false);
     }
   };
 
@@ -151,6 +161,7 @@ function writeTableDirect(ss, sheetName, list) {
     const res = await onTriggerSync();
     setLoading(false);
     setSyncResponse(res.message);
+    setSyncError(!res.success);
   };
 
   return (
@@ -249,8 +260,12 @@ function writeTableDirect(ss, sheetName, list) {
           </form>
 
           {syncResponse && (
-            <div className="p-4 bg-pink-50 border border-pink-100 text-[#EC4899] font-medium rounded-2xl text-[11px] leading-relaxed">
-              🎉 {syncResponse}
+            <div className={`p-4 rounded-2xl text-[11px] leading-relaxed transition ${
+              syncError 
+                ? 'bg-rose-50 border border-rose-100 text-rose-600 font-bold' 
+                : 'bg-emerald-50 border border-emerald-100 text-emerald-800 font-medium'
+            }`}>
+              {syncError ? '⚠️ Gagal: ' : '🎉 Sukses: '} {syncResponse}
             </div>
           )}
         </div>

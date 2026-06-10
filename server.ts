@@ -350,6 +350,9 @@ function readDatabase() {
   }
 }
 
+// Lock to prevent stale pulls from Google Sheets
+let syncLockTimestamp = 0;
+
 async function syncToGoogleSheets(db: any): Promise<boolean> {
   if (!db.sheetsConfig || !db.sheetsConfig.isLinked || !db.sheetsConfig.scriptUrl) {
     return false;
@@ -379,6 +382,9 @@ async function syncToGoogleSheets(db: any): Promise<boolean> {
       body: JSON.stringify(payload)
     });
     
+    // Update the lock immediately after the push completes
+    syncLockTimestamp = Date.now();
+    
     if (response.ok) {
       console.log("Successfully synchronized with Google Sheets!");
       return true;
@@ -392,19 +398,49 @@ async function syncToGoogleSheets(db: any): Promise<boolean> {
   }
 }
 
-async function pullFromGoogleSheets(db: any): Promise<boolean> {
+async function pullFromGoogleSheets(db: any, throwOnError: boolean = false): Promise<boolean> {
   if (!db.sheetsConfig || !db.sheetsConfig.isLinked || !db.sheetsConfig.scriptUrl) {
     return false;
   }
+  
+  // Capture pull start time to detect if a push happened while this was running or queued
+  const pullStartTime = Date.now();
+  
   try {
-    const url = `${db.sheetsConfig.scriptUrl}?action=readAll`;
+    const url = `${db.sheetsConfig.scriptUrl}?action=readAll&t=${Date.now()}`;
     console.log(`Pulling database from Google Sheets: ${url}`);
     const response = await fetch(url);
     if (!response.ok) {
       console.error(`Failed to pull from Google Sheets, response status: ${response.status}`);
       return false;
     }
-    const data = await response.json();
+    
+    // Safety lock: if a push happened while this fetch was executing or if it's very recent, discard this read 
+    // because Google Sheets might return stale data, and we don't want to overwrite our fresh local database!
+    if (pullStartTime <= syncLockTimestamp) {
+      console.log(`[Sync Engine] Discarding pulled Google Sheets data (stale). A push occurred after this pull request was initiated!`);
+      return false;
+    }
+    
+    const text = await response.text();
+    if (!text || text.trim() === "") {
+      console.error("Received an empty response from Google Sheets.");
+      throw new Error("Received an empty response from Google Sheets. Ensure your Google Apps Script is correctly returning the database JSON.");
+    }
+
+    if (text.trim().startsWith("<!DOCTYPE html>") || text.trim().startsWith("<html")) {
+      console.error(`Google Sheets URL returned HTML content instead of JSON. Ensure your Apps Script Web App is deployed with Access set to 'Anyone' and executed as 'Me'.`);
+      throw new Error("Google Sheets returned HTML instead of JSON. This usually indicates your Google Apps Script Web App is not authorized or not set to 'Who has access: Anyone'.");
+    }
+
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch (e: any) {
+      console.error(`Failed to parse JSON from Google Sheets. Raw snippet: ${text.substring(0, 300)}`);
+      throw new Error(`Failed to parse JSON response. The server returned invalid data (Snippet: ${text.substring(0, 100).replace(/\r?\n|\r/g, " ")}...)`);
+    }
+
     if (!data) {
       console.error("No data received from Google Sheets pull");
       return false;
@@ -420,7 +456,7 @@ async function pullFromGoogleSheets(db: any): Promise<boolean> {
     };
 
     if (data.Products && Array.isArray(data.Products) && data.Products.length > 0) {
-      db.products = data.Products.map((p: any) => ({
+      const validProducts = data.Products.filter((p: any) => p.Product_ID || p.SKU || p.product_ID || p.sku).map((p: any) => ({
         Product_ID: p.Product_ID || p.product_ID || '',
         SKU: p.SKU || p.sku || '',
         Barcode: p.Barcode || p.barcode || p.SKU || '',
@@ -436,11 +472,17 @@ async function pullFromGoogleSheets(db: any): Promise<boolean> {
         Minimum_Stock: parseNumber(p.Minimum_Stock),
         Status: p.Status || 'Active'
       }));
-      modified = true;
+      
+      if (validProducts.length > 0) {
+        db.products = validProducts;
+        modified = true;
+      } else {
+        console.warn("Pulled data.Products was empty. Skipping overwrite to prevent data loss.");
+      }
     }
 
     if (data.Customers && Array.isArray(data.Customers) && data.Customers.length > 0) {
-      db.customers = data.Customers.map((c: any) => ({
+      db.customers = data.Customers.filter((c: any) => c.Customer_ID || c.Customer_Name).map((c: any) => ({
         Customer_ID: c.Customer_ID || '',
         Customer_Name: c.Customer_Name || '',
         Customer_Type: c.Customer_Type || 'Reseller',
@@ -454,7 +496,7 @@ async function pullFromGoogleSheets(db: any): Promise<boolean> {
     }
 
     if (data.Stock_In && Array.isArray(data.Stock_In)) {
-      db.stockIn = data.Stock_In.map((s: any) => ({
+      db.stockIn = data.Stock_In.filter((s: any) => s.Transaction_ID || s.SKU).map((s: any) => ({
         Transaction_ID: s.Transaction_ID || '',
         Date: s.Date || '',
         SKU: s.SKU || '',
@@ -466,7 +508,7 @@ async function pullFromGoogleSheets(db: any): Promise<boolean> {
     }
 
     if (data.Stock_Out && Array.isArray(data.Stock_Out)) {
-      db.stockOut = data.Stock_Out.map((s: any) => ({
+      db.stockOut = data.Stock_Out.filter((s: any) => s.Transaction_ID || s.SKU).map((s: any) => ({
         Transaction_ID: s.Transaction_ID || '',
         Date: s.Date || '',
         SKU: s.SKU || '',
@@ -479,7 +521,7 @@ async function pullFromGoogleSheets(db: any): Promise<boolean> {
     }
 
     if (data.Stock_Opname && Array.isArray(data.Stock_Opname)) {
-      db.stockOpname = data.Stock_Opname.map((s: any) => ({
+      db.stockOpname = data.Stock_Opname.filter((s: any) => s.Opname_ID || s.SKU).map((s: any) => ({
         Opname_ID: s.Opname_ID || '',
         Month: s.Month || '',
         SKU: s.SKU || '',
@@ -493,7 +535,7 @@ async function pullFromGoogleSheets(db: any): Promise<boolean> {
     }
 
     if (data.Orders && Array.isArray(data.Orders)) {
-      db.orders = data.Orders.map((o: any) => ({
+      db.orders = data.Orders.filter((o: any) => o.Order_Number || o.Customer).map((o: any) => ({
         Order_Number: o.Order_Number || '',
         Order_Date: o.Order_Date || '',
         Customer: o.Customer || '',
@@ -509,7 +551,7 @@ async function pullFromGoogleSheets(db: any): Promise<boolean> {
     }
 
     if (data.Shipping && Array.isArray(data.Shipping)) {
-      db.shipping = data.Shipping.map((s: any) => ({
+      db.shipping = data.Shipping.filter((s: any) => s.Tracking_Number || s.Order_Number).map((s: any) => ({
         Tracking_Number: s.Tracking_Number || '',
         Courier: s.Courier || '',
         Order_Number: s.Order_Number || '',
@@ -522,7 +564,7 @@ async function pullFromGoogleSheets(db: any): Promise<boolean> {
     if (data.Users && Array.isArray(data.Users) && data.Users.length > 0) {
       // Find default owner account so we don't accidentally wipe its password hash from sheets
       const defaultOwner = db.users.find((u: any) => u.User_ID === 'USR-001');
-      db.users = data.Users.map((u: any) => {
+      db.users = data.Users.filter((u: any) => u.User_ID || u.Email).map((u: any) => {
         const isOwner = u.User_ID === 'USR-001' || u.Email?.toLowerCase() === 'owner@alina.com';
         return {
           User_ID: u.User_ID || '',
@@ -540,7 +582,7 @@ async function pullFromGoogleSheets(db: any): Promise<boolean> {
     }
 
     if (data.Activity_Log && Array.isArray(data.Activity_Log)) {
-      db.activityLog = data.Activity_Log.map((l: any) => ({
+      db.activityLog = data.Activity_Log.filter((l: any) => l.Log_ID || l.Activity).map((l: any) => ({
         Log_ID: l.Log_ID || '',
         User_Name: l.User_Name || '',
         User_Role: l.User_Role || 'ADMIN',
@@ -561,6 +603,9 @@ async function pullFromGoogleSheets(db: any): Promise<boolean> {
     return false;
   } catch (error) {
     console.error("Failed to pull from Google Sheets:", error);
+    if (throwOnError) {
+      throw error;
+    }
     return false;
   }
 }
@@ -584,14 +629,21 @@ function saveDatabase(data: typeof DEFAULT_DB) {
   }
 }
 
+let hasBootstrappedFromSheets = false;
+
 async function readAndPullDatabase(): Promise<typeof DEFAULT_DB> {
   const db = readDatabase();
-  if (db.sheetsConfig && db.sheetsConfig.isLinked && db.sheetsConfig.scriptUrl) {
+  // Only pull automatically on first boot if the link is active AND autoSync is enabled.
+  if (!hasBootstrappedFromSheets && db.sheetsConfig && db.sheetsConfig.isLinked && db.sheetsConfig.autoSync && db.sheetsConfig.scriptUrl) {
     try {
-      console.log("[Sync Engine] Pulling latest state from Google Sheets during request...");
+      console.log("[Sync Engine] Pulling latest state from Google Sheets during initial app boot...");
+      hasBootstrappedFromSheets = true; // Mark as bootstrapped regardless of success to prevent loop
       await pullFromGoogleSheets(db);
+      // Wait wait, if pullFromGoogleSheets returned true, it already wrote to fs!
+      // So we must read it again to ensure we return the fresh state
+      return readDatabase();
     } catch (err) {
-      console.error("Failed to pull from Google Sheets:", err);
+      console.error("Failed to pull from Google Sheets during boot:", err);
     }
   }
   return db;
@@ -1299,7 +1351,14 @@ app.post('/api/settings/sync-now', async (req, res) => {
     appendAuditLog(user.name, user.role, `Triggered manual synchronisation push/pull of Google Sheets data`, 'System');
     
     // Attempt to pull latest changes from sheets first
-    await pullFromGoogleSheets(db);
+    try {
+      await pullFromGoogleSheets(db, true);
+    } catch (pullError: any) {
+      console.error("Failed to pull from Google Sheets during manual sync:", pullError);
+      return res.status(400).json({
+        error: pullError.message || "Failed to pull from Google Sheets."
+      });
+    }
     
     // Read the database again for updated local state
     const currentDb = readDatabase();
