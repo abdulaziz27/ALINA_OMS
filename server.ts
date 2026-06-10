@@ -392,6 +392,179 @@ async function syncToGoogleSheets(db: any): Promise<boolean> {
   }
 }
 
+async function pullFromGoogleSheets(db: any): Promise<boolean> {
+  if (!db.sheetsConfig || !db.sheetsConfig.isLinked || !db.sheetsConfig.scriptUrl) {
+    return false;
+  }
+  try {
+    const url = `${db.sheetsConfig.scriptUrl}?action=readAll`;
+    console.log(`Pulling database from Google Sheets: ${url}`);
+    const response = await fetch(url);
+    if (!response.ok) {
+      console.error(`Failed to pull from Google Sheets, response status: ${response.status}`);
+      return false;
+    }
+    const data = await response.json();
+    if (!data) {
+      console.error("No data received from Google Sheets pull");
+      return false;
+    }
+
+    let modified = false;
+
+    // Helper to sanitize pulled array items (e.g. converting numeric strings to numbers)
+    const parseNumber = (v: any) => {
+      if (v === "" || v === null || v === undefined) return 0;
+      const num = Number(v);
+      return isNaN(num) ? v : num;
+    };
+
+    if (data.Products && Array.isArray(data.Products) && data.Products.length > 0) {
+      db.products = data.Products.map((p: any) => ({
+        Product_ID: p.Product_ID || p.product_ID || '',
+        SKU: p.SKU || p.sku || '',
+        Barcode: p.Barcode || p.barcode || p.SKU || '',
+        QR_Code: p.QR_Code || p.qr_Code || p.SKU || '',
+        Product_Name: p.Product_Name || p.product_Name || '',
+        Category: p.Category || p.category || '',
+        Variant: p.Variant || p.variant || '',
+        Color: p.Color || p.color || '',
+        Size: p.Size || p.size || '',
+        Cost_Price: parseNumber(p.Cost_Price),
+        Selling_Price: parseNumber(p.Selling_Price),
+        Current_Stock: parseNumber(p.Current_Stock),
+        Minimum_Stock: parseNumber(p.Minimum_Stock),
+        Status: p.Status || 'Active'
+      }));
+      modified = true;
+    }
+
+    if (data.Customers && Array.isArray(data.Customers) && data.Customers.length > 0) {
+      db.customers = data.Customers.map((c: any) => ({
+        Customer_ID: c.Customer_ID || '',
+        Customer_Name: c.Customer_Name || '',
+        Customer_Type: c.Customer_Type || 'Reseller',
+        Phone: c.Phone || '',
+        Email: c.Email || '',
+        Address: c.Address || '',
+        City: c.City || '',
+        Status: c.Status || 'Active'
+      }));
+      modified = true;
+    }
+
+    if (data.Stock_In && Array.isArray(data.Stock_In)) {
+      db.stockIn = data.Stock_In.map((s: any) => ({
+        Transaction_ID: s.Transaction_ID || '',
+        Date: s.Date || '',
+        SKU: s.SKU || '',
+        Product_Name: s.Product_Name || '',
+        Qty: parseNumber(s.Qty),
+        Notes: s.Notes || ''
+      }));
+      modified = true;
+    }
+
+    if (data.Stock_Out && Array.isArray(data.Stock_Out)) {
+      db.stockOut = data.Stock_Out.map((s: any) => ({
+        Transaction_ID: s.Transaction_ID || '',
+        Date: s.Date || '',
+        SKU: s.SKU || '',
+        Product_Name: s.Product_Name || '',
+        Customer: s.Customer || '',
+        Qty: parseNumber(s.Qty),
+        Notes: s.Notes || ''
+      }));
+      modified = true;
+    }
+
+    if (data.Stock_Opname && Array.isArray(data.Stock_Opname)) {
+      db.stockOpname = data.Stock_Opname.map((s: any) => ({
+        Opname_ID: s.Opname_ID || '',
+        Month: s.Month || '',
+        SKU: s.SKU || '',
+        Product_Name: s.Product_Name || '',
+        System_Stock: parseNumber(s.System_Stock),
+        Physical_Stock: parseNumber(s.Physical_Stock),
+        Difference: parseNumber(s.Difference),
+        Date: s.Date || ''
+      }));
+      modified = true;
+    }
+
+    if (data.Orders && Array.isArray(data.Orders)) {
+      db.orders = data.Orders.map((o: any) => ({
+        Order_Number: o.Order_Number || '',
+        Order_Date: o.Order_Date || '',
+        Customer: o.Customer || '',
+        Channel: o.Channel || 'Retail',
+        SKU: o.SKU || '',
+        Product: o.Product || '',
+        Qty: parseNumber(o.Qty),
+        Price: parseNumber(o.Price),
+        Total: parseNumber(o.Total),
+        Status: o.Status || 'New Order'
+      }));
+      modified = true;
+    }
+
+    if (data.Shipping && Array.isArray(data.Shipping)) {
+      db.shipping = data.Shipping.map((s: any) => ({
+        Tracking_Number: s.Tracking_Number || '',
+        Courier: s.Courier || '',
+        Order_Number: s.Order_Number || '',
+        Shipping_Date: s.Shipping_Date || '',
+        Status: s.Status || 'In Transit'
+      }));
+      modified = true;
+    }
+
+    if (data.Users && Array.isArray(data.Users) && data.Users.length > 0) {
+      // Find default owner account so we don't accidentally wipe its password hash from sheets
+      const defaultOwner = db.users.find((u: any) => u.User_ID === 'USR-001');
+      db.users = data.Users.map((u: any) => {
+        const isOwner = u.User_ID === 'USR-001' || u.Email?.toLowerCase() === 'owner@alina.com';
+        return {
+          User_ID: u.User_ID || '',
+          Full_Name: u.Full_Name || '',
+          Email: u.Email || '',
+          Password_Hash: u.Password_Hash || (isOwner && defaultOwner ? defaultOwner.Password_Hash : hashPassword("admin123")),
+          Role: u.Role || (isOwner ? 'OWNER' : 'ADMIN'),
+          Status: u.Status || 'Active',
+          Last_Login: u.Last_Login || '',
+          Created_Date: u.Created_Date || '',
+          Permissions: typeof u.Permissions === 'string' ? JSON.parse(u.Permissions) : (u.Permissions || [])
+        };
+      });
+      modified = true;
+    }
+
+    if (data.Activity_Log && Array.isArray(data.Activity_Log)) {
+      db.activityLog = data.Activity_Log.map((l: any) => ({
+        Log_ID: l.Log_ID || '',
+        User_Name: l.User_Name || '',
+        User_Role: l.User_Role || 'ADMIN',
+        Activity: l.Activity || '',
+        Module: l.Module || '',
+        Timestamp: l.Timestamp || '',
+        Device: l.Device || ''
+      }));
+      modified = true;
+    }
+
+    if (modified) {
+      // Direct file write avoids the circular loop (bypasses triggerSheetsSyncIfNeeded)
+      fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2), 'utf8');
+      console.log("Successfully pulled and updated local db.json with Google Sheets state!");
+      return true;
+    }
+    return false;
+  } catch (error) {
+    console.error("Failed to pull from Google Sheets:", error);
+    return false;
+  }
+}
+
 function triggerSheetsSyncIfNeeded(db: any) {
   if (db.sheetsConfig && db.sheetsConfig.isLinked && db.sheetsConfig.autoSync && db.sheetsConfig.scriptUrl) {
     syncToGoogleSheets(db).catch(err => {
@@ -1063,18 +1236,31 @@ app.post('/api/shipping', (req, res) => {
 
 // 9. CONFIGURATION & SHEET SYNCHRONIZATION
 app.post('/api/settings/sheets-config', (req, res) => {
-  const { scriptUrl, spreadsheetId, autoSync, user } = req.body;
+  const { scriptUrl, spreadsheetId, autoSync, customLogoUrl, user } = req.body;
   const db = readDatabase();
   
   db.sheetsConfig = {
     scriptUrl: scriptUrl || "",
     spreadsheetId: spreadsheetId || "",
     isLinked: !!scriptUrl,
-    autoSync: !!autoSync
+    autoSync: !!autoSync,
+    customLogoUrl: customLogoUrl || ""
   };
 
   saveDatabase(db);
-  appendAuditLog(user.name, user.role, `Configured Google Sheets connection`, 'System');
+  
+  // Instantly trigger an initial background pull to load pre-existing sheets database
+  if (db.sheetsConfig.isLinked) {
+    pullFromGoogleSheets(db).then((pulled) => {
+      if (pulled) {
+        console.log("Initial background pull complete: loaded pre-existing Google Sheets data");
+      }
+    }).catch(err => {
+      console.error("Initial sheets-config background pull error:", err);
+    });
+  }
+
+  appendAuditLog(user && user.name ? user.name : "System", user && user.role ? user.role : "ADMIN", `Configured Google Sheets connection`, 'System');
   res.json({ success: true, config: db.sheetsConfig });
 });
 
@@ -1086,9 +1272,17 @@ app.post('/api/settings/sync-now', async (req, res) => {
   let successMessage = "";
   if (db.sheetsConfig.isLinked && db.sheetsConfig.scriptUrl) {
     appendAuditLog(user.name, user.role, `Triggered manual synchronisation push/pull of Google Sheets data`, 'System');
-    const success = await syncToGoogleSheets(db);
+    
+    // Attempt to pull latest changes from sheets first
+    await pullFromGoogleSheets(db);
+    
+    // Read the database again for updated local state
+    const currentDb = readDatabase();
+    
+    // Push consolidated database back to sheets to ensure they are synchronized
+    const success = await syncToGoogleSheets(currentDb);
     if (success) {
-      successMessage = `Successfully synchronized WMS & OMS tables dynamically with Google Spreadsheet ID ${db.sheetsConfig.spreadsheetId}`;
+      successMessage = `Berhasil melakukan sinkronisasi dua arah (Tarik & Kirim) dengan Google Spreadsheet ID ${db.sheetsConfig.spreadsheetId}`;
       return res.json({ success: true, message: successMessage });
     } else {
       return res.status(500).json({ 
@@ -1211,6 +1405,19 @@ async function startServer() {
       res.sendFile(path.join(distPath, 'index.html'));
     });
   }
+
+  // Periodic background Google Sheets auto-pull synchronization daemon
+  setInterval(async () => {
+    try {
+      const db = readDatabase();
+      if (db.sheetsConfig && db.sheetsConfig.isLinked && db.sheetsConfig.autoSync && db.sheetsConfig.scriptUrl) {
+        console.log("[Background Sync Engine] Checking and pulling latest updates from Google Sheets in background...");
+        await pullFromGoogleSheets(db);
+      }
+    } catch (err) {
+      console.error("[Background Sync Engine] Error in automatic background pull:", err);
+    }
+  }, 10000); // pull every 10 seconds
 
   app.listen(PORT, "0.0.0.0", () => {
     console.log(`ALINA Enterprise running at http://0.0.0.0:${PORT}`);

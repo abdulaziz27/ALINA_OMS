@@ -126,4 +126,5 @@ export interface SheetsConfig {
   spreadsheetId: string;
   isLinked: boolean;
   autoSync: boolean;
+  customLogoUrl?: string;
 }

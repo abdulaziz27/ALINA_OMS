@@ -754,7 +754,8 @@ async function handleOfflineApiRoute(url: string, init?: RequestInit): Promise<R
       scriptUrl: body.scriptUrl || '',
       spreadsheetId: body.spreadsheetId || '',
       autoSync: !!body.autoSync,
-      isLinked: !!(body.scriptUrl && body.spreadsheetId)
+      isLinked: !!(body.scriptUrl && body.spreadsheetId),
+      customLogoUrl: body.customLogoUrl || ''
     };
     appendOfflineLog(db, 'System', 'Admin', 'Menyimpan konfigurasi Google Sheets offline');
     saveLocalDB(db);
@@ -2428,7 +2429,7 @@ export default function App() {
   };
 
   // Sheets Connector settings save
-  const handleSaveSheetsConfig = async (cfg: { scriptUrl: string; spreadsheetId: string; autoSync: boolean }): Promise<boolean> => {
+  const handleSaveSheetsConfig = async (cfg: { scriptUrl: string; spreadsheetId: string; autoSync: boolean; customLogoUrl?: string }): Promise<boolean> => {
     try {
       const res = await fetch('/api/settings/sheets-config', {
         method: 'POST',
@@ -2439,7 +2440,7 @@ export default function App() {
         })
       });
       if (res.ok) {
-        safeLocalStorage.setItem('alina_sheets_config', JSON.stringify({ ...cfg, isLinked: true }));
+        safeLocalStorage.setItem('alina_sheets_config', JSON.stringify({ ...cfg, isLinked: !!(cfg.scriptUrl && cfg.spreadsheetId) }));
         await fetchDatabaseState();
         return true;
       }
@@ -2565,7 +2566,15 @@ export default function App() {
           className="bg-white/80 backdrop-blur-md rounded-[32px] w-full max-w-sm p-8 shadow-2xl border border-pink-100 flex flex-col space-y-6 relative"
         >
           {/* Brand Presentation */}
-          <div className="text-center space-y-1.5">
+          <div className="text-center space-y-1.5 flex flex-col items-center">
+            {sheetsConfig.customLogoUrl ? (
+              <img 
+                src={sheetsConfig.customLogoUrl} 
+                alt="Brand Logo" 
+                className="w-16 h-16 rounded-full object-cover shadow-lg border-2 border-pink-200 mb-1 bg-white"
+                referrerPolicy="no-referrer"
+              />
+            ) : null}
             <span className="text-[10px] bg-[#FFF3F8] text-[#EC4899] font-black tracking-widest px-3 py-1 rounded-full border border-pink-100/60 uppercase">
               MOSLEM FASHION ERP
             </span>
@@ -2658,9 +2667,18 @@ export default function App() {
       <header className="sticky top-3 z-40 mx-4 max-w-7xl lg:mx-auto select-none">
         <div className={`${currentTheme.headerBg} rounded-2xl sm:rounded-[24px] px-4.5 py-2.5 sm:py-3 flex justify-between items-center transition-all duration-300`}>
           <div className="flex items-center gap-2.5">
-            <div className={`w-8 h-8 rounded-full ${currentTheme.logoBg} flex items-center justify-center font-extrabold text-white text-xs shadow-md`}>
-              {currentTheme.logo}
-            </div>
+            {sheetsConfig.customLogoUrl ? (
+              <img 
+                src={sheetsConfig.customLogoUrl} 
+                alt="Logo" 
+                className="w-8 h-8 rounded-full object-cover shadow-md border border-pink-100 bg-white"
+                referrerPolicy="no-referrer"
+              />
+            ) : (
+              <div className={`w-8 h-8 rounded-full ${currentTheme.logoBg} flex items-center justify-center font-extrabold text-white text-xs shadow-md`}>
+                {currentTheme.logo}
+              </div>
+            )}
             <div className="text-left">
               <h1 className="text-xs sm:text-sm font-extrabold text-gray-900 tracking-tight leading-none">{currentTheme.brandName}</h1>
               <p className={`text-[9px] ${currentTheme.text} font-black font-mono tracking-wider mt-0.5 uppercase`}>
@@ -4852,6 +4870,197 @@ export default function App() {
                         <span className="text-[9px] bg-pink-500 text-white px-2 py-0.5 rounded-md font-bold uppercase w-fit font-mono mt-auto">Aktif 🐱</span>
                       )}
                     </button>
+                  </div>
+                </div>
+
+                {/* Custom Logo Customizer Block */}
+                <div className="bg-white rounded-[32px] p-6 border border-pink-100 shadow-xl shadow-pink-500/[0.02] space-y-5 select-none font-sans mt-8" id="alina-logo-customizer-wrapper">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-[#EC4899] animate-pulse" />
+                    <h3 className="font-extrabold text-xs uppercase tracking-widest text-[#EC4899]">
+                      KUSTOMISASI LOGO APLIKASI
+                    </h3>
+                  </div>
+                  <p className="text-xs text-gray-500 leading-relaxed">
+                    Personalisasikan portal Alina Enterprise WMS & OMS Anda dengan menggunakan logo bisnis sendiri. Logo ini akan terintegrasi otomatis di halaman login utama serta header bar navigasi portal.
+                  </p>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start pt-2">
+                    {/* Visual Preview Card */}
+                    <div className="bg-pink-50/20 rounded-2xl p-5 border border-pink-100/40 flex flex-col items-center justify-center space-y-4 text-center">
+                      <span className="text-[10px] text-pink-600 font-bold uppercase tracking-wider">PREVIEW LOGO ANDA</span>
+                      
+                      <div className="relative">
+                        {sheetsConfig.customLogoUrl ? (
+                          <div className="relative group">
+                            <img 
+                              src={sheetsConfig.customLogoUrl} 
+                              alt="Custom Logo Preview" 
+                              className="w-24 h-24 rounded-full object-cover shadow-lg border-2 border-pink-100 bg-white"
+                              referrerPolicy="no-referrer"
+                            />
+                            <div className="absolute inset-0 bg-black/40 rounded-full opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                              <span className="text-white text-[10px] font-bold">Logo Aktif</span>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="w-24 h-24 rounded-full bg-gradient-to-tr from-[#EC4899] to-[#F9A8D4] flex items-center justify-center text-white text-3xl font-extrabold shadow-lg">
+                            {currentTheme.logo}
+                          </div>
+                        )}
+                        <span className={`absolute -bottom-1 right-2 px-2.5 py-0.5 text-[9px] font-bold rounded-full text-white shadow-sm ${sheetsConfig.customLogoUrl ? 'bg-emerald-500' : 'bg-pink-500 animate-pulse'}`}>
+                          {sheetsConfig.customLogoUrl ? 'Kustom' : 'Default'}
+                        </span>
+                      </div>
+
+                      <div className="space-y-1">
+                        <strong className="text-xs text-gray-800 font-black block">
+                          {sheetsConfig.customLogoUrl ? 'Merek kustom Anda Aktif' : 'Menggunakan Visual Karakter Alina'}
+                        </strong>
+                        <p className="text-[10px] text-gray-400 max-w-[240px] leading-relaxed">
+                          {sheetsConfig.customLogoUrl 
+                            ? 'Dimensi logo telah disesuaikan secara dinamis agar presisi di seluruh elemen antarmuka.' 
+                            : 'Unggah file gambar pilihan Anda langsung atau sematkan URL gambar pilihan Anda.'}
+                        </p>
+                      </div>
+
+                      {sheetsConfig.customLogoUrl && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const updated = { ...sheetsConfig, customLogoUrl: '' };
+                            handleSaveSheetsConfig(updated);
+                          }}
+                          className="text-[10px] text-red-500 hover:text-red-700 font-bold underline cursor-pointer hover:no-underline"
+                        >
+                          Reset ke Logo Bawaan
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Inputs & Tutorials */}
+                    <div className="space-y-4">
+                      {/* File Upload Selector */}
+                      <div className="space-y-1.5">
+                        <label className="text-[11px] font-bold text-gray-700 uppercase tracking-wide block">Metode 1: Unggah File Gambar Langsung</label>
+                        <div className="border border-dashed border-pink-250 hover:border-pink-400 rounded-2xl p-4 transition-all duration-200 text-center relative group cursor-pointer bg-[#FFFBFD]">
+                          <input 
+                            type="file" 
+                            accept="image/*"
+                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) {
+                                if (file.size > 2 * 1024 * 1024) {
+                                  alert("Ukuran gambar terlalu besar! Harap unggah logo maksimal 2MB agar loading sistem tetap super cepat.");
+                                  return;
+                                }
+                                const reader = new FileReader();
+                                reader.onloadend = () => {
+                                  if (typeof reader.result === 'string') {
+                                    const updated = { ...sheetsConfig, customLogoUrl: reader.result };
+                                    handleSaveSheetsConfig(updated).then((success) => {
+                                      if (success) {
+                                        alert("Logo default berhasil disimpan ke database utama!");
+                                      }
+                                    });
+                                  }
+                                };
+                                reader.readAsDataURL(file);
+                              }
+                            }}
+                          />
+                          <div className="space-y-1 select-none pointer-events-none">
+                            <span className="text-xl">📁</span>
+                            <p className="text-[11px] font-bold text-pink-600 group-hover:text-pink-700">Pilih / Seret File Logo Anda</p>
+                            <p className="text-[9px] text-gray-400 leading-snug">Mendukung JPEG, PNG, SVG (Maks. 2MB). Disimpan aman otomatis.</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* URL Source Input */}
+                      <div className="space-y-1.5" id="custom-logo-url-input-container">
+                        <label className="text-[11px] font-bold text-gray-700 uppercase tracking-wide block">Metode 2: Menggunakan Link / Google Drive URL</label>
+                        <div className="flex gap-2">
+                          <input
+                            id="custom-logo-url-input"
+                            type="url"
+                            placeholder="https://drive.google.com/uc?export=view&id=..."
+                            defaultValue={sheetsConfig.customLogoUrl && !sheetsConfig.customLogoUrl.startsWith('data:') ? sheetsConfig.customLogoUrl : ''}
+                            className="bg-[#FFF8FB] border border-pink-100 hover:border-pink-300 rounded-xl py-2 px-3 text-xs text-gray-900 focus:outline-none focus:border-pink-500 transition-all flex-1"
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                const target = e.currentTarget;
+                                let val = target.value.trim();
+                                if (val) {
+                                  if (val.includes('drive.google.com') && !val.includes('export=view')) {
+                                    const match = val.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+                                    if (match && match[1]) {
+                                      val = `https://drive.google.com/uc?export=view&id=${match[1]}`;
+                                      target.value = val;
+                                    }
+                                  }
+                                  const updated = { ...sheetsConfig, customLogoUrl: val };
+                                  handleSaveSheetsConfig(updated).then((success) => {
+                                    if (success) {
+                                      alert("Logo default berhasil diperbarui menggunakan Link!");
+                                    }
+                                  });
+                                }
+                              }
+                            }}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const inputEl = document.getElementById('custom-logo-url-input') as HTMLInputElement;
+                              if (inputEl) {
+                                let val = inputEl.value.trim();
+                                if (!val) {
+                                  alert("Harap masukkan URL logo yang valid terlebih dahulu!");
+                                  return;
+                                }
+                                if (val.includes('drive.google.com') && !val.includes('export=view')) {
+                                  const match = val.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+                                  if (match && match[1]) {
+                                    val = `https://drive.google.com/uc?export=view&id=${match[1]}`;
+                                    inputEl.value = val;
+                                  }
+                                }
+                                const updated = { ...sheetsConfig, customLogoUrl: val };
+                                handleSaveSheetsConfig(updated).then((success) => {
+                                  if (success) {
+                                    alert("Logo default berhasil diperbarui menggunakan Link!");
+                                  }
+                                });
+                              }
+                            }}
+                            className="bg-[#111827] hover:bg-black text-white text-xs font-bold px-4 py-2 rounded-xl transition cursor-pointer font-sans shrink-0"
+                          >
+                            Terapkan
+                          </button>
+                        </div>
+                        <p className="text-[9px] text-gray-400">Tekan tombol <strong className="text-pink-600">Terapkan</strong> atau tekan <strong className="text-gray-600">Enter</strong> untuk menyimpan.</p>
+                      </div>
+
+                      {/* Accordion Tutorial Google Drive */}
+                      <details className="group border border-pink-100/50 rounded-2xl bg-pink-50/10 overflow-hidden">
+                        <summary className="flex items-center justify-between p-3 text-[11px] font-bold text-pink-700 cursor-pointer hover:bg-pink-50/30 transition select-none">
+                          <span className="flex items-center gap-1.5 font-sans">💡 Tutorial Integrasi via Google Drive</span>
+                          <span className="transition duration-200 group-open:-rotate-180 text-pink-400">▼</span>
+                        </summary>
+                        <div className="p-3 pt-0 text-[10px] text-gray-500 leading-relaxed space-y-2 border-t border-pink-50/50 font-sans">
+                          <ol className="list-decimal pl-4 space-y-1">
+                            <li>Unggah file logo ke <strong>Google Drive</strong> Anda.</li>
+                            <li>Klik kanan pada file → Pilih <strong>Bagikan (Share)</strong>.</li>
+                            <li>Ubah akses umum menjadi <strong>Siapa saja yang memiliki link (Anyone with the link)</strong> sebagai Viewer (Penglihat).</li>
+                            <li>Salin link bagikan tersebut (Contoh: <code className="bg-white px-1 border border-pink-100 rounded text-pink-600 block my-0.5 truncate select-all">https://drive.google.com/file/d/ID_FILE/view?usp=sharing</code>).</li>
+                            <li>Sematkan link tersebut ke kolom input Metode 2 di atas. Sistem Alina akan otomatis mengonversi ke link direct image untuk Anda!</li>
+                          </ol>
+                        </div>
+                      </details>
+
+                    </div>
                   </div>
                 </div>
 

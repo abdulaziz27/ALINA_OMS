@@ -1,41 +1,37 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
   <defs>
-    <!-- Beautiful modern gradient representing Alina pink/indigo palette -->
-    <linearGradient id="alina-bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#FFF0F5" />
-      <stop offset="50%" stop-color="#FFE4E1" />
-      <stop offset="100%" stop-color="#FFF8FB" />
-    </linearGradient>
-    <linearGradient id="alina-brand" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#EC4899" />
-      <stop offset="100%" stop-color="#BE185D" />
-    </linearGradient>
+    <!-- Import Google Fonts for extreme typography elegance -->
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Sacramento&amp;family=Great+Vibes&amp;family=Pacifico&amp;display=swap');
+      
+      .brand-circle {
+        fill: #F19CBE;
+      }
+      
+      .hanger-path {
+        stroke: #FFFFFF;
+        stroke-width: 16;
+        fill: none;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+      
+      .brand-text {
+        font-family: 'Sacramento', 'Great Vibes', 'Pacifico', 'Brush Script MT', cursive;
+        font-size: 132px;
+        fill: #FFFFFF;
+        text-anchor: middle;
+        font-weight: bold;
+      }
+    </style>
   </defs>
-  
-  <!-- Smooth squirclish rounded background -->
-  <rect x="0" y="0" width="512" height="512" rx="140" fill="url(#alina-bg)" />
-  <rect x="16" y="16" width="480" height="480" rx="124" fill="none" stroke="#FCE7F3" stroke-width="12" />
 
-  <!-- Elegant Lotus / Geometric Modern "A" Motif -->
-  <g transform="translate(256, 266)">
-    <!-- Base Ribbon/Platform -->
-    <path d="M -160 80 Q 0 40 160 80 Q 120 -20 0 -20 Q -120 -20 -160 80 Z" fill="#F472B6" opacity="0.4" />
-    
-    <!-- Outer Left Leaf -->
-    <path d="M 0 60 C -120 40 -150 -60 -50 -100 C -30 -50 -10 -10 0 60 Z" fill="url(#alina-brand)" opacity="0.8" />
-    
-    <!-- Outer Right Leaf -->
-    <path d="M 0 60 C 120 40 150 -60 50 -100 C 30 -50 10 -10 0 60 Z" fill="url(#alina-brand)" opacity="0.8" />
+  <!-- Solid circular background matching the uploaded logo paint -->
+  <circle cx="256" cy="256" r="256" class="brand-circle" />
 
-    <!-- Center Main Leaf / Upward "A" Apex -->
-    <path d="M 0 80 C -80 0 -110 -150 0 -210 C 110 -150 80 0 0 80 Z" fill="url(#alina-brand)" />
+  <!-- Symmetrical clothing hanger skeleton outline -->
+  <path d="M 274 200 C 274 150, 226 150, 226 180 C 226 210, 256 215, 256 226 L 256 248 M 256 248 L 130 315 C 105 328, 105 365, 134 365 L 378 365 C 407 365, 407 328, 382 315 L 256 248 Z" class="hanger-path" />
 
-    <!-- Inner Core Glowing Bud -->
-    <path d="M 0 40 C -40 10 -50 -60 0 -100 C 50 -60 40 10 0 40 Z" fill="#FCE7F3" opacity="0.9" />
-    <path d="M 0 20 C -20 5 -25 -30 0 -50 C 25 -30 20 5 0 20 Z" fill="#EC4899" />
-  </g>
-  
-  <!-- Sparkling geometric dots -->
-  <circle cx="120" cy="120" r="14" fill="#EC4899" />
-  <circle cx="400" cy="140" r="10" fill="#F472B6" />
+  <!-- Alina artistic script typography precisely positioned -->
+  <text x="256" y="340" class="brand-text">Alina</text>
 </svg>
