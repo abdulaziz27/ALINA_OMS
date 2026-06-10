@@ -2767,7 +2767,14 @@ export default function App() {
                 className="w-16 h-16 rounded-full object-cover shadow-lg border-2 border-pink-200 mb-1 bg-white"
                 referrerPolicy="no-referrer"
               />
-            ) : null}
+            ) : (
+              <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-[#EC4899] via-pink-400 to-white p-0.5 shadow-lg border border-pink-200 mb-1 flex items-center justify-center transform hover:rotate-6 transition-all duration-300 select-none">
+                <div className="w-full h-full rounded-full bg-white flex flex-col items-center justify-center p-1 font-sans">
+                  <span className="text-[14px] font-black tracking-tight bg-gradient-to-r from-[#EC4899] to-pink-400 bg-clip-text text-transparent leading-none">Alina</span>
+                  <span className="text-[8px] font-bold text-[#EC4899] tracking-wider uppercase mt-0.5">Official</span>
+                </div>
+              </div>
+            )}
             <span className="text-[10px] bg-[#FFF3F8] text-[#EC4899] font-black tracking-widest px-3 py-1 rounded-full border border-pink-100/60 uppercase">
               MOSLEM FASHION ERP
             </span>
@@ -2868,8 +2875,11 @@ export default function App() {
                 referrerPolicy="no-referrer"
               />
             ) : (
-              <div className={`w-8 h-8 rounded-full ${currentTheme.logoBg} flex items-center justify-center font-extrabold text-white text-xs shadow-md`}>
-                {currentTheme.logo}
+              <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#EC4899] via-pink-400 to-white p-[1px] shadow-md flex items-center justify-center transform hover:rotate-6 transition-all select-none">
+                <div className="w-full h-full rounded-full bg-white flex flex-col items-center justify-center font-sans">
+                  <span className="text-[7px] font-black tracking-tighter bg-gradient-to-r from-[#EC4899] to-pink-400 bg-clip-text text-transparent leading-none">Alina</span>
+                  <span className="text-[4px] font-bold text-[#EC4899] uppercase leading-none" style={{ fontSize: '4px' }}>Official</span>
+                </div>
               </div>
             )}
             <div className="text-left">
@@ -5097,8 +5107,11 @@ export default function App() {
                             </div>
                           </div>
                         ) : (
-                          <div className="w-24 h-24 rounded-full bg-gradient-to-tr from-[#EC4899] to-[#F9A8D4] flex items-center justify-center text-white text-3xl font-extrabold shadow-lg">
-                            {currentTheme.logo}
+                          <div className="w-24 h-24 rounded-full bg-gradient-to-tr from-[#EC4899] via-pink-400 to-white p-0.5 shadow-lg border border-pink-200 flex items-center justify-center select-none">
+                            <div className="w-full h-full rounded-full bg-white flex flex-col items-center justify-center p-1 font-sans">
+                              <span className="text-[16px] font-black tracking-tight bg-gradient-to-r from-[#EC4899] to-pink-400 bg-clip-text text-transparent leading-none">Alina</span>
+                              <span className="text-[9px] font-bold text-[#EC4899] tracking-wider uppercase mt-1">Official</span>
+                            </div>
                           </div>
                         )}
                         <span className={`absolute -bottom-1 right-2 px-2.5 py-0.5 text-[9px] font-bold rounded-full text-white shadow-sm ${sheetsConfig.customLogoUrl ? 'bg-emerald-500' : 'bg-pink-500 animate-pulse'}`}>

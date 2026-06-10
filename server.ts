@@ -584,6 +584,31 @@ function saveDatabase(data: typeof DEFAULT_DB) {
   }
 }
 
+async function readAndPullDatabase(): Promise<typeof DEFAULT_DB> {
+  const db = readDatabase();
+  if (db.sheetsConfig && db.sheetsConfig.isLinked && db.sheetsConfig.scriptUrl) {
+    try {
+      console.log("[Sync Engine] Pulling latest state from Google Sheets during request...");
+      await pullFromGoogleSheets(db);
+    } catch (err) {
+      console.error("Failed to pull from Google Sheets:", err);
+    }
+  }
+  return db;
+}
+
+async function saveDatabaseAndSync(data: typeof DEFAULT_DB) {
+  try {
+    fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2), 'utf8');
+    if (data.sheetsConfig && data.sheetsConfig.isLinked && data.sheetsConfig.autoSync && data.sheetsConfig.scriptUrl) {
+      console.log("[Sync Engine] Synchronizing / pushing state to Google Sheets on mutation...");
+      await syncToGoogleSheets(data);
+    }
+  } catch (error) {
+    console.error("Failed to write to database and sync:", error);
+  }
+}
+
 // Log actions dynamically
 function appendAuditLog(userName: string, userRole: 'OWNER' | 'ADMIN', activity: string, module: string, userAgent?: string) {
   const db = readDatabase();
@@ -656,8 +681,8 @@ app.post('/api/auth/logout', (req, res) => {
 });
 
 // 2. RETRIEVE ALL DATABASE TABLES
-app.get('/api/db', (req, res) => {
-  const db = readDatabase();
+app.get('/api/db', async (req, res) => {
+  const db = await readAndPullDatabase();
   // Strip password hashes for client safety
   const safeUsers = db.users.map((u: User) => {
     const { Password_Hash, ...safe } = u;
@@ -667,9 +692,9 @@ app.get('/api/db', (req, res) => {
 });
 
 // 3. PRODUCT MASTER CRUD
-app.post('/api/products', (req, res) => {
+app.post('/api/products', async (req, res) => {
   const { action, product, user, id } = req.body; // action: CREATE, UPDATE, DELETE
-  const db = readDatabase();
+  const db = await readAndPullDatabase();
 
   if (action === 'CREATE') {
     // Generate Product_ID
@@ -699,7 +724,7 @@ app.post('/api/products', (req, res) => {
     }
 
     db.products.push(newProduct);
-    saveDatabase(db);
+    await saveDatabaseAndSync(db);
     appendAuditLog(user.name, user.role, `Created product SKU: ${newProduct.SKU}`, 'Product');
     return res.json({ success: true, product: newProduct });
   }
@@ -733,7 +758,7 @@ app.post('/api/products', (req, res) => {
       Status: product.Status
     };
 
-    saveDatabase(db);
+    await saveDatabaseAndSync(db);
     appendAuditLog(user.name, user.role, `Updated product SKU: ${product.SKU}`, 'Product');
     return res.json({ success: true, product: db.products[idx] });
   }
@@ -750,7 +775,7 @@ app.post('/api/products', (req, res) => {
 
     const targetSKU = db.products[idx].SKU;
     db.products.splice(idx, 1);
-    saveDatabase(db);
+    await saveDatabaseAndSync(db);
     appendAuditLog(user.name, user.role, `Deleted product SKU: ${targetSKU}`, 'Product');
     return res.json({ success: true });
   }
@@ -759,13 +784,13 @@ app.post('/api/products', (req, res) => {
 });
 
 // Import Products endpoint (Bulk insertion / upsert)
-app.post('/api/products/import', (req, res) => {
+app.post('/api/products/import', async (req, res) => {
   const { products, user } = req.body;
   if (!products || !Array.isArray(products)) {
     return res.status(400).json({ error: 'Invalid or empty products array for import' });
   }
 
-  const db = readDatabase();
+  const db = await readAndPullDatabase();
   let created = 0;
   let updated = 0;
 
@@ -811,15 +836,15 @@ app.post('/api/products/import', (req, res) => {
     }
   }
 
-  saveDatabase(db);
+  await saveDatabaseAndSync(db);
   appendAuditLog(user.name, user.role, `Imported products: ${created} created, ${updated} updated`, 'Product');
   res.json({ success: true, created, updated });
 });
 
 // 4. CUSTOMER MASTER CRUD
-app.post('/api/customers', (req, res) => {
+app.post('/api/customers', async (req, res) => {
   const { action, customer, user, id } = req.body;
-  const db = readDatabase();
+  const db = await readAndPullDatabase();
 
   if (action === 'CREATE') {
     const nextIdNum = db.customers.length + 1;
@@ -837,7 +862,7 @@ app.post('/api/customers', (req, res) => {
     };
 
     db.customers.push(newCustomer);
-    saveDatabase(db);
+    await saveDatabaseAndSync(db);
     appendAuditLog(user.name, user.role, `Created customer: ${newCustomer.Customer_Name}`, 'Customer');
     return res.json({ success: true, customer: newCustomer });
   }
@@ -859,7 +884,7 @@ app.post('/api/customers', (req, res) => {
       Status: customer.Status
     };
 
-    saveDatabase(db);
+    await saveDatabaseAndSync(db);
     appendAuditLog(user.name, user.role, `Updated customer: ${customer.Customer_Name}`, 'Customer');
     return res.json({ success: true, customer: db.customers[idx] });
   }
@@ -872,7 +897,7 @@ app.post('/api/customers', (req, res) => {
 
     const name = db.customers[idx].Customer_Name;
     db.customers.splice(idx, 1);
-    saveDatabase(db);
+    await saveDatabaseAndSync(db);
     appendAuditLog(user.name, user.role, `Deleted customer: ${name}`, 'Customer');
     return res.json({ success: true });
   }
@@ -883,13 +908,13 @@ app.post('/api/customers', (req, res) => {
 // 5. INVENTORY & TRANSACTION LOGIC
 
 // STOCK IN
-app.post('/api/inventory/stock-in', (req, res) => {
+app.post('/api/inventory/stock-in', async (req, res) => {
   const { sku, qty, notes, user, source_type, quality_type } = req.body;
   if (!sku || !qty) {
     return res.status(400).json({ error: 'SKU and Quantity are required' });
   }
 
-  const db = readDatabase();
+  const db = await readAndPullDatabase();
   const product = db.products.find((p: Product) => p.SKU === sku);
   if (!product) {
     return res.status(404).json({ error: `Product with SKU ${sku} does not exist.` });
@@ -916,7 +941,7 @@ app.post('/api/inventory/stock-in', (req, res) => {
   };
 
   db.stockIn.unshift(newTx);
-  saveDatabase(db);
+  await saveDatabaseAndSync(db);
 
   const auditMsg = `Stock In: +${qty} [${source_type || 'Konveksi'} - ${quality_type || 'Good'}] for SKU ${sku} (${product.Product_Name})`;
   appendAuditLog(user.name, user.role, auditMsg, 'WMS');
@@ -924,13 +949,13 @@ app.post('/api/inventory/stock-in', (req, res) => {
 });
 
 // STOCK OUT
-app.post('/api/inventory/stock-out', (req, res) => {
+app.post('/api/inventory/stock-out', async (req, res) => {
   const { sku, customer, qty, notes, user, destination_type, quality_type } = req.body;
   if (!sku || !qty) {
     return res.status(400).json({ error: 'SKU and Quantity are required' });
   }
 
-  const db = readDatabase();
+  const db = await readAndPullDatabase();
   const product = db.products.find((p: Product) => p.SKU === sku);
   if (!product) {
     return res.status(404).json({ error: `Product with SKU ${sku} does not exist.` });
@@ -955,7 +980,7 @@ app.post('/api/inventory/stock-out', (req, res) => {
   };
 
   db.stockOut.unshift(newTx);
-  saveDatabase(db);
+  await saveDatabaseAndSync(db);
 
   const auditMsg = `Stock Out: -${qty} [${destination_type || 'Sales'} - ${quality_type || 'Good'}] for SKU ${sku} (${product.Product_Name})`;
   appendAuditLog(user.name, user.role, auditMsg, 'WMS');
@@ -963,13 +988,13 @@ app.post('/api/inventory/stock-out', (req, res) => {
 });
 
 // 6. STOCK OPNAME BULANAN
-app.post('/api/inventory/stock-opname', (req, res) => {
+app.post('/api/inventory/stock-opname', async (req, res) => {
   const { month, sku, physicalStock, user } = req.body;
   if (!month || !sku || physicalStock === undefined) {
     return res.status(400).json({ error: 'Month, SKU, and Physical Stock count are required' });
   }
 
-  const db = readDatabase();
+  const db = await readAndPullDatabase();
   const product = db.products.find((p: Product) => p.SKU === sku);
   if (!product) {
     return res.status(404).json({ error: `Product with SKU ${sku} not found.` });
@@ -996,7 +1021,7 @@ app.post('/api/inventory/stock-opname', (req, res) => {
   product.Current_Stock = pCount;
 
   db.stockOpname.unshift(opnameEntry);
-  saveDatabase(db);
+  await saveDatabaseAndSync(db);
 
   appendAuditLog(
     user.name, 
@@ -1009,9 +1034,9 @@ app.post('/api/inventory/stock-opname', (req, res) => {
 });
 
 // 7. ORDER MANAGEMENT SYSTEM (OMS)
-app.post('/api/orders', (req, res) => {
+app.post('/api/orders', async (req, res) => {
   const { action, order, user, orderNumber } = req.body;
-  const db = readDatabase();
+  const db = await readAndPullDatabase();
 
   if (action === 'CREATE') {
     // Generate Order Number: ORD-YYYYMMDD-XXXX
@@ -1110,7 +1135,7 @@ app.post('/api/orders', (req, res) => {
       });
     }
 
-    saveDatabase(db);
+    await saveDatabaseAndSync(db);
     appendAuditLog(user.name, user.role, `Created sales order ${ordNum} with ${itemsToCreate.length} items, channel: ${order.Channel}`, 'OMS');
     return res.json({ success: true, order: firstOrder });
   }
@@ -1173,7 +1198,7 @@ app.post('/api/orders', (req, res) => {
       appendAuditLog(user.name, user.role, `Verified checklist and packed order: ${orderNumber}`, 'OMS');
     }
 
-    saveDatabase(db);
+    await saveDatabaseAndSync(db);
     appendAuditLog(user.name, user.role, `Changed status of Order ${orderNumber} from "${oldStatus}" to "${newStatus}"`, 'OMS');
     return res.json({ success: true });
   }
@@ -1184,7 +1209,7 @@ app.post('/api/orders', (req, res) => {
     if (db.orders.length === lengthBefore) {
       return res.status(404).json({ error: 'Order not found.' });
     }
-    saveDatabase(db);
+    await saveDatabaseAndSync(db);
     appendAuditLog(user.name, user.role, `Deleted Order ${orderNumber}`, 'OMS');
     return res.json({ success: true });
   }
@@ -1193,9 +1218,9 @@ app.post('/api/orders', (req, res) => {
 });
 
 // 8. SHIPPING MANAGEMENT
-app.post('/api/shipping', (req, res) => {
+app.post('/api/shipping', async (req, res) => {
   const { action, shipping, user } = req.body;
-  const db = readDatabase();
+  const db = await readAndPullDatabase();
 
   if (action === 'UPSERT') {
     const existingIdx = db.shipping.findIndex((s: Shipping) => s.Order_Number === shipping.Order_Number);
@@ -1226,7 +1251,7 @@ app.post('/api/shipping', (req, res) => {
       });
     }
 
-    saveDatabase(db);
+    await saveDatabaseAndSync(db);
     appendAuditLog(user.name, user.role, `Updated shipping record for order ${shipping.Order_Number} (${shippingRecord.Courier} - ${shippingRecord.Tracking_Number})`, 'Shipping');
     return res.json({ success: true, shipping: shippingRecord });
   }
@@ -1235,9 +1260,9 @@ app.post('/api/shipping', (req, res) => {
 });
 
 // 9. CONFIGURATION & SHEET SYNCHRONIZATION
-app.post('/api/settings/sheets-config', (req, res) => {
+app.post('/api/settings/sheets-config', async (req, res) => {
   const { scriptUrl, spreadsheetId, autoSync, customLogoUrl, user } = req.body;
-  const db = readDatabase();
+  const db = await readAndPullDatabase();
   
   db.sheetsConfig = {
     scriptUrl: scriptUrl || "",
@@ -1247,7 +1272,7 @@ app.post('/api/settings/sheets-config', (req, res) => {
     customLogoUrl: customLogoUrl || ""
   };
 
-  saveDatabase(db);
+  await saveDatabaseAndSync(db);
   
   // Instantly trigger an initial background pull to load pre-existing sheets database
   if (db.sheetsConfig.isLinked) {
@@ -1297,9 +1322,9 @@ app.post('/api/settings/sync-now', async (req, res) => {
 });
 
 // 10. USER MANAGEMENT (OWNER ONLY)
-app.post('/api/users', (req, res) => {
+app.post('/api/users', async (req, res) => {
   const { action, targetUser, user, id } = req.body;
-  const db = readDatabase();
+  const db = await readAndPullDatabase();
 
   if (user.role !== 'OWNER') {
     return res.status(403).json({ error: 'Access denied: Only OWNER can manage users.' });
@@ -1326,7 +1351,7 @@ app.post('/api/users', (req, res) => {
     };
 
     db.users.push(newUser);
-    saveDatabase(db);
+    await saveDatabaseAndSync(db);
     appendAuditLog(user.name, user.role, `Created User: ${newUser.Full_Name} (${newUser.Role})`, 'Security');
     return res.json({ success: true, user: newUser });
   }
@@ -1354,7 +1379,7 @@ app.post('/api/users', (req, res) => {
       Permissions: targetUser.Permissions || current.Permissions || ["dashboard", "products", "inventory", "opname", "orders", "shipping", "reports", "customers", "settings"]
     };
 
-    saveDatabase(db);
+    await saveDatabaseAndSync(db);
     appendAuditLog(user.name, user.role, `Updated User details for: ${targetUser.Full_Name}`, 'Security');
     return res.json({ success: true });
   }
@@ -1371,7 +1396,7 @@ app.post('/api/users', (req, res) => {
     }
 
     db.users.splice(idx, 1);
-    saveDatabase(db);
+    await saveDatabaseAndSync(db);
     appendAuditLog(user.name, user.role, `Deleted user account: ${name}`, 'Security');
     return res.json({ success: true });
   }
