@@ -7,7 +7,6 @@ import express from 'express';
 import path from 'path';
 import fs from 'fs';
 import crypto from 'crypto';
-import { createServer as createViteServer } from 'vite';
 import { 
   User, Product, Customer, StockIn, StockOut, 
   StockOpname, Order, Shipping, ActivityLog, SheetsConfig, OrderStatus 
@@ -15,7 +14,12 @@ import {
 
 const app = express();
 const PORT = 3000;
-const DB_FILE = path.join(process.cwd(), 'db.json');
+
+const IS_VERCEL = !!process.env.VERCEL;
+const BUNDLED_DB_FILE = path.join(process.cwd(), 'db.json');
+const DB_FILE = IS_VERCEL 
+  ? path.join('/tmp', 'db.json')
+  : BUNDLED_DB_FILE;
 
 app.use(express.json({ limit: '10mb' }));
 
@@ -303,13 +307,31 @@ const DEFAULT_DB = {
 // Reads data from db.json file, or seeds and returns default
 function readDatabase() {
   try {
-    if (fs.existsSync(DB_FILE)) {
-      const data = fs.readFileSync(DB_FILE, 'utf8');
-      return JSON.parse(data);
+    if (IS_VERCEL) {
+      if (!fs.existsSync(DB_FILE)) {
+        console.log("Database file doesn't exist in /tmp. Attempting to seed or copy bundled database...");
+        if (fs.existsSync(BUNDLED_DB_FILE)) {
+          try {
+            const bundledData = fs.readFileSync(BUNDLED_DB_FILE, 'utf8');
+            fs.writeFileSync(DB_FILE, bundledData, 'utf8');
+            console.log("Successfully copied seed database to /tmp/db.json");
+          } catch (copyErr) {
+            console.error("Failed to copy bundled db.json to /tmp/db.json, fallback to DEFAULT_DB", copyErr);
+            fs.writeFileSync(DB_FILE, JSON.stringify(DEFAULT_DB, null, 2), 'utf8');
+          }
+        } else {
+          console.log("No bundled db.json found. Creating new empty database in /tmp/db.json...");
+          fs.writeFileSync(DB_FILE, JSON.stringify(DEFAULT_DB, null, 2), 'utf8');
+        }
+      }
     } else {
-      fs.writeFileSync(DB_FILE, JSON.stringify(DEFAULT_DB, null, 2), 'utf8');
-      return DEFAULT_DB;
+      if (!fs.existsSync(DB_FILE)) {
+        fs.writeFileSync(DB_FILE, JSON.stringify(DEFAULT_DB, null, 2), 'utf8');
+      }
     }
+
+    const data = fs.readFileSync(DB_FILE, 'utf8');
+    return JSON.parse(data);
   } catch (error) {
     console.error("Failed to read database file:", error);
     return DEFAULT_DB;
@@ -1164,6 +1186,7 @@ async function startServer() {
   }
 
   if (process.env.NODE_ENV !== "production") {
+    const { createServer: createViteServer } = await import('vite');
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: "spa",
