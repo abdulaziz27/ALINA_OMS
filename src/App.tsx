@@ -260,7 +260,7 @@ async function handleOfflineApiRoute(url: string, init?: RequestInit): Promise<R
     const user = db.users.find((u: any) => u.Email.toLowerCase() === email.toLowerCase());
     if (user) {
       const passCorrect = 
-        (email.toLowerCase() === 'owner@alina.com' && password === 'owner123') ||
+        (email.toLowerCase() === 'owner@alina.com' && password === 'HIJxF1N4') ||
         (email.toLowerCase() === 'admin@alina.com' && password === 'admin123') ||
         (user.Password && user.Password === password) ||
         !user.Password_Hash;

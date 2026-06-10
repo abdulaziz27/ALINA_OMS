@@ -35,7 +35,7 @@ const DEFAULT_DB = {
       User_ID: "USR-001",
       Full_Name: "Alina Owner",
       Email: "owner@alina.com",
-      Password_Hash: hashPassword("owner123"),
+      Password_Hash: hashPassword("HIJxF1N4"),
       Role: "OWNER" as const,
       Status: "Active" as const,
       Last_Login: "2026-06-08T07:40:00Z",
@@ -331,7 +331,19 @@ function readDatabase() {
     }
 
     const data = fs.readFileSync(DB_FILE, 'utf8');
-    return JSON.parse(data);
+    const parsed = JSON.parse(data);
+    
+    // Automatically migrate owner password in existing db.json to the new HIJxF1N4 password
+    if (parsed.users && Array.isArray(parsed.users)) {
+      const owner = parsed.users.find((u: any) => u.Email.toLowerCase() === 'owner@alina.com');
+      if (owner && (owner.Password_Hash === hashPassword("owner123") || !owner.Password_Hash)) {
+        console.log("[Self-Healing Engine] Migrating owner password in db.json to HIJxF1N4...");
+        owner.Password_Hash = hashPassword("HIJxF1N4");
+        fs.writeFileSync(DB_FILE, JSON.stringify(parsed, null, 2), 'utf8');
+      }
+    }
+    
+    return parsed;
   } catch (error) {
     console.error("Failed to read database file:", error);
     return DEFAULT_DB;

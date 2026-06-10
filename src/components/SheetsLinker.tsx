@@ -127,13 +127,22 @@ function writeTableDirect(ss, sheetName, list) {
     setTimeout(() => setCopied(false), 3000);
   };
 
-  const handleSaveSubmit = async (e: React.FormEvent) => {
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+
+  const handleSaveSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setShowConfirmModal(true);
+  };
+
+  const executeSaveConfig = async () => {
+    setShowConfirmModal(false);
     setLoading(true);
     const success = await onSaveConfig({ scriptUrl, spreadsheetId, autoSync });
     setLoading(false);
     if (success) {
-      setSyncResponse("Google Sheet configuration saved successfully! If your webhook URL is active and published, system updates will automatically mirror live.");
+      setShowSuccessModal(true);
+      setSyncResponse("Koneksi Google Sheets berhasil dihubungkan! Setiap transaksi/update sistem akan disinkronisasikan otomatis.");
     }
   };
 
@@ -289,6 +298,80 @@ function writeTableDirect(ss, sheetName, list) {
         </div>
 
       </div>
+
+      {/* ========================================== */}
+      {/* 1. CONFIRMATION MODAL OVERLAY */}
+      {/* ========================================== */}
+      {showConfirmModal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-fade-in" id="confirm-sheet-modal">
+          <div className="bg-white rounded-[32px] p-6 max-w-md w-full border border-pink-100 shadow-2xl space-y-5 text-center animate-scale-up">
+            <div className="mx-auto w-14 h-14 bg-pink-50 rounded-full flex items-center justify-center text-[#EC4899]">
+              <Link2 className="w-7 h-7" />
+            </div>
+            
+            <div className="space-y-2">
+              <h4 className="font-bold text-gray-900 text-lg leading-tight">Konfirmasi Koneksi Database</h4>
+              <p className="text-xs text-gray-500 leading-relaxed">
+                Apakah Anda yakin ingin menghubungkan database Alina Enterprise System dengan Google Sheets menggunakan kredensial ini?
+              </p>
+              <div className="p-3 bg-pink-50/50 rounded-2xl border border-pink-100/50 text-[10px] text-left space-y-1">
+                <span className="font-bold text-[#EC4899] block">💡 Catatan Sinkronisasi:</span>
+                <p className="text-gray-500">
+                  Pastikan spreadsheet Anda telah memiliki sheet dengan nama yang sesuai dan script Apps Script dideploy sebagai Web App yang diakses oleh 'Anyone'.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => setShowConfirmModal(false)}
+                className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-2.5 px-4 rounded-xl transition text-xs border border-gray-200 cursor-pointer font-sans"
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                onClick={executeSaveConfig}
+                className="flex-1 bg-[#111827] hover:bg-black text-white font-semibold py-2.5 px-4 rounded-xl transition text-xs shadow-md cursor-pointer font-sans"
+              >
+                Ya, Hubungkan
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================== */}
+      {/* 2. SUCCESS MODAL OVERLAY */}
+      {/* ========================================== */}
+      {showSuccessModal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-fade-in" id="success-sheet-modal">
+          <div className="bg-white rounded-[32px] p-6 max-w-md w-full border border-emerald-100 shadow-2xl space-y-5 text-center animate-scale-up">
+            <div className="mx-auto w-14 h-14 bg-emerald-50 rounded-full flex items-center justify-center text-emerald-500">
+              <ShieldCheck className="w-8 h-8" />
+            </div>
+            
+            <div className="space-y-2">
+              <h4 className="font-bold text-gray-900 text-lg leading-tight">Sistem Berhasil Terhubung!</h4>
+              <p className="text-xs text-gray-500 leading-relaxed">
+                Koneksi Google Sheets berhasil disimpan dan diaktifkan. Alina Enterprise System sekarang berjalan dalam sinkronisasi waktu nyata (real-time).
+              </p>
+              <div className="p-3 bg-emerald-50/30 rounded-2xl border border-emerald-100/50 text-[10px] text-emerald-800 text-left">
+                <strong>✓ Sinkronisasi Aktif:</strong> Setiap perubahan inventaris, pesanan retail, dan log audit akan dipush otomatis ke Spreadsheet Anda.
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setShowSuccessModal(false)}
+              className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2.5 px-4 rounded-xl transition text-xs shadow-md cursor-pointer font-sans"
+            >
+              Selesai
+            </button>
+          </div>
+        </div>
+      )}
 
     </div>
   );
