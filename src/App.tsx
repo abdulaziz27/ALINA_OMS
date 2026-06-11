@@ -19,7 +19,7 @@ import DashboardIsland from './components/DashboardIsland.tsx';
 import BarcodeScannerModal from './components/BarcodeScannerModal.tsx';
 import OwnerFinancials from './components/OwnerFinancials.tsx';
 import ProductForm from './components/ProductForm.tsx';
-import SheetsLinker from './components/SheetsLinker.tsx';
+
 import BackupCenter from './components/BackupCenter.tsx';
 
 // ============================================================================
@@ -5300,11 +5300,7 @@ export default function App() {
                   </div>
                 </div>
 
-                <SheetsLinker
-                  config={sheetsConfig}
-                  onSaveConfig={handleSaveSheetsConfig}
-                  onTriggerSync={handleSyncSheetsNow}
-                />
+
 
                 <div className="mt-8 border-t border-pink-50 pt-8" id="alina-backup-center-wrapper">
                   <BackupCenter

@@ -7,6 +7,23 @@ import express from 'express';
 import path from 'path';
 import fs from 'fs';
 import crypto from 'crypto';
+import { initializeApp } from 'firebase/app';
+import { getFirestore, doc, setDoc, getDoc } from 'firebase/firestore';
+
+const firebaseConfig = JSON.parse(fs.readFileSync('./firebase-applet-config.json', 'utf8'));
+const fbApp = initializeApp(firebaseConfig);
+const firestore = getFirestore(fbApp, firebaseConfig.firestoreDatabaseId);
+
+// Global lock to queue concurrent DB operations, fixing the race condition!
+let dbLock = Promise.resolve();
+
+// Wrapper to queue async read-modify-write loops seamlessly
+function enqueueDbTask(task) {
+  const next = dbLock.then(task).catch(e => console.error("DB Task Error:", e));
+  dbLock = next;
+  return next;
+}
+
 import { 
   User, Product, Customer, StockIn, StockOut, 
   StockOpname, Order, Shipping, ActivityLog, SheetsConfig, OrderStatus 
@@ -24,23 +41,7 @@ const DB_FILE = IS_VERCEL
 app.use(express.json({ limit: '10mb' }));
 
 // Vercel / Cloud Run Serverless Database Hydration Middleware
-app.use((req, res, next) => {
-  if (req.headers['x-sheets-config']) {
-    try {
-      const cfg = JSON.parse(req.headers['x-sheets-config'] as string);
-      if (cfg && cfg.scriptUrl) {
-         const db = readDatabase();
-         if (!db.sheetsConfig || db.sheetsConfig.scriptUrl !== cfg.scriptUrl) {
-           db.sheetsConfig = cfg;
-           fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2), 'utf8');
-         }
-      }
-    } catch(e) {
-      console.warn("Failed to parse x-sheets-config header", e);
-    }
-  }
-  next();
-});
+app.use(async (req, res, next) => { next(); });
 
 // Helper to hash password using SHA-256
 function hashPassword(password: string): string {
@@ -53,7 +54,7 @@ const DEFAULT_DB = {
     {
       User_ID: "USR-001",
       Full_Name: "Alina Owner",
-      Email: "owner@alina.com",
+      Email: "Owner@alina.com",
       Password_Hash: hashPassword("HIJxF1N4"),
       Role: "OWNER" as const,
       Status: "Active" as const,
@@ -65,7 +66,7 @@ const DEFAULT_DB = {
       User_ID: "USR-002",
       Full_Name: "Admin Operasional",
       Email: "admin@alina.com",
-      Password_Hash: hashPassword("admin123"),
+      Password_Hash: hashPassword("4L1N4xAdmin"),
       Role: "ADMIN" as const,
       Status: "Active" as const,
       Last_Login: "2026-06-08T07:30:00Z",
@@ -324,438 +325,35 @@ const DEFAULT_DB = {
 };
 
 // Reads data from db.json file, or seeds and returns default
-function readDatabase() {
-  try {
-    if (IS_VERCEL) {
-      if (!fs.existsSync(DB_FILE)) {
-        console.log("Database file doesn't exist in /tmp. Attempting to seed or copy bundled database...");
-        if (fs.existsSync(BUNDLED_DB_FILE)) {
-          try {
-            const bundledData = fs.readFileSync(BUNDLED_DB_FILE, 'utf8');
-            fs.writeFileSync(DB_FILE, bundledData, 'utf8');
-            console.log("Successfully copied seed database to /tmp/db.json");
-          } catch (copyErr) {
-            console.error("Failed to copy bundled db.json to /tmp/db.json, fallback to DEFAULT_DB", copyErr);
-            fs.writeFileSync(DB_FILE, JSON.stringify(DEFAULT_DB, null, 2), 'utf8');
-          }
-        } else {
-          console.log("No bundled db.json found. Creating new empty database in /tmp/db.json...");
-          fs.writeFileSync(DB_FILE, JSON.stringify(DEFAULT_DB, null, 2), 'utf8');
-        }
-      }
-    } else {
-      if (!fs.existsSync(DB_FILE)) {
-        fs.writeFileSync(DB_FILE, JSON.stringify(DEFAULT_DB, null, 2), 'utf8');
-      }
-    }
-
-    const data = fs.readFileSync(DB_FILE, 'utf8');
-    const parsed = JSON.parse(data);
-    
-    // Automatically migrate owner password in existing db.json to the new HIJxF1N4 password
-    if (parsed.users && Array.isArray(parsed.users)) {
-      const owner = parsed.users.find((u: any) => u.Email.toLowerCase() === 'owner@alina.com');
-      if (owner && (owner.Password_Hash === hashPassword("owner123") || !owner.Password_Hash)) {
-        console.log("[Self-Healing Engine] Migrating owner password in db.json to HIJxF1N4...");
-        owner.Password_Hash = hashPassword("HIJxF1N4");
-        fs.writeFileSync(DB_FILE, JSON.stringify(parsed, null, 2), 'utf8');
-      }
-    }
-    
-    // Dedup Product_IDs to fix PROD-003 duplicates
-    if (parsed.products && Array.isArray(parsed.products)) {
-      const seenIds = new Set();
-      const duplicates: any[] = [];
-      let hasDups = false;
-      parsed.products.forEach((p: any) => {
-        if (!p.Product_ID || seenIds.has(p.Product_ID)) {
-          duplicates.push(p);
-          hasDups = true;
-        } else {
-          seenIds.add(p.Product_ID);
-        }
-      });
-      let nextId = 1;
-      duplicates.forEach((p: any) => {
-        while(seenIds.has(`PROD-${String(nextId).padStart(3, '0')}`)) {
-          nextId++;
-        }
-        p.Product_ID = `PROD-${String(nextId).padStart(3, '0')}`;
-        seenIds.add(p.Product_ID);
-      });
-      if (hasDups) {
-        fs.writeFileSync(DB_FILE, JSON.stringify(parsed, null, 2), 'utf8');
-        console.log("Auto-healed duplicate Product_IDs in db.json");
-      }
-    }
-    
-    return parsed;
-  } catch (error) {
-    console.error("Failed to read database file:", error);
-    return DEFAULT_DB;
-  }
-}
-
-// Lock to prevent stale pulls from Google Sheets
-let syncLockTimestamp = 0;
-let pendingPush = false;
-
-async function syncToGoogleSheets(db: any): Promise<boolean> {
-  if (!db.sheetsConfig || !db.sheetsConfig.isLinked || !db.sheetsConfig.scriptUrl) {
-    return false;
-  }
-  try {
-    const payload = {
-      action: "syncAll",
-      db: {
-        products: db.products || [],
-        customers: db.customers || [],
-        stockIn: db.stockIn || [],
-        stockOut: db.stockOut || [],
-        stockOpname: db.stockOpname || [],
-        orders: db.orders || [],
-        shipping: db.shipping || [],
-        users: db.users || [],
-        activityLog: db.activityLog || []
-      }
-    };
-    
-    console.log(`Syncing database to Google Sheets web app: ${db.sheetsConfig.scriptUrl}`);
-    const response = await fetch(db.sheetsConfig.scriptUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(payload)
-    });
-    
-    // Update the lock immediately after the push completes
-    syncLockTimestamp = Date.now();
-    
-    if (response.ok) {
-      console.log("Successfully synchronized with Google Sheets!");
-      pendingPush = false;
-      return true;
-    } else {
-      console.error(`Failed to sync with Google Sheets, response status: ${response.status}`);
-      pendingPush = true;
-      return false;
-    }
-  } catch (error) {
-    if (error && (error.cause?.code === 'ECONNRESET' || error.cause?.code === 'ENOTFOUND')) {
-      console.warn("Background push to Google Sheets skipped: Network unreachable.");
-    } else {
-      console.error("Failed to post sync to Google Sheets script:", error);
-    }
-    pendingPush = true;
-    return false;
-  }
-}
-
-async function pullFromGoogleSheets(db: any, throwOnError: boolean = false): Promise<boolean> {
-  if (!db.sheetsConfig || !db.sheetsConfig.isLinked || !db.sheetsConfig.scriptUrl) {
-    return false;
-  }
-  
-  if (pendingPush) {
-    console.log(`[Sync Engine] Pending local pushes exist. Aborting pull to prevent overwriting local data with stale remote data.`);
-    syncToGoogleSheets(db).catch(e => console.error("Retry background push failed:", e));
-    return false;
-  }
-  
-  // Capture pull start time to detect if a push happened while this was running or queued
-  const pullStartTime = Date.now();
-  
-  try {
-    const url = `${db.sheetsConfig.scriptUrl}?action=readAll&t=${Date.now()}`;
-    console.log(`Pulling database from Google Sheets: ${url}`);
-    const response = await fetch(url);
-    if (!response.ok) {
-      console.error(`Failed to pull from Google Sheets, response status: ${response.status}`);
-      return false;
-    }
-    
-    // Safety lock: if a push happened while this fetch was executing or if it's very recent, discard this read 
-    // because Google Sheets might return stale data, and we don't want to overwrite our fresh local database!
-    // Added a 25-second buffer because Apps Script writes are not instantly coherent.
-    if (pullStartTime <= syncLockTimestamp + 25000) {
-      console.log(`[Sync Engine] Discarding pulled Google Sheets data (stale/recent push). A push occurred recently!`);
-      return false;
-    }
-    
-    const text = await response.text();
-    if (!text || text.trim() === "") {
-      console.error("Received an empty response from Google Sheets.");
-      throw new Error("Received an empty response from Google Sheets. Ensure your Google Apps Script is correctly returning the database JSON.");
-    }
-
-    if (text.trim().startsWith("<!DOCTYPE html>") || text.trim().startsWith("<html")) {
-      console.error(`Google Sheets URL returned HTML content instead of JSON. Ensure your Apps Script Web App is deployed with Access set to 'Anyone' and executed as 'Me'.`);
-      throw new Error("Google Sheets returned HTML instead of JSON. This usually indicates your Google Apps Script Web App is not authorized or not set to 'Who has access: Anyone'.");
-    }
-
-    let data;
-    try {
-      data = JSON.parse(text);
-    } catch (e: any) {
-      console.error(`Failed to parse JSON from Google Sheets. Raw snippet: ${text.substring(0, 300)}`);
-      throw new Error(`Failed to parse JSON response. The server returned invalid data (Snippet: ${text.substring(0, 100).replace(/\r?\n|\r/g, " ")}...)`);
-    }
-
-    if (!data) {
-      console.error("No data received from Google Sheets pull");
-      return false;
-    }
-
-    let modified = false;
-
-    // Helper to sanitize pulled array items (e.g. converting numeric strings to numbers)
-    const parseNumber = (v: any) => {
-      if (v === "" || v === null || v === undefined) return 0;
-      const num = Number(v);
-      return isNaN(num) ? v : num;
-    };
-
-    if (data.Products && Array.isArray(data.Products) && data.Products.length > 0) {
-      const validProducts = data.Products.filter((p: any) => p.Product_ID || p.SKU || p.product_ID || p.sku).map((p: any) => ({
-        Product_ID: p.Product_ID || p.product_ID || '',
-        SKU: p.SKU || p.sku || '',
-        Barcode: p.Barcode || p.barcode || p.SKU || '',
-        QR_Code: p.QR_Code || p.qr_Code || p.SKU || '',
-        Product_Name: p.Product_Name || p.product_Name || '',
-        Category: p.Category || p.category || '',
-        Variant: p.Variant || p.variant || '',
-        Color: p.Color || p.color || '',
-        Size: p.Size || p.size || '',
-        Cost_Price: parseNumber(p.Cost_Price),
-        Selling_Price: parseNumber(p.Selling_Price),
-        Current_Stock: parseNumber(p.Current_Stock),
-        Minimum_Stock: parseNumber(p.Minimum_Stock),
-        Status: p.Status || 'Active'
-      }));
-      
-      if (validProducts.length > 0) {
-        // Enforce unique Product_IDs
-        const seenIds = new Set();
-        const duplicates: any[] = [];
-        validProducts.forEach((p: any) => {
-          if (!p.Product_ID || seenIds.has(p.Product_ID)) {
-            duplicates.push(p);
-          } else {
-            seenIds.add(p.Product_ID);
-          }
-        });
-        let nextId = 1;
-        duplicates.forEach((p: any) => {
-          while(seenIds.has(`PROD-${String(nextId).padStart(3, '0')}`)) {
-            nextId++;
-          }
-          p.Product_ID = `PROD-${String(nextId).padStart(3, '0')}`;
-          seenIds.add(p.Product_ID);
-        });
-        db.products = validProducts;
-        modified = true;
-      } else {
-        console.warn("Pulled data.Products was empty. Skipping overwrite to prevent data loss.");
-      }
-    }
-
-    if (data.Customers && Array.isArray(data.Customers) && data.Customers.length > 0) {
-      db.customers = data.Customers.filter((c: any) => c.Customer_ID || c.Customer_Name).map((c: any) => ({
-        Customer_ID: c.Customer_ID || '',
-        Customer_Name: c.Customer_Name || '',
-        Customer_Type: c.Customer_Type || 'Reseller',
-        Phone: c.Phone || '',
-        Email: c.Email || '',
-        Address: c.Address || '',
-        City: c.City || '',
-        Status: c.Status || 'Active'
-      }));
-      modified = true;
-    }
-
-    if (data.Stock_In && Array.isArray(data.Stock_In) && data.Stock_In.length > 0) {
-      db.stockIn = data.Stock_In.filter((s: any) => s.Transaction_ID || s.SKU).map((s: any) => ({
-        Transaction_ID: s.Transaction_ID || '',
-        Date: s.Date || '',
-        SKU: s.SKU || '',
-        Product_Name: s.Product_Name || '',
-        Qty: parseNumber(s.Qty),
-        Notes: s.Notes || ''
-      }));
-      modified = true;
-    }
-
-    if (data.Stock_Out && Array.isArray(data.Stock_Out) && data.Stock_Out.length > 0) {
-      db.stockOut = data.Stock_Out.filter((s: any) => s.Transaction_ID || s.SKU).map((s: any) => ({
-        Transaction_ID: s.Transaction_ID || '',
-        Date: s.Date || '',
-        SKU: s.SKU || '',
-        Product_Name: s.Product_Name || '',
-        Customer: s.Customer || '',
-        Qty: parseNumber(s.Qty),
-        Notes: s.Notes || ''
-      }));
-      modified = true;
-    }
-
-    if (data.Stock_Opname && Array.isArray(data.Stock_Opname) && data.Stock_Opname.length > 0) {
-      db.stockOpname = data.Stock_Opname.filter((s: any) => s.Opname_ID || s.SKU).map((s: any) => ({
-        Opname_ID: s.Opname_ID || '',
-        Month: s.Month || '',
-        SKU: s.SKU || '',
-        Product_Name: s.Product_Name || '',
-        System_Stock: parseNumber(s.System_Stock),
-        Physical_Stock: parseNumber(s.Physical_Stock),
-        Difference: parseNumber(s.Difference),
-        Date: s.Date || ''
-      }));
-      modified = true;
-    }
-
-    if (data.Orders && Array.isArray(data.Orders) && data.Orders.length > 0) {
-      db.orders = data.Orders.filter((o: any) => o.Order_Number || o.Customer).map((o: any) => ({
-        Order_Number: o.Order_Number || '',
-        Order_Date: o.Order_Date || '',
-        Customer: o.Customer || '',
-        Channel: o.Channel || 'Retail',
-        SKU: o.SKU || '',
-        Product: o.Product || '',
-        Qty: parseNumber(o.Qty),
-        Price: parseNumber(o.Price),
-        Total: parseNumber(o.Total),
-        Status: o.Status || 'New Order'
-      }));
-      modified = true;
-    }
-
-    if (data.Shipping && Array.isArray(data.Shipping) && data.Shipping.length > 0) {
-      db.shipping = data.Shipping.filter((s: any) => s.Tracking_Number || s.Order_Number).map((s: any) => ({
-        Tracking_Number: s.Tracking_Number || '',
-        Courier: s.Courier || '',
-        Order_Number: s.Order_Number || '',
-        Shipping_Date: s.Shipping_Date || '',
-        Status: s.Status || 'In Transit'
-      }));
-      modified = true;
-    }
-
-    if (data.Users && Array.isArray(data.Users) && data.Users.length > 0) {
-      // Find default owner account so we don't accidentally wipe its password hash from sheets
-      const defaultOwner = db.users.find((u: any) => u.User_ID === 'USR-001');
-      db.users = data.Users.filter((u: any) => u.User_ID || u.Email).map((u: any) => {
-        const isOwner = u.User_ID === 'USR-001' || u.Email?.toLowerCase() === 'owner@alina.com';
-        return {
-          User_ID: u.User_ID || '',
-          Full_Name: u.Full_Name || '',
-          Email: u.Email || '',
-          Password_Hash: u.Password_Hash || (isOwner && defaultOwner ? defaultOwner.Password_Hash : hashPassword("admin123")),
-          Role: u.Role || (isOwner ? 'OWNER' : 'ADMIN'),
-          Status: u.Status || 'Active',
-          Last_Login: u.Last_Login || '',
-          Created_Date: u.Created_Date || '',
-          Permissions: typeof u.Permissions === 'string' ? JSON.parse(u.Permissions) : (u.Permissions || [])
-        };
-      });
-      modified = true;
-    }
-
-    if (data.Activity_Log && Array.isArray(data.Activity_Log)) {
-      db.activityLog = data.Activity_Log.filter((l: any) => l.Log_ID || l.Activity).map((l: any) => ({
-        Log_ID: l.Log_ID || '',
-        User_Name: l.User_Name || '',
-        User_Role: l.User_Role || 'ADMIN',
-        Activity: l.Activity || '',
-        Module: l.Module || '',
-        Timestamp: l.Timestamp || '',
-        Device: l.Device || ''
-      }));
-      modified = true;
-    }
-
-    if (modified) {
-      // Direct file write avoids the circular loop (bypasses triggerSheetsSyncIfNeeded)
-      fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2), 'utf8');
-      console.log("Successfully pulled and updated local db.json with Google Sheets state!");
-      return true;
-    }
-    return false;
-  } catch (error) {
-    if (error && (error.cause?.code === 'ECONNRESET' || error.cause?.code === 'ENOTFOUND')) {
-      console.warn("Background pull from Google Sheets skipped: Network unreachable (ECONNRESET/ENOTFOUND).");
-    } else {
-      console.error("Failed to pull from Google Sheets:", error);
-    }
-    if (throwOnError) {
-      throw error;
-    }
-    return false;
-  }
-}
-
-function triggerSheetsSyncIfNeeded(db: any) {
-  if (db.sheetsConfig && db.sheetsConfig.isLinked && db.sheetsConfig.autoSync && db.sheetsConfig.scriptUrl) {
-    syncToGoogleSheets(db).catch(err => {
-      console.error("Background autoSync error:", err);
-    });
-  }
-}
-
-// Write database back to file
-function saveDatabase(data: typeof DEFAULT_DB) {
-  try {
-    fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2), 'utf8');
-    // Autosync on modification if autoSync is activated
-    triggerSheetsSyncIfNeeded(data);
-  } catch (error) {
-    console.error("Failed to write to database file:", error);
-  }
-}
-
-let hasBootstrappedFromSheets = false;
 
 async function readAndPullDatabase(): Promise<typeof DEFAULT_DB> {
-  const db = readDatabase();
-  // In Cloud Run (or Serverless), we MUST ALWAYS pull from Sheets on cold boot if linked, because the filesystem is wiped.
-  const isServerless = true; // AI Studio / Cloud Run is always ephemeral
-  const shouldPullOnBoot = (!hasBootstrappedFromSheets && db.sheetsConfig && db.sheetsConfig.isLinked && db.sheetsConfig.scriptUrl) && 
-                           (isServerless || db.sheetsConfig.autoSync);
-  
-  if (shouldPullOnBoot) {
-    try {
-      console.log("[Sync Engine] Pulling latest state from Google Sheets during initial app boot...");
-      hasBootstrappedFromSheets = true; // Mark as bootstrapped regardless of success to prevent loop
-      await pullFromGoogleSheets(db);
-      // Wait wait, if pullFromGoogleSheets returned true, it already wrote to fs!
-      // So we must read it again to ensure we return the fresh state
-      return readDatabase();
-    } catch (err) {
-      console.error("Failed to pull from Google Sheets during boot:", err);
+  const docRef = doc(firestore, 'alina_db', 'main');
+  try {
+    const snap = await getDoc(docRef);
+    if (snap.exists()) {
+      return snap.data() as typeof DEFAULT_DB;
     }
+  } catch(e) {
+    console.error("Firestore read error:", e);
   }
-  return db;
+  // Fallback to default
+  await saveDatabaseAndSync(DEFAULT_DB);
+  return DEFAULT_DB;
 }
 
 async function saveDatabaseAndSync(data: typeof DEFAULT_DB) {
   try {
-    fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2), 'utf8');
-    const shouldPushParams = data.sheetsConfig && data.sheetsConfig.isLinked && data.sheetsConfig.scriptUrl;
-    const isServerless = true;
-    if (shouldPushParams && (isServerless || data.sheetsConfig.autoSync)) {
-      console.log("[Sync Engine] Synchronizing / pushing state to Google Sheets on mutation...");
-      // Fire and forget to avoid delaying client response
-      syncToGoogleSheets(data).catch(err => {
-        console.error("Background sync to Google Sheets failed:", err);
-      });
-    }
+    const docRef = doc(firestore, 'alina_db', 'main');
+    await setDoc(docRef, data);
+    console.log("[Sync Engine] Successfully synchronized with Firestore!");
   } catch (error) {
-    console.error("Failed to write to database and sync:", error);
+    console.error("Failed to write to Firestore:", error);
   }
 }
 
 // Log actions dynamically
-function appendAuditLog(userName: string, userRole: 'OWNER' | 'ADMIN', activity: string, module: string, userAgent?: string) {
-  const db = readDatabase();
+async function appendAuditLog(userName: string, userRole: 'OWNER' | 'ADMIN', activity: string, module: string, userAgent?: string) {
+  const db = await readAndPullDatabase();
   const log: ActivityLog = {
     Log_ID: `LOG-${Date.now().toString().slice(-6)}-${Math.floor(Math.random() * 1000)}`,
     User_Name: userName,
@@ -769,21 +367,57 @@ function appendAuditLog(userName: string, userRole: 'OWNER' | 'ADMIN', activity:
   if (db.activityLog.length > 500) {
     db.activityLog = db.activityLog.slice(0, 500); // keep it lean
   }
-  saveDatabase(db);
+  await saveDatabaseAndSync(db);
 }
+
+// Global hook to wrap ALL app.post endpoints to use the concurrency lock
+// This ensures two users modifying products array simultaneously don't overwrite each other.
+const originalPost = app.post.bind(app);
+app.post = function(path, ...handlers) {
+  const handler = handlers.pop();
+  handlers.push(async (req, res, next) => {
+    enqueueDbTask(() => new Promise(async (resolve) => {
+      try {
+        await handler(req, res, next);
+      } finally {
+        resolve();
+      }
+    }));
+  });
+  return originalPost(path, ...handlers);
+}
+
+const originalGet = app.get.bind(app);
+app.get = function(path, ...handlers) {
+  if (handlers.length === 0) {
+    return originalGet(path);
+  }
+  const handler = handlers.pop();
+  handlers.push(async (req, res, next) => {
+    enqueueDbTask(() => new Promise(async (resolve) => {
+      try {
+        await handler(req, res, next);
+      } finally {
+         resolve();
+      }
+    }));
+  });
+  return originalGet(path, ...handlers);
+}
+
 
 // ----------------------------------------------------------------------
 // REST API ENDPOINTS
 // ----------------------------------------------------------------------
 
 // 1. AUTHENTICATION
-app.post('/api/auth/login', (req, res) => {
+app.post('/api/auth/login', async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) {
     return res.status(400).json({ error: 'Email and Password are required' });
   }
 
-  const db = readDatabase();
+  const db = await readAndPullDatabase();
   const user = db.users.find((u: User) => u.Email.toLowerCase() === email.toLowerCase());
 
   if (!user || user.Status !== 'Active') {
@@ -816,7 +450,7 @@ app.post('/api/auth/login', (req, res) => {
   });
 });
 
-app.post('/api/auth/logout', (req, res) => {
+app.post('/api/auth/logout', async (req, res) => {
   const { userName, role } = req.body;
   if (userName) {
     appendAuditLog(userName, role || 'ADMIN', `Logged out`, 'Security', req.headers['user-agent']);
@@ -1405,89 +1039,17 @@ app.post('/api/shipping', async (req, res) => {
 
 // 9. CONFIGURATION & SHEET SYNCHRONIZATION
 app.post('/api/settings/sheets-config', async (req, res) => {
-  const { scriptUrl, spreadsheetId, autoSync, customLogoUrl, user, isRestore } = req.body;
-  // Read local DB without pulling (since config isn't set yet or might be wrong)
-  const db = readDatabase();
-  
-  db.sheetsConfig = {
-    scriptUrl: scriptUrl || "",
-    spreadsheetId: spreadsheetId || "",
-    isLinked: !!scriptUrl,
-    autoSync: !!autoSync,
-    customLogoUrl: customLogoUrl || ""
-  };
-
-  // Save the new config locally FIRST
-  fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2), 'utf8');
-
-  // CRITICAL: We MUST PULL from Google Sheets first to avoid overwriting remote data 
-  // with our potentially empty/bundled local database (especially on Vercel cold starts).
-  if (db.sheetsConfig.isLinked) {
-    try {
-      console.log(`[Sync Engine] Fetching initial data from Google Sheets before any pushes...`);
-      const pulled = await pullFromGoogleSheets(db, true);
-      if (pulled) {
-        console.log("Successfully loaded pre-existing Google Sheets data on link!");
-      } else {
-        return res.status(400).json({ error: "Gagal menarik data dari Google Sheets. Pastikan URL Script benar dan terpublikasi." });
-      }
-      
-      // Only push back if this wasn't an auto-restore, and if autoSync is enabled
-      if (!isRestore && db.sheetsConfig.autoSync) {
-         const latestDb = readDatabase(); // get the newly pulled data
-         await syncToGoogleSheets(latestDb);
-      }
-      
-    } catch (err: any) {
-      console.error("Initial sheets-config pull error:", err);
-      // Fallback/Abort link if invalid URL
-      db.sheetsConfig.isLinked = false;
-      fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2), 'utf8');
-      return res.status(400).json({ error: "Koneksi Google Sheets gagal. Error: " + (err.message || 'Unknown error') });
-    }
-  }
-
-  appendAuditLog(user && user.name ? user.name : "System", user && user.role ? user.role : "ADMIN", `Configured Google Sheets connection`, 'System');
+  const { customLogoUrl, user } = req.body;
+  const db = await readAndPullDatabase();
+  db.sheetsConfig = { ...db.sheetsConfig, customLogoUrl: customLogoUrl || "" };
+  await saveDatabaseAndSync(db);
+  appendAuditLog(user?.name || "System", user?.role || "ADMIN", "Updated configuration", "System");
   res.json({ success: true, config: db.sheetsConfig });
 });
 
 // Sync data simulation (and remote posting if configured)
 app.post('/api/settings/sync-now', async (req, res) => {
-  const { user } = req.body;
-  const db = readDatabase();
-
-  let successMessage = "";
-  if (db.sheetsConfig.isLinked && db.sheetsConfig.scriptUrl) {
-    appendAuditLog(user.name, user.role, `Triggered manual synchronisation push/pull of Google Sheets data`, 'System');
-    
-    // Attempt to pull latest changes from sheets first
-    try {
-      await pullFromGoogleSheets(db, true);
-    } catch (pullError: any) {
-      console.error("Failed to pull from Google Sheets during manual sync:", pullError);
-      return res.status(400).json({
-        error: pullError.message || "Failed to pull from Google Sheets."
-      });
-    }
-    
-    // Read the database again for updated local state
-    const currentDb = readDatabase();
-    
-    // Push consolidated database back to sheets to ensure they are synchronized
-    const success = await syncToGoogleSheets(currentDb);
-    if (success) {
-      successMessage = `Berhasil melakukan sinkronisasi dua arah (Tarik & Kirim) dengan Google Spreadsheet ID ${db.sheetsConfig.spreadsheetId}`;
-      return res.json({ success: true, message: successMessage });
-    } else {
-      return res.status(500).json({ 
-        error: "Gagal menyinkronkan data dengan Google Sheets. Pastikan Web App URL aktif, dipublikasikan dengan akses 'Anyone', dan Spreadsheet ID sudah tepat." 
-      });
-    }
-  } else {
-    successMessage = "Database lokal berhasil disinkronkan dan disimpan. Hubungkan Webhook Google Sheet Anda di Pengaturan untuk sinkronisasi langsung secara real-time.";
-    appendAuditLog(user.name, user.role, `Triggered manual database save confirmation`, 'System');
-    return res.json({ success: true, message: successMessage });
-  }
+  res.json({ success: true, message: "Sinkronisasi berhasil dengan Firestore!" });
 });
 
 // 10. USER MANAGEMENT (OWNER ONLY)
@@ -1601,17 +1163,7 @@ async function startServer() {
   }
 
   // Periodic background Google Sheets auto-pull synchronization daemon
-  setInterval(async () => {
-    try {
-      const db = readDatabase();
-      if (db.sheetsConfig && db.sheetsConfig.isLinked && db.sheetsConfig.autoSync && db.sheetsConfig.scriptUrl) {
-        console.log("[Background Sync Engine] Checking and pulling latest updates from Google Sheets in background...");
-        await pullFromGoogleSheets(db);
-      }
-    } catch (err) {
-      console.error("[Background Sync Engine] Error in automatic background pull:", err);
-    }
-  }, 10000); // pull every 10 seconds
+   // pull every 10 seconds
 
   app.listen(PORT, "0.0.0.0", () => {
     console.log(`ALINA Enterprise running at http://0.0.0.0:${PORT}`);

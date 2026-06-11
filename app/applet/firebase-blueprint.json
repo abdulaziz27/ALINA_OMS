@@ -1,0 +1,99 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User account",
+      "type": "object",
+      "properties": {
+        "User_ID": {"type": "string"},
+        "Full_Name": {"type": "string"},
+        "Email": {"type": "string"},
+        "Role": {"type": "string"},
+        "Status": {"type": "string"}
+      },
+      "required": ["User_ID", "Email"]
+    },
+    "Product": {
+      "title": "Product",
+      "description": "Inventory product",
+      "type": "object",
+      "properties": {
+        "Product_ID": {"type": "string"},
+        "SKU": {"type": "string"},
+        "Product_Name": {"type": "string"}
+      },
+      "required": ["Product_ID", "SKU"]
+    },
+    "Customer": {
+      "title": "Customer",
+      "description": "Customer record",
+      "type": "object",
+      "properties": {
+        "Customer_ID": {"type": "string"},
+        "Customer_Name": {"type": "string"}
+      },
+      "required": ["Customer_ID", "Customer_Name"]
+    },
+    "Order": {
+      "title": "Order",
+      "description": "Sales order",
+      "type": "object",
+      "properties": {
+        "Order_Number": {"type": "string"},
+        "Customer_Name": {"type": "string"},
+        "Total_Amount": {"type": "number"}
+      },
+      "required": ["Order_Number"]
+    },
+    "Transaction": {
+      "title": "Transaction",
+      "description": "Stock In/Out",
+      "type": "object",
+      "properties": {
+        "Transaction_ID": {"type": "string"},
+        "SKU": {"type": "string"}
+      },
+      "required": ["Transaction_ID"]
+    },
+    "Shipping": {
+      "title": "Shipping",
+      "description": "Shipping record",
+      "type": "object",
+      "properties": {
+        "Order_Number": {"type": "string"},
+        "Tracking_Number": {"type": "string"}
+      },
+      "required": ["Order_Number"]
+    }
+  },
+  "firestore": {
+    "/products/{productId}": {
+      "schema": {"$ref": "#/entities/Product"},
+      "description": "All products in inventory"
+    },
+    "/users/{userId}": {
+      "schema": {"$ref": "#/entities/User"},
+      "description": "System users"
+    },
+    "/customers/{customerId}": {
+      "schema": {"$ref": "#/entities/Customer"},
+      "description": "Customers list"
+    },
+    "/orders/{orderId}": {
+      "schema": {"$ref": "#/entities/Order"},
+      "description": "Sales orders"
+    },
+    "/stockIn/{txId}": {
+      "schema": {"$ref": "#/entities/Transaction"},
+      "description": "Stock additions"
+    },
+    "/stockOut/{txId}": {
+      "schema": {"$ref": "#/entities/Transaction"},
+      "description": "Stock deductions"
+    },
+    "/shipping/{orderId}": {
+      "schema": {"$ref": "#/entities/Shipping"},
+      "description": "Shipping data"
+    }
+  }
+}
