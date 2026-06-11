@@ -71,9 +71,7 @@ export default function BarcodeScannerModal({
           });
           
           const config = {
-            fps: 10, // Moderate fps to preserve performance on mobile
-            qrbox: { width: 250, height: 250 },
-            aspectRatio: 1.0,
+            fps: 10 // Moderate fps to preserve performance on mobile
           };
 
           const onDecode = (decodedText: string) => {
@@ -357,19 +355,19 @@ export default function BarcodeScannerModal({
                 </div>
               )}
               
-              <div className="relative rounded-2xl overflow-hidden bg-black aspect-video flex items-center justify-center border-2 border-pink-500 shadow-md">
+              <div className="relative rounded-2xl overflow-hidden bg-black min-h-[300px] flex items-center justify-center border-2 border-pink-500 shadow-md">
                 <div 
                   id="html5-qrcode-reader" 
-                  className="w-full h-full [&_video]:object-cover [&_video]:w-full [&_video]:h-full"
+                  className="w-full h-full"
                 />
                 
                 {/* Visual guideline overlay (Full frame) */}
                 <div className="absolute inset-0 pointer-events-none flex flex-col items-center justify-center p-4">
-                  <div className="w-full h-full border-2 border-[#EC4899]/30 rounded-lg relative flex items-center justify-center">
+                  <div className="w-[80%] aspect-square max-w-[250px] border-2 border-[#EC4899]/60 rounded-lg relative flex items-center justify-center shadow-[0_0_0_999px_rgba(0,0,0,0.4)]">
                     <div className="w-full h-[2px] bg-red-500/80 absolute animate-[ping_2s_infinite]" />
                   </div>
-                  <p className="text-[10px] text-white/80 bg-black/60 px-3 py-1.5 rounded-full mt-3 z-10">
-                    Arahkan Kamera ke Kode Batang / QR
+                  <p className="text-[10px] text-white bg-black/80 px-3 py-1.5 rounded-full mt-3 z-10 font-bold tracking-widest">
+                    ARAHKAN KAMERA KE QR CODE
                   </p>
                 </div>
               </div>
