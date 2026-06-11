@@ -7,7 +7,7 @@
       "Password_Hash": "c570e667306851a91d3068d3daaeb637a292d2f2130b202345cff7f5d69b4bc2",
       "Role": "OWNER",
       "Status": "Active",
-      "Last_Login": "2026-06-10T09:18:23.059Z",
+      "Last_Login": "2026-06-11T06:27:31.331Z",
       "Created_Date": "2026-01-01T00:00:00Z",
       "Permissions": [
         "dashboard",
@@ -28,7 +28,7 @@
       "Password_Hash": "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9",
       "Role": "ADMIN",
       "Status": "Active",
-      "Last_Login": "2026-06-10T03:48:59.195Z",
+      "Last_Login": "2026-06-11T03:13:49.395Z",
       "Created_Date": "2026-01-02T00:00:00Z",
       "Permissions": [
         "dashboard",
@@ -56,7 +56,7 @@
       "Size": "All Size",
       "Cost_Price": 0,
       "Selling_Price": 90000,
-      "Current_Stock": 36,
+      "Current_Stock": 24,
       "Minimum_Stock": 10,
       "Status": "Active"
     },
@@ -107,6 +107,54 @@
       "Current_Stock": 43,
       "Minimum_Stock": 10,
       "Status": "Active"
+    },
+    {
+      "Product_ID": "PROD-005",
+      "SKU": "ALN-CEL-0002",
+      "Barcode": "ALN-CEL-0002",
+      "QR_Code": "ALN-CEL-0002",
+      "Product_Name": "CELAMIS REGULAR ALL SIZE (MAROON)",
+      "Category": "Celamis Regular",
+      "Variant": "All Size",
+      "Color": "Maroon",
+      "Size": "All Size",
+      "Cost_Price": 40000,
+      "Selling_Price": 89000,
+      "Current_Stock": 433,
+      "Minimum_Stock": 10,
+      "Status": "Active"
+    },
+    {
+      "Product_ID": "PROD-006",
+      "SKU": "ALN-CEL-0003",
+      "Barcode": "ALN-CEL-0003",
+      "QR_Code": "ALN-CEL-0003",
+      "Product_Name": "CELAMIS REGULAR ALL SIZE (UNGU TUA)",
+      "Category": "Celamis Regular",
+      "Variant": "All Size",
+      "Color": "Ungu Tua",
+      "Size": "All Size",
+      "Cost_Price": 35000,
+      "Selling_Price": 89000,
+      "Current_Stock": 33,
+      "Minimum_Stock": 10,
+      "Status": "Active"
+    },
+    {
+      "Product_ID": "PROD-007",
+      "SKU": "ALN-CEL-0004",
+      "Barcode": "ALN-CEL-0004",
+      "QR_Code": "ALN-CEL-0004",
+      "Product_Name": "CELAMIS REGULAR JUMBO (MAROON)",
+      "Category": "Celamis Regular",
+      "Variant": "Jumbo",
+      "Color": "Maroon",
+      "Size": "Jumbo",
+      "Cost_Price": 33000,
+      "Selling_Price": 89000,
+      "Current_Stock": 55,
+      "Minimum_Stock": 10,
+      "Status": "Active"
     }
   ],
   "customers": [
@@ -153,6 +201,14 @@
   ],
   "stockIn": [
     {
+      "Transaction_ID": "STK-IN-0003",
+      "Date": "2026-06-11T04:23:33.659Z",
+      "SKU": "ALN-CSP-0001",
+      "Product_Name": "CELAMIS SHORT PANTS ALL SIZE (HIJAU MINT)",
+      "Qty": 12,
+      "Notes": ""
+    },
+    {
       "Transaction_ID": "STK-IN-0002",
       "Date": "2026-06-10T09:39:18.073Z",
       "SKU": "ALN-CSP-0001",
@@ -171,6 +227,24 @@
   ],
   "stockOut": [
     {
+      "Transaction_ID": "STK-OUT-0003",
+      "Date": "2026-06-11T04:25:58.055Z",
+      "SKU": "ALN-CSP-0001",
+      "Product_Name": "CELAMIS SHORT PANTS ALL SIZE (HIJAU MINT)",
+      "Customer": "Rania Hijab Store",
+      "Qty": 12,
+      "Notes": ""
+    },
+    {
+      "Transaction_ID": "STK-OUT-0002",
+      "Date": "2026-06-11T04:25:29.942Z",
+      "SKU": "ALN-CSP-0001",
+      "Product_Name": "CELAMIS SHORT PANTS ALL SIZE (HIJAU MINT)",
+      "Customer": "Rania Hijab Store",
+      "Qty": 12,
+      "Notes": ""
+    },
+    {
       "Transaction_ID": "STK-OUT-0001",
       "Date": "2026-06-10T09:39:37.107Z",
       "SKU": "ALN-CSP-0001",
@@ -180,7 +254,18 @@
       "Notes": ""
     }
   ],
-  "stockOpname": [],
+  "stockOpname": [
+    {
+      "Opname_ID": "OPN-0001",
+      "Month": "Mei 2026",
+      "SKU": "ALN-CEL-0001",
+      "Product_Name": "Celamis All Size Pink Pastel",
+      "System_Stock": 30,
+      "Physical_Stock": 30,
+      "Difference": 0,
+      "Date": "2026-05-31T23:59:59Z"
+    }
+  ],
   "orders": [
     {
       "Order_Number": "ORD-20260610-0007",
@@ -303,8 +388,113 @@
       "Status": "Processing"
     }
   ],
-  "shipping": [],
+  "shipping": [
+    {
+      "Tracking_Number": "SPX-9988112233",
+      "Courier": "Shopee Express",
+      "Order_Number": "ORD-20260608-0003",
+      "Shipping_Date": "2026-06-08T06:00:00Z",
+      "Status": "Delivered"
+    },
+    {
+      "Tracking_Number": "JNE-88229911",
+      "Courier": "JNE Reg",
+      "Order_Number": "ORD-20260608-0004",
+      "Shipping_Date": "2026-06-07T14:00:00Z",
+      "Status": "In Transit"
+    }
+  ],
   "activityLog": [
+    {
+      "Log_ID": "LOG-251334-416",
+      "User_Name": "Alina Owner",
+      "User_Role": "OWNER",
+      "Activity": "Logged in successfully",
+      "Module": "Security",
+      "Timestamp": "2026-06-11T06:27:31.334Z",
+      "Device": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.5 Mobile/15E148 Safari/604.1"
+    },
+    {
+      "Log_ID": "LOG-298919-761",
+      "User_Name": "Alina Owner",
+      "User_Role": "OWNER",
+      "Activity": "Created product SKU: ALN-CEL-0004",
+      "Module": "Product",
+      "Timestamp": "2026-06-11T04:31:38.919Z",
+      "Device": "Web Client"
+    },
+    {
+      "Log_ID": "LOG-962162-362",
+      "User_Name": "Alina Owner",
+      "User_Role": "OWNER",
+      "Activity": "Stock Out: -12 [Sales - Good] for SKU ALN-CSP-0001 (CELAMIS SHORT PANTS ALL SIZE (HIJAU MINT))",
+      "Module": "WMS",
+      "Timestamp": "2026-06-11T04:26:02.162Z",
+      "Device": "Web Client"
+    },
+    {
+      "Log_ID": "LOG-819051-305",
+      "User_Name": "Alina Owner",
+      "User_Role": "OWNER",
+      "Activity": "Stock In: +12 [Return - Good] for SKU ALN-CSP-0001 (CELAMIS SHORT PANTS ALL SIZE (HIJAU MINT))",
+      "Module": "WMS",
+      "Timestamp": "2026-06-11T04:23:39.051Z",
+      "Device": "Web Client"
+    },
+    {
+      "Log_ID": "LOG-877940-607",
+      "User_Name": "Alina Owner",
+      "User_Role": "OWNER",
+      "Activity": "Created product SKU: ALN-CEL-0002",
+      "Module": "Product",
+      "Timestamp": "2026-06-11T04:07:57.940Z",
+      "Device": "Web Client"
+    },
+    {
+      "Log_ID": "LOG-823457-621",
+      "User_Name": "Alina Owner",
+      "User_Role": "OWNER",
+      "Activity": "Logged in successfully",
+      "Module": "Security",
+      "Timestamp": "2026-06-11T04:07:03.457Z",
+      "Device": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.5 Mobile/15E148 Safari/604.1"
+    },
+    {
+      "Log_ID": "LOG-134060-978",
+      "User_Name": "Alina Owner",
+      "User_Role": "OWNER",
+      "Activity": "Configured Google Sheets connection",
+      "Module": "System",
+      "Timestamp": "2026-06-11T03:55:34.060Z",
+      "Device": "Web Client"
+    },
+    {
+      "Log_ID": "LOG-629397-147",
+      "User_Name": "Admin Operasional",
+      "User_Role": "ADMIN",
+      "Activity": "Logged in successfully",
+      "Module": "Security",
+      "Timestamp": "2026-06-11T03:13:49.397Z",
+      "Device": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/30.0 Chrome/143.0.0.0 Mobile Safari/537.36"
+    },
+    {
+      "Log_ID": "LOG-583519-870",
+      "User_Name": "Alina Owner",
+      "User_Role": "OWNER",
+      "Activity": "Logged in successfully",
+      "Module": "Security",
+      "Timestamp": "2026-06-11T03:13:03.519Z",
+      "Device": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.5 Mobile/15E148 Safari/604.1"
+    },
+    {
+      "Log_ID": "LOG-381621-36",
+      "User_Name": "Alina Owner",
+      "User_Role": "OWNER",
+      "Activity": "Configured Google Sheets connection",
+      "Module": "System",
+      "Timestamp": "2026-06-11T03:09:41.621Z",
+      "Device": "Web Client"
+    },
     {
       "Log_ID": "LOG-381874-200",
       "User_Name": "Alina Owner",

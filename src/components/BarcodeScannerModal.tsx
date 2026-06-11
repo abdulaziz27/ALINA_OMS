@@ -7,7 +7,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Camera, QrCode, ClipboardList, Keyboard, X, ShieldAlert, CheckCircle2, Upload, Image as ImageIcon } from 'lucide-react';
 import { Product } from '../types.ts';
 import { Html5Qrcode, Html5QrcodeSupportedFormats } from 'html5-qrcode';
-import { BrowserMultiFormatReader } from '@zxing/library';
+import { BrowserQRCodeReader } from '@zxing/library';
 
 interface BarcodeScannerModalProps {
   isOpen: boolean;
@@ -22,7 +22,7 @@ export default function BarcodeScannerModal({
   onClose,
   productsList,
   onScanSuccess,
-  title = "SCAN BARCODE & QR CODE"
+  title = "SCAN QR CODE"
 }: BarcodeScannerModalProps) {
   const [activeMode, setActiveMode] = useState<'camera' | 'simulation' | 'hardware'>('camera');
   const [simSelectedSku, setSimSelectedSku] = useState('');
@@ -71,7 +71,9 @@ export default function BarcodeScannerModal({
           });
           
           const config = {
-            fps: 30, // Higher scan frequency for instant tracking
+            fps: 10, // Moderate fps to preserve performance on mobile
+            qrbox: { width: 250, height: 250 },
+            aspectRatio: 1.0,
           };
 
           const onDecode = (decodedText: string) => {
@@ -194,7 +196,7 @@ export default function BarcodeScannerModal({
         try {
           // @ts-ignore
           const barcodeDetector = new window.BarcodeDetector({ 
-            formats: ['code_128', 'ean_13', 'ean_8', 'qr_code', 'upc_a', 'upc_e', 'code_39', 'code_93'] 
+            formats: ['qr_code'] 
           });
           const barcodes = await barcodeDetector.detect(image);
           if (barcodes && barcodes.length > 0) {
@@ -220,7 +222,7 @@ export default function BarcodeScannerModal({
       // 3. Fallback to ZXing BrowserMultiFormatReader
       if (!decoded) {
         try {
-          const codeReader = new BrowserMultiFormatReader();
+          const codeReader = new BrowserQRCodeReader();
           const result = await codeReader.decodeFromImageElement(image);
           if (result && result.getText()) {
             decoded = result.getText();
@@ -262,7 +264,7 @@ export default function BarcodeScannerModal({
       }
     } catch (err) {
       console.warn("File scanning failed:", err);
-      setFileError("Kode tidak terdeteksi. Silakan ambil foto barcode yang lebih dekat, beresolusi baik, dan tegak lurus.");
+      setFileError("Kode tidak terdeteksi. Silakan ambil foto QR Code yang jelas, dan tegak lurus.");
     } finally {
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
@@ -373,7 +375,7 @@ export default function BarcodeScannerModal({
               </div>
               
               <p className="text-xs text-gray-500">
-                Pindai barcode Code128 pada tag pakaian Alina atau QR Code pelanggan.
+                Pindai QR Code pada tag pakaian Alina atau pelanggan.
               </p>
 
               {/* Robust Photo Scan Fallback Divider */}
@@ -386,7 +388,7 @@ export default function BarcodeScannerModal({
               {/* Gallery upload fallback UI */}
               <div className="bg-[#FFF5FA] border border-pink-100/50 p-4 rounded-3xl space-y-3">
                 <div className="text-[11px] text-gray-600 font-medium leading-relaxed">
-                  Kamera HP kesulitan fokus / resolusi? Ambil foto tag barcode secara dekat dan tegak lurus, lalu unggah di sini:
+                  Kamera HP kesulitan fokus / resolusi? Ambil foto QR Code secara dekat dan tegak lurus, lalu unggah di sini:
                 </div>
 
                 <input 
@@ -404,12 +406,12 @@ export default function BarcodeScannerModal({
                   className="w-full bg-white hover:bg-pink-50 border border-pink-200 hover:border-pink-300 text-pink-600 font-bold py-2.5 px-4 rounded-2xl cursor-pointer transition shadow-sm flex items-center justify-center gap-2 text-xs"
                 >
                   <Upload className="w-4 h-4 text-pink-500" />
-                  {fileScanning ? "Membaca Barcode..." : "PILIH / FOTO DARI GALERI"}
+                  {fileScanning ? "Membaca QR Code..." : "PILIH / FOTO DARI GALERI"}
                 </button>
 
                 {fileScanning && (
                   <div className="text-xs text-pink-500 font-bold animate-pulse">
-                    Mohon tunggu, AI sedang memindai barcode dari berkas gambar...
+                    Mohon tunggu, AI sedang memindai QR Code dari berkas gambar...
                   </div>
                 )}
 
@@ -463,7 +465,7 @@ export default function BarcodeScannerModal({
             <form onSubmit={handleHardwareSubmit} className="space-y-4">
               <div className="bg-gray-50 border border-gray-200 p-4 rounded-2xl">
                 <p className="text-xs text-gray-600 font-medium">
-                  Hubungkan USB Barcode Gun fisik. Fokuskan kursor pada kotak input di bawah dan lakukan pemindaian langsung pada produk pakaian.
+                  Hubungkan USB Scanner fisik. Fokuskan kursor pada kotak input di bawah dan lakukan pemindaian langsung pada produk pakaian.
                 </p>
               </div>
 
