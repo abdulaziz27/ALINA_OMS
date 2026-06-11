@@ -5646,15 +5646,9 @@ export default function App() {
                   setIsScanChoiceOpen(false);
                   setSelectedTrxType('IN');
                   triggerCameraScanner("Penerimaan Stock In (Masuk)", (scanned) => {
-                    const matched = products.find(p => p.SKU === scanned);
                     setSelectedTrxType('IN');
                     setTrxSku(scanned);
                     setActiveTab('inventory');
-                    if (matched) {
-                      alert(`Barcode cocok: SKU [${scanned}] ${matched.Product_Name}. Dialihkan ke log Transaksi Stock In.`);
-                    } else {
-                      alert(`SKU [${scanned}] belum terdaftar di master produk, namun telah disalin ke log Transaksi Stock In.`);
-                    }
                   });
                 }}
                 className="p-4 rounded-2xl border-2 border-emerald-100 hover:border-emerald-500 bg-emerald-50/10 hover:bg-emerald-50/40 text-left transition duration-250 cursor-pointer flex items-center gap-4 group"
@@ -5675,15 +5669,9 @@ export default function App() {
                   setIsScanChoiceOpen(false);
                   setSelectedTrxType('OUT');
                   triggerCameraScanner("Pengeluaran Stock Out (Keluar)", (scanned) => {
-                    const matched = products.find(p => p.SKU === scanned);
                     setSelectedTrxType('OUT');
                     setTrxSku(scanned);
                     setActiveTab('inventory');
-                    if (matched) {
-                      alert(`Barcode cocok: SKU [${scanned}] ${matched.Product_Name}. Dialihkan ke log Transaksi Stock Out.`);
-                    } else {
-                      alert(`SKU [${scanned}] belum terdaftar di master produk, namun telah disalin ke log Transaksi Stock Out.`);
-                    }
                   });
                 }}
                 className="p-4 rounded-2xl border-2 border-red-100 hover:border-red-500 bg-red-50/10 hover:bg-red-50/40 text-left transition duration-250 cursor-pointer flex items-center gap-4 group"
