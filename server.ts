@@ -23,9 +23,9 @@ const DB_FILE = IS_VERCEL
 
 app.use(express.json({ limit: '10mb' }));
 
-// Vercel Serverless Database Hydration Middleware
+// Vercel / Cloud Run Serverless Database Hydration Middleware
 app.use((req, res, next) => {
-  if (IS_VERCEL && req.headers['x-sheets-config']) {
+  if (req.headers['x-sheets-config']) {
     try {
       const cfg = JSON.parse(req.headers['x-sheets-config'] as string);
       if (cfg && cfg.scriptUrl) {
@@ -716,10 +716,10 @@ let hasBootstrappedFromSheets = false;
 
 async function readAndPullDatabase(): Promise<typeof DEFAULT_DB> {
   const db = readDatabase();
-  // On Vercel, we must ALWAYS pull from Sheets on cold boot if linked, because /tmp is wiped.
-  // Locally, we only auto-pull if autoSync is enabled.
+  // In Cloud Run (or Serverless), we MUST ALWAYS pull from Sheets on cold boot if linked, because the filesystem is wiped.
+  const isServerless = true; // AI Studio / Cloud Run is always ephemeral
   const shouldPullOnBoot = (!hasBootstrappedFromSheets && db.sheetsConfig && db.sheetsConfig.isLinked && db.sheetsConfig.scriptUrl) && 
-                           (IS_VERCEL || db.sheetsConfig.autoSync);
+                           (isServerless || db.sheetsConfig.autoSync);
   
   if (shouldPullOnBoot) {
     try {
@@ -740,7 +740,8 @@ async function saveDatabaseAndSync(data: typeof DEFAULT_DB) {
   try {
     fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2), 'utf8');
     const shouldPushParams = data.sheetsConfig && data.sheetsConfig.isLinked && data.sheetsConfig.scriptUrl;
-    if (shouldPushParams && (IS_VERCEL || data.sheetsConfig.autoSync)) {
+    const isServerless = true;
+    if (shouldPushParams && (isServerless || data.sheetsConfig.autoSync)) {
       console.log("[Sync Engine] Synchronizing / pushing state to Google Sheets on mutation...");
       // Fire and forget to avoid delaying client response
       syncToGoogleSheets(data).catch(err => {
