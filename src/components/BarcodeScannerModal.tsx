@@ -7,6 +7,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Camera, QrCode, ClipboardList, Keyboard, X, ShieldAlert, CheckCircle2, Upload, Image as ImageIcon } from 'lucide-react';
 import { Product } from '../types.ts';
 import { Html5Qrcode, Html5QrcodeSupportedFormats } from 'html5-qrcode';
+import { BrowserMultiFormatReader } from '@zxing/library';
 
 interface BarcodeScannerModalProps {
   isOpen: boolean;
@@ -230,6 +231,32 @@ export default function BarcodeScannerModal({
         return;
       }
 
+      // 3. Fallback to ZXing BrowserMultiFormatReader
+      if (!decoded) {
+        try {
+          const codeReader = new BrowserMultiFormatReader();
+          const result = await codeReader.decodeFromImageElement(image);
+          if (result && result.getText()) {
+            decoded = result.getText();
+          }
+        } catch (zxingErr) {
+          console.warn("ZXing failed, falling back to Html5Qrcode...", zxingErr);
+        }
+      }
+
+      // If decoded with ZXing, trigger success
+      if (decoded) {
+        URL.revokeObjectURL(imageUrl);
+        if ('vibrate' in navigator) {
+          try { navigator.vibrate(100); } catch (_) {}
+        }
+        onScanSuccessRef.current(decoded.trim().toUpperCase());
+        onClose();
+        setFileScanning(false);
+        return;
+      }
+
+      // 4. Fallback to Html5Qrcode
       const fileScanner = new Html5Qrcode(tempElementId, {
         formatsToSupport: [
           Html5QrcodeSupportedFormats.CODE_128,

@@ -3319,6 +3319,7 @@ export default function App() {
                           setSelectedTrxType('IN');
                           triggerCameraScanner("Penerimaan Stock In", (scanned) => {
                             setTrxSku(scanned);
+                            setActiveTab('inventory');
                           });
                         }}
                         className="bg-emerald-500 font-bold py-2 px-4 rounded-xl text-xs text-white hover:bg-emerald-600 cursor-pointer flex items-center gap-1 shadow-sm"
@@ -3331,6 +3332,7 @@ export default function App() {
                           setSelectedTrxType('OUT');
                           triggerCameraScanner("Pengeluaran Stock Out", (scanned) => {
                             setTrxSku(scanned);
+                            setActiveTab('inventory');
                           });
                         }}
                         className="bg-red-500 font-bold py-2 px-4 rounded-xl text-xs text-white hover:bg-red-600 cursor-pointer flex items-center gap-1 shadow-sm"
@@ -3372,6 +3374,7 @@ export default function App() {
                           type="button"
                           onClick={() => triggerCameraScanner("Muted Sku Reader", (sku) => {
                             setTrxSku(sku);
+                            setActiveTab('inventory');
                           })}
                           className="text-[#EC4899] font-bold text-[10px] hover:underline"
                         >
