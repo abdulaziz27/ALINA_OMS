@@ -78,7 +78,7 @@ export default function BarcodeScannerModal({
           });
           
           const config = {
-            fps: 24, // Higher scan frequency for instant tracking
+            fps: 30, // Higher scan frequency for instant tracking
             qrbox: (width: number, height: number) => {
               // Custom wide rectangular window optimized for standard linear barcodes (like Code-128)
               const w = Math.min(Math.floor(width * 0.9), 320);
@@ -137,7 +137,7 @@ export default function BarcodeScannerModal({
             setCameraError("Gagal mempersiapkan pemindaian kamera.");
           }
         }
-      }, 400);
+      }, 20);
 
       return () => {
         isMounted = false;
