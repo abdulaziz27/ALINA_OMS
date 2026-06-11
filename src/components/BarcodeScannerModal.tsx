@@ -28,6 +28,11 @@ export default function BarcodeScannerModal({
   const [hardwareInput, setHardwareInput] = useState('');
   const [cameraError, setCameraError] = useState<string | null>(null);
   
+  const onScanSuccessRef = useRef(onScanSuccess);
+  useEffect(() => {
+    onScanSuccessRef.current = onScanSuccess;
+  }, [onScanSuccess]);
+
   // File upload scan states
   const [fileError, setFileError] = useState<string | null>(null);
   const [fileScanning, setFileScanning] = useState(false);
@@ -88,7 +93,7 @@ export default function BarcodeScannerModal({
               if ('vibrate' in navigator) {
                 try { navigator.vibrate(100); } catch (_) {}
               }
-              onScanSuccess(decodedText.trim().toUpperCase());
+              onScanSuccessRef.current(decodedText.trim().toUpperCase());
               onClose();
             }
           };
@@ -175,11 +180,56 @@ export default function BarcodeScannerModal({
     if (!tempContainer) {
       tempContainer = document.createElement('div');
       tempContainer.id = tempElementId;
-      tempContainer.style.display = 'none';
+      tempContainer.style.position = 'absolute';
+      tempContainer.style.top = '-9999px';
+      tempContainer.style.left = '-9999px';
+      tempContainer.style.visibility = 'hidden';
+      tempContainer.style.width = '640px'; 
+      tempContainer.style.height = '480px';
       document.body.appendChild(tempContainer);
     }
 
     try {
+      // Pre-process image to load it via memory
+      const imageUrl = URL.createObjectURL(file);
+      const image = new Image();
+      image.src = imageUrl;
+
+      await new Promise((resolve, reject) => {
+        image.onload = resolve;
+        image.onerror = reject;
+      });
+
+      let decoded = null;
+
+      // 1. Try Native BarcodeDetector API first (Supported in Chrome/Android for speed & accuracy)
+      if ('BarcodeDetector' in window) {
+        try {
+          // @ts-ignore
+          const barcodeDetector = new window.BarcodeDetector({ 
+            formats: ['code_128', 'ean_13', 'ean_8', 'qr_code', 'upc_a', 'upc_e', 'code_39', 'code_93'] 
+          });
+          const barcodes = await barcodeDetector.detect(image);
+          if (barcodes && barcodes.length > 0) {
+            decoded = barcodes[0].rawValue;
+          }
+        } catch (err) {
+          console.warn("Native BarcodeDetector failed, falling back to Html5Qrcode...", err);
+        }
+      }
+
+      // 2. If decoded with native API, immediately trigger success
+      if (decoded) {
+        URL.revokeObjectURL(imageUrl);
+        if ('vibrate' in navigator) {
+          try { navigator.vibrate(100); } catch (_) {}
+        }
+        onScanSuccessRef.current(decoded.trim().toUpperCase());
+        onClose();
+        setFileScanning(false);
+        return;
+      }
+
       const fileScanner = new Html5Qrcode(tempElementId, {
         formatsToSupport: [
           Html5QrcodeSupportedFormats.CODE_128,
@@ -195,17 +245,22 @@ export default function BarcodeScannerModal({
       });
 
       const decodedText = await fileScanner.scanFile(file, false);
+      try { URL.revokeObjectURL(imageUrl); } catch (_) {}
+      
       if (decodedText) {
         if ('vibrate' in navigator) {
           try { navigator.vibrate(100); } catch (_) {}
         }
-        onScanSuccess(decodedText.trim().toUpperCase());
+        onScanSuccessRef.current(decodedText.trim().toUpperCase());
         onClose();
       }
     } catch (err) {
       console.warn("File scanning failed:", err);
       setFileError("Kode tidak terdeteksi. Silakan ambil foto barcode yang lebih dekat, beresolusi baik, dan tegak lurus.");
     } finally {
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
       setFileScanning(false);
       if (tempContainer && tempContainer.parentNode) {
         tempContainer.parentNode.removeChild(tempContainer);
@@ -215,7 +270,7 @@ export default function BarcodeScannerModal({
 
   const handleSimulateScan = () => {
     if (simSelectedSku) {
-      onScanSuccess(simSelectedSku);
+      onScanSuccessRef.current(simSelectedSku);
       onClose();
     }
   };
@@ -223,7 +278,7 @@ export default function BarcodeScannerModal({
   const handleHardwareSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (hardwareInput.trim()) {
-      onScanSuccess(hardwareInput.trim().toUpperCase());
+      onScanSuccessRef.current(hardwareInput.trim().toUpperCase());
       setHardwareInput('');
       onClose();
     }

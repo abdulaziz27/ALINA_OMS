@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Users, ShoppingCart, Truck, TrendingUp, Settings, 
   LogOut, AlertTriangle, ShieldCheck, HelpCircle, Activity,
@@ -1438,7 +1438,7 @@ export default function App() {
 
   // Scanner States
   const [isScannerOpen, setIsScannerOpen] = useState(false);
-  const [scanCallback, setScanCallback] = useState<(sku: string) => void>(() => {});
+  const scanCallbackRef = useRef<(sku: string) => void>(() => {});
   const [scannerTitle, setScannerTitle] = useState("SCAN SKU TAG");
   const [isScanChoiceOpen, setIsScanChoiceOpen] = useState(false);
 
@@ -2203,7 +2203,7 @@ export default function App() {
   // Scanning triggers
   const triggerCameraScanner = (titleMsg: string, successCallback: (sku: string) => void) => {
     setScannerTitle(titleMsg);
-    setScanCallback(() => successCallback);
+    scanCallbackRef.current = successCallback;
     setIsScannerOpen(true);
   };
 
@@ -5693,7 +5693,7 @@ export default function App() {
         isOpen={isScannerOpen}
         onClose={() => setIsScannerOpen(false)}
         productsList={products}
-        onScanSuccess={scanCallback}
+        onScanSuccess={(sku) => scanCallbackRef.current(sku)}
         title={scannerTitle}
       />
 
