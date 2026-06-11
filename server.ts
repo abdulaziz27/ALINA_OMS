@@ -742,7 +742,10 @@ async function saveDatabaseAndSync(data: typeof DEFAULT_DB) {
     const shouldPushParams = data.sheetsConfig && data.sheetsConfig.isLinked && data.sheetsConfig.scriptUrl;
     if (shouldPushParams && (IS_VERCEL || data.sheetsConfig.autoSync)) {
       console.log("[Sync Engine] Synchronizing / pushing state to Google Sheets on mutation...");
-      await syncToGoogleSheets(data);
+      // Fire and forget to avoid delaying client response
+      syncToGoogleSheets(data).catch(err => {
+        console.error("Background sync to Google Sheets failed:", err);
+      });
     }
   } catch (error) {
     console.error("Failed to write to database and sync:", error);

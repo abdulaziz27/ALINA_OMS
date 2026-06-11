@@ -3196,7 +3196,7 @@ export default function App() {
                     <div className="space-y-3 text-xs leading-relaxed text-gray-600">
                       <p>WMS/OMS Alina siap digunakan untuk operasional terpadu:</p>
                       <ul className="list-disc pl-5 space-y-1 text-gray-500 font-medium">
-                        <li>Fungsi <strong className="text-[#EC4899]">Code128 Barcode</strong> otomatis dibuat per produk. Unduh dan tempel d tag baju.</li>
+                        <li>Fungsi <strong className="text-[#EC4899]">QR Code</strong> otomatis dibuat per produk. Unduh dan tempel d tag baju.</li>
                         <li>Gunakan modul <strong className="text-[#EC4899]">Picking & Packing</strong> saat memproses pesanan untuk memverifikasi akurasi isi barang menggunakan laser terminal HP.</li>
                         <li>Simpan <strong className="text-[#EC4899]">Stock Opname bulanan</strong> pada tanggal akhir untuk menjaga konsistensi selisih stok fisik & sistem.</li>
                         <li>Masukkan Spreadsheet ID Anda pada tab <strong className="text-[#EC4899]">Sheets Connector</strong> untuk menyinkronkan data.</li>

@@ -65,13 +65,6 @@ export default function BarcodeScannerModal({
         try {
           qrScanner = new Html5Qrcode(elementId, {
             formatsToSupport: [
-              Html5QrcodeSupportedFormats.CODE_128,
-              Html5QrcodeSupportedFormats.EAN_13,
-              Html5QrcodeSupportedFormats.EAN_8,
-              Html5QrcodeSupportedFormats.CODE_39,
-              Html5QrcodeSupportedFormats.CODE_93,
-              Html5QrcodeSupportedFormats.UPC_A,
-              Html5QrcodeSupportedFormats.UPC_E,
               Html5QrcodeSupportedFormats.QR_CODE
             ],
             verbose: false
@@ -252,13 +245,6 @@ export default function BarcodeScannerModal({
       // 4. Fallback to Html5Qrcode
       const fileScanner = new Html5Qrcode(tempElementId, {
         formatsToSupport: [
-          Html5QrcodeSupportedFormats.CODE_128,
-          Html5QrcodeSupportedFormats.EAN_13,
-          Html5QrcodeSupportedFormats.EAN_8,
-          Html5QrcodeSupportedFormats.CODE_39,
-          Html5QrcodeSupportedFormats.CODE_93,
-          Html5QrcodeSupportedFormats.UPC_A,
-          Html5QrcodeSupportedFormats.UPC_E,
           Html5QrcodeSupportedFormats.QR_CODE
         ],
         verbose: false

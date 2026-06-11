@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { Product, UserRole } from '../types.ts';
 import { generateCode128SvgPath, generateAutoSKU } from '../barcodeUtils.ts';
+import { QRCodeSVG } from 'qrcode.react';
 
 interface ColorPreset {
   name: string;
@@ -362,7 +363,7 @@ export default function ProductForm({
   const handleDownloadBarcode = (targetSku: string, targetName: string) => {
     const svgElement = document.getElementById(`barcode-svg-${targetSku}`);
     if (!svgElement) {
-      triggerNotif('error', 'Sumber barcode tidak ditemukan.');
+      triggerNotif('error', 'Sumber QR Code tidak ditemukan.');
       return;
     }
     const svgString = new XMLSerializer().serializeToString(svgElement);
@@ -371,20 +372,20 @@ export default function ProductForm({
     
     const downloadLink = document.createElement("a");
     downloadLink.href = svgUrl;
-    downloadLink.download = `ALINA_BARCODE_${targetSku}.svg`;
+    downloadLink.download = `ALINA_QRCODE_${targetSku}.svg`;
     document.body.appendChild(downloadLink);
     downloadLink.click();
     document.body.removeChild(downloadLink);
     URL.revokeObjectURL(svgUrl);
-    triggerNotif('success', `Berhasil mengunduh barcode untuk SKU ${targetSku}`);
+    triggerNotif('success', `Berhasil mengunduh QR Code untuk SKU ${targetSku}`);
   };
 
   const handlePrintLabel = (p: Product) => {
     const printWindow = window.open('', '_blank');
     if (!printWindow) return;
     
-    const { path, width } = generateCode128SvgPath(p.SKU);
-    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=85x85&data=${p.SKU}`;
+    // We only use QR Code now
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${p.SKU}`;
 
     printWindow.document.write(`
       <html>
@@ -396,7 +397,7 @@ export default function ProductForm({
             .brand-h { font-size: 14px; font-weight: bold; margin-bottom: 2px; letter-spacing: 1px; color: #EC4899; }
             .prod-n { font-size: 11px; margin-bottom: 8px; font-weight: bold; }
             .meta { font-size: 9px; margin-bottom: 15px; border-bottom: 1px dashed #ccc; padding-bottom: 5px; }
-            .flex-code { display: flex; justify-content: space-around; items: center; margin-top: 10px; }
+            .qr-center { margin-top: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
           </style>
         </head>
         <body onload="window.print()">
@@ -405,17 +406,10 @@ export default function ProductForm({
             <div class="prod-n">${p.Product_Name}</div>
             <div class="meta">COLOR: ${p.Color} | SIZE: ${p.Size} | VARIANT: ${p.Variant}</div>
             
-            <div class="flex-code">
-              <div>
-                <svg width="180" height="70" viewBox="0 0 ${width} 80">
-                  <path d="${path}" stroke="#000000" stroke-width="2" />
-                </svg>
-                <div style="font-size:10px; font-weight:bold; margin-top:4px;">${p.SKU}</div>
-              </div>
-              <div>
-                <img src="${qrUrl}" width="70" height="70" />
-                <div style="font-size:8px; font-weight:bold; margin-top:2px;">SCAN COMPLIANT</div>
-              </div>
+            <div class="qr-center">
+              <img src="${qrUrl}" width="120" height="120" />
+              <div style="font-size:12px; font-weight:bold; margin-top:6px;">${p.SKU}</div>
+              <div style="font-size:8px; font-weight:bold; margin-top:2px;">SCAN COMPLIANT</div>
             </div>
           </div>
         </body>
@@ -941,29 +935,21 @@ export default function ProductForm({
               {sku && (
                 <div className="bg-[#FFF8FB] p-4 rounded-2xl border border-pink-100 flex flex-col items-center justify-center space-y-2.5 text-center mt-3 shadow-inner">
                   <p className="font-black text-[9px] text-[#EC4899] uppercase tracking-widest flex items-center gap-1.5">
-                    <Tag className="w-3 h-3" /> BARCODE GENERATOR CODE-128
+                    <Tag className="w-3 h-3" /> QR CODE GENERATOR
                   </p>
                   
-                  {(() => {
-                    const { path, width } = generateCode128SvgPath(sku);
-                    return (
-                      <div className="bg-white p-2.5 rounded-xl border border-pink-100/50 inline-block">
-                        <svg 
-                          id={`barcode-svg-${sku}`}
-                          className="mx-auto" 
-                          width="210" 
-                          height="75" 
-                          viewBox={`0 0 ${width} 75`}
-                        >
-                          <rect width="100%" height="100%" fill="#ffffff" />
-                          <path d={path} stroke="#000000" strokeWidth="2.5" />
-                        </svg>
-                        <p className="font-mono text-[10px] font-extrabold tracking-widest text-[#111827] mt-[4px]">
-                          {sku}
-                        </p>
-                      </div>
-                    );
-                  })()}
+                  <div className="bg-white p-2.5 rounded-xl border border-pink-100/50 inline-block text-center flex flex-col items-center">
+                    <QRCodeSVG 
+                      id={`barcode-svg-${sku}`}
+                      value={sku}
+                      size={120}
+                      level={"M"}
+                      includeMargin={true}
+                    />
+                    <p className="font-mono text-[10px] font-extrabold tracking-widest text-[#111827] mt-[4px]">
+                      {sku}
+                    </p>
+                  </div>
 
                   <div className="flex gap-2 w-full pt-1">
                     <button
