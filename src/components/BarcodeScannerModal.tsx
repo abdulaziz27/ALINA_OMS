@@ -23,7 +23,7 @@ export default function BarcodeScannerModal({
   onScanSuccess,
   title = "SCAN BARCODE & QR CODE"
 }: BarcodeScannerModalProps) {
-  const [activeMode, setActiveMode] = useState<'camera' | 'simulation' | 'hardware'>('simulation');
+  const [activeMode, setActiveMode] = useState<'camera' | 'simulation' | 'hardware'>('camera');
   const [simSelectedSku, setSimSelectedSku] = useState('');
   const [hardwareInput, setHardwareInput] = useState('');
   const [cameraError, setCameraError] = useState<string | null>(null);
@@ -82,28 +82,43 @@ export default function BarcodeScannerModal({
             aspectRatio: 1.7777778
           };
 
+          const onDecode = (decodedText: string) => {
+            if (decodedText && isMounted) {
+              // Try a quick phone vibration if supported
+              if ('vibrate' in navigator) {
+                try { navigator.vibrate(100); } catch (_) {}
+              }
+              onScanSuccess(decodedText.trim().toUpperCase());
+              onClose();
+            }
+          };
+
+          const onFail = () => {}; // Ignore single-frame scan failures naturally
+
           qrScanner.start(
             { facingMode: 'environment' },
             config,
-            (decodedText) => {
-              if (decodedText && isMounted) {
-                // Try a quick phone vibration if supported
-                if ('vibrate' in navigator) {
-                  try { navigator.vibrate(100); } catch (_) {}
-                }
-                onScanSuccess(decodedText.trim().toUpperCase());
-                onClose();
-              }
-            },
-            () => {
-              // Ignore single-frame scan failures naturally
-            }
+            onDecode,
+            onFail
           ).then(() => {
             isStreaming = true;
           }).catch((err) => {
-            console.warn("Camera start failed or cancelled:", err);
-            if (isMounted) {
-              setCameraError("Akses kamera ditolak, atau kamera tidak ditemukan di modul ini.");
+            console.warn("Environment camera start failed, attempting user-facing camera fallback...", err);
+            // Fallback: try default or user camera if environment camera is unavailable (desktop)
+            if (qrScanner && isMounted) {
+              qrScanner.start(
+                { facingMode: 'user' },
+                config,
+                onDecode,
+                onFail
+              ).then(() => {
+                isStreaming = true;
+              }).catch((fallbackErr) => {
+                console.warn("User camera also failed:", fallbackErr);
+                if (isMounted) {
+                  setCameraError("Tidak dapat mengakses kamera. Pastikan browser memiliki izin akses kamera atau coba unggah foto.");
+                }
+              });
             }
           });
         } catch (e) {
