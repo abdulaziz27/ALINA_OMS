@@ -1424,6 +1424,8 @@ app.post('/api/settings/sheets-config', async (req, res) => {
       const pulled = await pullFromGoogleSheets(db, true);
       if (pulled) {
         console.log("Successfully loaded pre-existing Google Sheets data on link!");
+      } else {
+        return res.status(400).json({ error: "Gagal menarik data dari Google Sheets. Pastikan URL Script benar dan terpublikasi." });
       }
       
       // Only push back if this wasn't an auto-restore, and if autoSync is enabled
@@ -1432,8 +1434,12 @@ app.post('/api/settings/sheets-config', async (req, res) => {
          await syncToGoogleSheets(latestDb);
       }
       
-    } catch (err) {
+    } catch (err: any) {
       console.error("Initial sheets-config pull error:", err);
+      // Fallback/Abort link if invalid URL
+      db.sheetsConfig.isLinked = false;
+      fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2), 'utf8');
+      return res.status(400).json({ error: "Koneksi Google Sheets gagal. Error: " + (err.message || 'Unknown error') });
     }
   }
 

@@ -846,9 +846,6 @@ const originalFetch = (window.fetch ? window.fetch.bind(window) : globalThis.fet
 const customFetch = async function (input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
   const url = typeof input === 'string' ? input : input instanceof URL ? input.toString() : (input as any).url || '';
   if (url.startsWith('/api/')) {
-    if (isOfflineForcedGlobal) {
-      return handleOfflineApiRoute(url, init);
-    }
     try {
       // Hydrate Vercel serverless configurations via headers
       const sc = safeLocalStorage.getItem('alina_sheets_config');
@@ -861,10 +858,17 @@ const customFetch = async function (input: RequestInfo | URL, init?: RequestInit
       }
       
       const response = await originalFetch(input, init);
-      // If we got a 5xx gateway/internal serverless freeze pattern or a 404, fallback instantly
+      // If we got a 5xx gateway/internal serverless freeze pattern, fallback instantly
       if (response.status >= 500 || response.type === 'error') {
         throw new Error(`Server status ${response.status}`);
       }
+      
+      // Auto-recover from offline mode if server responds successfully with 2xx
+      if (response.ok && isOfflineForcedGlobal) {
+        isOfflineForcedGlobal = false;
+        window.dispatchEvent(new CustomEvent('alina_online_mode_detected'));
+      }
+      
       return response;
     } catch (err) {
       console.warn(`[Offline-First Engine] Intercepting connection failure to ${url}. Routing to local storage database...`, err);
@@ -1567,15 +1571,20 @@ export default function App() {
     const handleOfflineMode = () => {
       setIsOfflineMode(true);
     };
+    const handleOnlineMode = () => {
+      setIsOfflineMode(false);
+    };
     const handleOfflineDbUpdate = () => {
       fetchDatabaseState();
     };
 
     window.addEventListener('alina_offline_mode_detected', handleOfflineMode);
+    window.addEventListener('alina_online_mode_detected', handleOnlineMode);
     window.addEventListener('alina_db_offline_update', handleOfflineDbUpdate);
 
     return () => {
       window.removeEventListener('alina_offline_mode_detected', handleOfflineMode);
+      window.removeEventListener('alina_online_mode_detected', handleOnlineMode);
       window.removeEventListener('alina_db_offline_update', handleOfflineDbUpdate);
     };
   }, []);
@@ -2626,12 +2635,16 @@ export default function App() {
         })
       });
       if (res.ok) {
-        safeLocalStorage.setItem('alina_sheets_config', JSON.stringify({ ...cfg, isLinked: !!(cfg.scriptUrl && cfg.spreadsheetId) }));
+        safeLocalStorage.setItem('alina_sheets_config', JSON.stringify({ ...cfg, isLinked: !!(cfg.scriptUrl) }));
         await fetchDatabaseState();
         return true;
+      } else {
+        const err = await res.json();
+        alert(err.error || "Gagal menyimpan konfigurasi Sheets.");
       }
     } catch (e) {
       console.error(e);
+      alert("Koneksi gagal. Silahkan coba lagi.");
     }
     return false;
   };
