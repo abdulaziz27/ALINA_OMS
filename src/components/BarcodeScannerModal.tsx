@@ -79,13 +79,6 @@ export default function BarcodeScannerModal({
           
           const config = {
             fps: 30, // Higher scan frequency for instant tracking
-            qrbox: (width: number, height: number) => {
-              // Custom wide rectangular window optimized for standard linear barcodes (like Code-128)
-              const w = Math.min(Math.floor(width * 0.9), 320);
-              const h = Math.min(Math.floor(height * 0.45), 140);
-              return { width: w, height: h };
-            },
-            aspectRatio: 1.7777778
           };
 
           const onDecode = (decodedText: string) => {
@@ -382,13 +375,13 @@ export default function BarcodeScannerModal({
                   className="w-full h-full [&_video]:object-cover [&_video]:w-full [&_video]:h-full"
                 />
                 
-                {/* Visual guideline overlay */}
+                {/* Visual guideline overlay (Full frame) */}
                 <div className="absolute inset-0 pointer-events-none flex flex-col items-center justify-center p-4">
-                  <div className="w-[85%] h-[45%] border-2 border-[#EC4899] border-dashed rounded-lg relative flex items-center justify-center">
-                    <div className="w-full h-[2px] bg-red-500 absolute animate-pulse" />
+                  <div className="w-full h-full border-2 border-[#EC4899]/30 rounded-lg relative flex items-center justify-center">
+                    <div className="w-full h-[2px] bg-red-500/80 absolute animate-[ping_2s_infinite]" />
                   </div>
                   <p className="text-[10px] text-white/80 bg-black/60 px-3 py-1.5 rounded-full mt-3 z-10">
-                    Arahkan Kode Batang / QR ke dalam kotak
+                    Arahkan Kamera ke Kode Batang / QR
                   </p>
                 </div>
               </div>
