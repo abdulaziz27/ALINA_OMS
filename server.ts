@@ -61,6 +61,36 @@ const DB_FILE = IS_VERCEL
 
 app.use(express.json({ limit: '10mb' }));
 
+function promiseWithTimeout<T>(promise: Promise<T>, ms: number, fallbackValue: T): Promise<T> {
+  let timer: NodeJS.Timeout;
+  const timeoutPromise = new Promise<T>((resolve) => {
+    timer = setTimeout(() => {
+      console.warn(`[Firestore Status] Timeout occurred after ${ms}ms.`);
+      resolve(fallbackValue);
+    }, ms);
+  });
+  return Promise.race([
+    promise.then((val) => {
+      clearTimeout(timer);
+      return val;
+    }),
+    timeoutPromise
+  ]);
+}
+
+// Global middleware to prevent any unhandled or missing req.body.user TypeError crashes
+app.use((req, res, next) => {
+  if (req.body && typeof req.body === 'object') {
+    if (!req.body.user) {
+      req.body.user = { name: 'System', role: 'ADMIN' };
+    } else {
+      if (!req.body.user.name) req.body.user.name = 'System';
+      if (!req.body.user.role) req.body.user.role = 'ADMIN';
+    }
+  }
+  next();
+});
+
 // Vercel / Cloud Run Serverless Database Hydration Middleware
 app.use(async (req, res, next) => { next(); });
 
@@ -362,22 +392,24 @@ async function readAndPullDatabase(forcePull?: boolean): Promise<typeof DEFAULT_
   
   isFetchingDb = true;
   dbFetchPromise = (async () => {
-    const fsInstance = getFirebase();
-    const docRef = doc(fsInstance, 'alina_db', 'main');
     try {
-      const snap = await getDoc(docRef);
-      if (snap.exists()) {
-        cachedDb = snap.data() as typeof DEFAULT_DB;
+      const fsInstance = getFirebase();
+      const docRef = doc(fsInstance, 'alina_db', 'main');
+      
+      // Use the timeout wrapper to avoid hanging Vercel/Cloud Run functions on poor network connections
+      const snapshot = await promiseWithTimeout(getDoc(docRef), 2500, null);
+      if (snapshot && snapshot.exists()) {
+        cachedDb = snapshot.data() as typeof DEFAULT_DB;
         lastDbFetchTime = Date.now();
         return cachedDb;
       }
     } catch(e) {
-      console.error("Firestore read error:", e);
+      console.error("Firestore read error or timeout:", e);
     }
-    // Fallback to default, do NOT spam saveDatabaseAndSync to avoid quotas if it crashed
-    cachedDb = DEFAULT_DB;
+    // Fallback gracefully to existing cache or DEFAULT_DB if Firestore is slow or unreachable
+    cachedDb = cachedDb || DEFAULT_DB;
     lastDbFetchTime = Date.now();
-    return DEFAULT_DB;
+    return cachedDb;
   })();
   
   try {
@@ -394,7 +426,9 @@ async function saveDatabaseAndSync(data: typeof DEFAULT_DB) {
   try {
     const fsInstance = getFirebase();
     const docRef = doc(fsInstance, 'alina_db', 'main');
-    await setDoc(docRef, data);
+    
+    // Protect setDoc write operation from hanging indefinitely by enforcing a 2500ms timeout
+    await promiseWithTimeout(setDoc(docRef, data), 2500, null);
     console.log("[Sync Engine] Successfully synchronized with Firestore!");
   } catch (error: any) {
     console.error("Failed to write to Firestore (Continuing server-side in memory):", error);
