@@ -432,7 +432,7 @@ app.post('/api/auth/login', async (req, res) => {
 
   // Update last login
   user.Last_Login = new Date().toISOString();
-  saveDatabase(db);
+  await saveDatabaseAndSync(db);
 
   // Log audit trail
   appendAuditLog(user.Full_Name, user.Role, `Logged in successfully`, 'Security', req.headers['user-agent']);
