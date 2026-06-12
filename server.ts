@@ -10,7 +10,18 @@ import crypto from 'crypto';
 import { initializeApp } from 'firebase/app';
 import { getFirestore, doc, setDoc, getDoc } from 'firebase/firestore';
 
-import firebaseConfig from './firebase-applet-config.json';
+import firebaseConfigFile from './firebase-applet-config.json';
+
+const firebaseConfig = {
+  apiKey: process.env.FIREBASE_API_KEY || firebaseConfigFile.apiKey,
+  authDomain: process.env.FIREBASE_AUTH_DOMAIN || firebaseConfigFile.authDomain,
+  projectId: process.env.FIREBASE_PROJECT_ID || firebaseConfigFile.projectId,
+  storageBucket: process.env.FIREBASE_STORAGE_BUCKET || firebaseConfigFile.storageBucket,
+  messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID || firebaseConfigFile.messagingSenderId,
+  appId: process.env.FIREBASE_APP_ID || firebaseConfigFile.appId,
+  firestoreDatabaseId: process.env.FIREBASE_DATABASE_ID || firebaseConfigFile.firestoreDatabaseId || "(default)"
+};
+
 const fbApp = initializeApp(firebaseConfig);
 const firestore = getFirestore(fbApp, firebaseConfig.firestoreDatabaseId);
 
