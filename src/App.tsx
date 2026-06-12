@@ -2005,8 +2005,13 @@ export default function App() {
       } else {
         let errorMsg = 'Invalid credentials.';
         try {
-          const errorData = await response.json();
-          errorMsg = errorData.error || errorMsg;
+          const rawText = await response.text();
+          try {
+            const errorData = JSON.parse(rawText);
+            errorMsg = errorData.error || errorMsg;
+          } catch(e) {
+            errorMsg = 'Server response: ' + rawText.substring(0, 100);
+          }
         } catch(e) {}
         setLoginError('Error API Server: ' + errorMsg);
       }

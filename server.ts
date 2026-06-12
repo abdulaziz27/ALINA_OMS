@@ -459,6 +459,8 @@ app.post('/api/auth/logout', async (req, res) => {
 });
 
 // 2. RETRIEVE ALL DATABASE TABLES
+app.get('/api/health', (req, res) => res.json({ status: 'ok', vercel: process.env.VERCEL }));
+
 app.get('/api/db', async (req, res) => {
   const db = await readAndPullDatabase();
   // Strip password hashes for client safety
