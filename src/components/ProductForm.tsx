@@ -335,8 +335,6 @@ export default function ProductForm({
     if (success) {
       handleCloseModal();
       alert('Data sudah tersimpan');
-    } else {
-      alert('Gagal menyimpan produk. SKU mungkin sudah terdaftar.');
     }
   };
 

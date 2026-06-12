@@ -530,9 +530,7 @@ export default function App() {
   const currentTheme = T(appTheme);
 
   // Session States
-  const [currentUser, setCurrentUser] = useState<{ User_ID?: string; Full_Name: string; Email: string; Role: UserRole; Permissions?: string[] } | null>(
-    { User_ID: "USR-001", Full_Name: "Alina Owner", Email: "owner@alina.com", Role: "OWNER", Permissions: ["dashboard", "products", "inventory", "opname", "orders", "shipping", "reports", "customers", "settings"] }
-  );
+  const [currentUser, setCurrentUser] = useState<{ User_ID?: string; Full_Name: string; Email: string; Role: UserRole; Permissions?: string[] } | null>(null);
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
   const [isRememberLogin, setIsRememberLogin] = useState(true);
@@ -1018,7 +1016,7 @@ export default function App() {
   // Sync state triggers
   const fetchDatabaseState = async () => {
     try {
-      const res = await fetch('/api/db');
+      const res = await fetch(`/api/db?t=${Date.now()}`);
       if (res.ok) {
         const data = await res.json();
         const serverConfig = data.sheetsConfig;
@@ -1216,9 +1214,14 @@ export default function App() {
       if (res.ok) {
         await fetchDatabaseState();
         return true;
+      } else {
+        const data = await res.json();
+        alert(data.error || 'Server error');
+        return false;
       }
     } catch (e) {
       console.error(e);
+      alert('Network error');
     }
     return false;
   };

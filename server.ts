@@ -12,18 +12,28 @@ import { getFirestore, doc, setDoc, getDoc } from 'firebase/firestore';
 
 import firebaseConfigFile from './firebase-applet-config.json';
 
-const firebaseConfig = {
-  apiKey: process.env.FIREBASE_API_KEY || firebaseConfigFile.apiKey,
-  authDomain: process.env.FIREBASE_AUTH_DOMAIN || firebaseConfigFile.authDomain,
-  projectId: process.env.FIREBASE_PROJECT_ID || firebaseConfigFile.projectId,
-  storageBucket: process.env.FIREBASE_STORAGE_BUCKET || firebaseConfigFile.storageBucket,
-  messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID || firebaseConfigFile.messagingSenderId,
-  appId: process.env.FIREBASE_APP_ID || firebaseConfigFile.appId,
-  firestoreDatabaseId: process.env.FIREBASE_DATABASE_ID || firebaseConfigFile.firestoreDatabaseId || "(default)"
-};
+let fbApp: any = null;
+let firestore: any = null;
 
-const fbApp = initializeApp(firebaseConfig);
-const firestore = getFirestore(fbApp, firebaseConfig.firestoreDatabaseId);
+function getFirebase() {
+  if (!fbApp) {
+    const firebaseConfig = {
+      apiKey: process.env.FIREBASE_API_KEY || firebaseConfigFile.apiKey,
+      authDomain: process.env.FIREBASE_AUTH_DOMAIN || firebaseConfigFile.authDomain,
+      projectId: process.env.FIREBASE_PROJECT_ID || firebaseConfigFile.projectId,
+      storageBucket: process.env.FIREBASE_STORAGE_BUCKET || firebaseConfigFile.storageBucket,
+      messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID || firebaseConfigFile.messagingSenderId,
+      appId: process.env.FIREBASE_APP_ID || firebaseConfigFile.appId,
+      firestoreDatabaseId: process.env.FIREBASE_DATABASE_ID || firebaseConfigFile.firestoreDatabaseId || "(default)"
+    };
+    if (!firebaseConfig.projectId) {
+      throw new Error("Firebase Project ID is missing. Harap isi environment variables di Vercel (FIREBASE_PROJECT_ID, dll).");
+    }
+    fbApp = initializeApp(firebaseConfig);
+    firestore = getFirestore(fbApp, firebaseConfig.firestoreDatabaseId);
+  }
+  return firestore;
+}
 
 // Global lock to queue concurrent DB operations, fixing the race condition!
 let dbLock = Promise.resolve();
@@ -337,34 +347,57 @@ const DEFAULT_DB = {
 
 // Reads data from db.json file, or seeds and returns default
 
+let cachedDb: typeof DEFAULT_DB | null = null;
+let isFetchingDb = false;
+let dbFetchPromise: Promise<typeof DEFAULT_DB> | null = null;
+
 async function readAndPullDatabase(): Promise<typeof DEFAULT_DB> {
-  const docRef = doc(firestore, 'alina_db', 'main');
-  try {
-    const snap = await getDoc(docRef);
-    if (snap.exists()) {
-      return snap.data() as typeof DEFAULT_DB;
+  if (cachedDb) return cachedDb;
+  
+  if (isFetchingDb && dbFetchPromise) return dbFetchPromise;
+  
+  isFetchingDb = true;
+  dbFetchPromise = (async () => {
+    const fsInstance = getFirebase();
+    const docRef = doc(fsInstance, 'alina_db', 'main');
+    try {
+      const snap = await getDoc(docRef);
+      if (snap.exists()) {
+        cachedDb = snap.data() as typeof DEFAULT_DB;
+        return cachedDb;
+      }
+    } catch(e) {
+      console.error("Firestore read error:", e);
     }
-  } catch(e) {
-    console.error("Firestore read error:", e);
+    // Fallback to default
+    cachedDb = DEFAULT_DB;
+    await saveDatabaseAndSync(DEFAULT_DB);
+    return DEFAULT_DB;
+  })();
+  
+  try {
+    return await dbFetchPromise;
+  } finally {
+    isFetchingDb = false;
+    dbFetchPromise = null;
   }
-  // Fallback to default
-  await saveDatabaseAndSync(DEFAULT_DB);
-  return DEFAULT_DB;
 }
 
 async function saveDatabaseAndSync(data: typeof DEFAULT_DB) {
+  cachedDb = data;
   try {
-    const docRef = doc(firestore, 'alina_db', 'main');
+    const fsInstance = getFirebase();
+    const docRef = doc(fsInstance, 'alina_db', 'main');
     await setDoc(docRef, data);
     console.log("[Sync Engine] Successfully synchronized with Firestore!");
   } catch (error) {
     console.error("Failed to write to Firestore:", error);
+    throw error;
   }
 }
 
 // Log actions dynamically
-async function appendAuditLog(userName: string, userRole: 'OWNER' | 'ADMIN', activity: string, module: string, userAgent?: string) {
-  const db = await readAndPullDatabase();
+function appendAuditLog(db: any, userName: string, userRole: 'OWNER' | 'ADMIN', activity: string, module: string, userAgent?: string) {
   const log: ActivityLog = {
     Log_ID: `LOG-${Date.now().toString().slice(-6)}-${Math.floor(Math.random() * 1000)}`,
     User_Name: userName,
@@ -378,7 +411,6 @@ async function appendAuditLog(userName: string, userRole: 'OWNER' | 'ADMIN', act
   if (db.activityLog.length > 500) {
     db.activityLog = db.activityLog.slice(0, 500); // keep it lean
   }
-  await saveDatabaseAndSync(db);
 }
 
 // Global hook to wrap ALL app.post endpoints to use the concurrency lock
@@ -446,7 +478,7 @@ app.post('/api/auth/login', async (req, res) => {
   await saveDatabaseAndSync(db);
 
   // Log audit trail
-  appendAuditLog(user.Full_Name, user.Role, `Logged in successfully`, 'Security', req.headers['user-agent']);
+  appendAuditLog(db, user.Full_Name, user.Role, `Logged in successfully`, 'Security', req.headers['user-agent']);
 
   return res.json({
     user: {
@@ -464,7 +496,9 @@ app.post('/api/auth/login', async (req, res) => {
 app.post('/api/auth/logout', async (req, res) => {
   const { userName, role } = req.body;
   if (userName) {
-    appendAuditLog(userName, role || 'ADMIN', `Logged out`, 'Security', req.headers['user-agent']);
+    const db = await readAndPullDatabase();
+    appendAuditLog(db, userName, role || 'ADMIN', `Logged out`, 'Security', req.headers['user-agent'] as string);
+    await saveDatabaseAndSync(db);
   }
   res.json({ success: true });
 });
@@ -473,6 +507,9 @@ app.post('/api/auth/logout', async (req, res) => {
 app.get('/api/health', (req, res) => res.json({ status: 'ok', vercel: process.env.VERCEL }));
 
 app.get('/api/db', async (req, res) => {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
   const db = await readAndPullDatabase();
   // Strip password hashes for client safety
   const safeUsers = db.users.map((u: User) => {
@@ -516,7 +553,7 @@ app.post('/api/products', async (req, res) => {
 
     db.products.push(newProduct);
     await saveDatabaseAndSync(db);
-    appendAuditLog(user.name, user.role, `Created product SKU: ${newProduct.SKU}`, 'Product');
+    appendAuditLog(db, user.name, user.role, `Created product SKU: ${newProduct.SKU}`, 'Product');
     return res.json({ success: true, product: newProduct });
   }
 
@@ -550,7 +587,7 @@ app.post('/api/products', async (req, res) => {
     };
 
     await saveDatabaseAndSync(db);
-    appendAuditLog(user.name, user.role, `Updated product SKU: ${product.SKU}`, 'Product');
+    appendAuditLog(db, user.name, user.role, `Updated product SKU: ${product.SKU}`, 'Product');
     return res.json({ success: true, product: db.products[idx] });
   }
 
@@ -567,7 +604,7 @@ app.post('/api/products', async (req, res) => {
     const targetSKU = db.products[idx].SKU;
     db.products.splice(idx, 1);
     await saveDatabaseAndSync(db);
-    appendAuditLog(user.name, user.role, `Deleted product SKU: ${targetSKU}`, 'Product');
+    appendAuditLog(db, user.name, user.role, `Deleted product SKU: ${targetSKU}`, 'Product');
     return res.json({ success: true });
   }
 
@@ -628,7 +665,7 @@ app.post('/api/products/import', async (req, res) => {
   }
 
   await saveDatabaseAndSync(db);
-  appendAuditLog(user.name, user.role, `Imported products: ${created} created, ${updated} updated`, 'Product');
+  appendAuditLog(db, user.name, user.role, `Imported products: ${created} created, ${updated} updated`, 'Product');
   res.json({ success: true, created, updated });
 });
 
@@ -654,7 +691,7 @@ app.post('/api/customers', async (req, res) => {
 
     db.customers.push(newCustomer);
     await saveDatabaseAndSync(db);
-    appendAuditLog(user.name, user.role, `Created customer: ${newCustomer.Customer_Name}`, 'Customer');
+    appendAuditLog(db, user.name, user.role, `Created customer: ${newCustomer.Customer_Name}`, 'Customer');
     return res.json({ success: true, customer: newCustomer });
   }
 
@@ -676,7 +713,7 @@ app.post('/api/customers', async (req, res) => {
     };
 
     await saveDatabaseAndSync(db);
-    appendAuditLog(user.name, user.role, `Updated customer: ${customer.Customer_Name}`, 'Customer');
+    appendAuditLog(db, user.name, user.role, `Updated customer: ${customer.Customer_Name}`, 'Customer');
     return res.json({ success: true, customer: db.customers[idx] });
   }
 
@@ -689,7 +726,7 @@ app.post('/api/customers', async (req, res) => {
     const name = db.customers[idx].Customer_Name;
     db.customers.splice(idx, 1);
     await saveDatabaseAndSync(db);
-    appendAuditLog(user.name, user.role, `Deleted customer: ${name}`, 'Customer');
+    appendAuditLog(db, user.name, user.role, `Deleted customer: ${name}`, 'Customer');
     return res.json({ success: true });
   }
 
@@ -735,7 +772,7 @@ app.post('/api/inventory/stock-in', async (req, res) => {
   await saveDatabaseAndSync(db);
 
   const auditMsg = `Stock In: +${qty} [${source_type || 'Konveksi'} - ${quality_type || 'Good'}] for SKU ${sku} (${product.Product_Name})`;
-  appendAuditLog(user.name, user.role, auditMsg, 'WMS');
+  appendAuditLog(db, user.name, user.role, auditMsg, 'WMS');
   res.json({ success: true, transaction: newTx, currentStock: product.Current_Stock });
 });
 
@@ -774,7 +811,7 @@ app.post('/api/inventory/stock-out', async (req, res) => {
   await saveDatabaseAndSync(db);
 
   const auditMsg = `Stock Out: -${qty} [${destination_type || 'Sales'} - ${quality_type || 'Good'}] for SKU ${sku} (${product.Product_Name})`;
-  appendAuditLog(user.name, user.role, auditMsg, 'WMS');
+  appendAuditLog(db, user.name, user.role, auditMsg, 'WMS');
   res.json({ success: true, transaction: newTx, currentStock: product.Current_Stock });
 });
 
@@ -814,7 +851,7 @@ app.post('/api/inventory/stock-opname', async (req, res) => {
   db.stockOpname.unshift(opnameEntry);
   await saveDatabaseAndSync(db);
 
-  appendAuditLog(
+  appendAuditLog(db, 
     user.name, 
     user.role, 
     `Stock Opname [${month}]: SKU ${sku} count as ${pCount} (Diff: ${difference >= 0 ? '+' : ''}${difference})`, 
@@ -927,7 +964,7 @@ app.post('/api/orders', async (req, res) => {
     }
 
     await saveDatabaseAndSync(db);
-    appendAuditLog(user.name, user.role, `Created sales order ${ordNum} with ${itemsToCreate.length} items, channel: ${order.Channel}`, 'OMS');
+    appendAuditLog(db, user.name, user.role, `Created sales order ${ordNum} with ${itemsToCreate.length} items, channel: ${order.Channel}`, 'OMS');
     return res.json({ success: true, order: firstOrder });
   }
 
@@ -986,11 +1023,11 @@ app.post('/api/orders', async (req, res) => {
 
     if (newStatus === 'Packing') {
       // Record packing checklist confirmation in logs
-      appendAuditLog(user.name, user.role, `Verified checklist and packed order: ${orderNumber}`, 'OMS');
+      appendAuditLog(db, user.name, user.role, `Verified checklist and packed order: ${orderNumber}`, 'OMS');
     }
 
     await saveDatabaseAndSync(db);
-    appendAuditLog(user.name, user.role, `Changed status of Order ${orderNumber} from "${oldStatus}" to "${newStatus}"`, 'OMS');
+    appendAuditLog(db, user.name, user.role, `Changed status of Order ${orderNumber} from "${oldStatus}" to "${newStatus}"`, 'OMS');
     return res.json({ success: true });
   }
 
@@ -1001,7 +1038,7 @@ app.post('/api/orders', async (req, res) => {
       return res.status(404).json({ error: 'Order not found.' });
     }
     await saveDatabaseAndSync(db);
-    appendAuditLog(user.name, user.role, `Deleted Order ${orderNumber}`, 'OMS');
+    appendAuditLog(db, user.name, user.role, `Deleted Order ${orderNumber}`, 'OMS');
     return res.json({ success: true });
   }
 
@@ -1043,7 +1080,7 @@ app.post('/api/shipping', async (req, res) => {
     }
 
     await saveDatabaseAndSync(db);
-    appendAuditLog(user.name, user.role, `Updated shipping record for order ${shipping.Order_Number} (${shippingRecord.Courier} - ${shippingRecord.Tracking_Number})`, 'Shipping');
+    appendAuditLog(db, user.name, user.role, `Updated shipping record for order ${shipping.Order_Number} (${shippingRecord.Courier} - ${shippingRecord.Tracking_Number})`, 'Shipping');
     return res.json({ success: true, shipping: shippingRecord });
   }
 
@@ -1052,11 +1089,17 @@ app.post('/api/shipping', async (req, res) => {
 
 // 9. CONFIGURATION & SHEET SYNCHRONIZATION
 app.post('/api/settings/sheets-config', async (req, res) => {
-  const { customLogoUrl, user } = req.body;
+  const { customLogoUrl, user, isLinked, scriptUrl, spreadsheetId, autoSync } = req.body;
   const db = await readAndPullDatabase();
-  db.sheetsConfig = { ...db.sheetsConfig, customLogoUrl: customLogoUrl || "" };
-  await saveDatabaseAndSync(db);
-  appendAuditLog(user?.name || "System", user?.role || "ADMIN", "Updated configuration", "System");
+  db.sheetsConfig = { 
+    ...db.sheetsConfig, 
+    customLogoUrl: customLogoUrl !== undefined ? customLogoUrl : db.sheetsConfig?.customLogoUrl || "",
+    isLinked: isLinked !== undefined ? isLinked : db.sheetsConfig?.isLinked || false,
+    scriptUrl: scriptUrl !== undefined ? scriptUrl : db.sheetsConfig?.scriptUrl || "",
+    spreadsheetId: spreadsheetId !== undefined ? spreadsheetId : db.sheetsConfig?.spreadsheetId || "",
+    autoSync: autoSync !== undefined ? autoSync : db.sheetsConfig?.autoSync || false
+  };
+  appendAuditLog(db, user?.name || "System", user?.role || "ADMIN", "Updated configuration", "System");
   res.json({ success: true, config: db.sheetsConfig });
 });
 
@@ -1096,7 +1139,7 @@ app.post('/api/users', async (req, res) => {
 
     db.users.push(newUser);
     await saveDatabaseAndSync(db);
-    appendAuditLog(user.name, user.role, `Created User: ${newUser.Full_Name} (${newUser.Role})`, 'Security');
+    appendAuditLog(db, user.name, user.role, `Created User: ${newUser.Full_Name} (${newUser.Role})`, 'Security');
     return res.json({ success: true, user: newUser });
   }
 
@@ -1124,7 +1167,7 @@ app.post('/api/users', async (req, res) => {
     };
 
     await saveDatabaseAndSync(db);
-    appendAuditLog(user.name, user.role, `Updated User details for: ${targetUser.Full_Name}`, 'Security');
+    appendAuditLog(db, user.name, user.role, `Updated User details for: ${targetUser.Full_Name}`, 'Security');
     return res.json({ success: true });
   }
 
@@ -1141,7 +1184,7 @@ app.post('/api/users', async (req, res) => {
 
     db.users.splice(idx, 1);
     await saveDatabaseAndSync(db);
-    appendAuditLog(user.name, user.role, `Deleted user account: ${name}`, 'Security');
+    appendAuditLog(db, user.name, user.role, `Deleted user account: ${name}`, 'Security');
     return res.json({ success: true });
   }
 
@@ -1152,6 +1195,15 @@ app.post('/api/users', async (req, res) => {
 // ----------------------------------------------------------------------
 // VITE OR STATIC SERVING MIDDLEWARE
 // ----------------------------------------------------------------------
+app.use((err: any, req: any, res: any, next: any) => {
+  console.error("Global crash via API:", err);
+  if (req.path.startsWith('/api/')) {
+    res.status(500).json({ error: String(err.message || err) });
+  } else {
+    next(err);
+  }
+});
+
 async function startServer() {
   // Jika berjalan pada ekosistem Vercel Serverless, biarkan router Vercel melayani static files,
   // Express hanya berperan sebagai API gateway mikro tanpa memblokir port (prevent port listen)
