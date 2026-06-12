@@ -1,10 +1,9 @@
 {
-  "projectId": "database-alina",
-  "appId": "1:703398000000:web:5cd412909e312dc9cffd65",
   "apiKey": "AIzaSyCt-ChGHV3viyKqUgaZGgn9y0r3iJhHiPw",
   "authDomain": "database-alina.firebaseapp.com",
-  "firestoreDatabaseId": "ai-studio-6b77bf92-34e1-47c6-b6b9-94247a7e4913",
+  "projectId": "database-alina",
   "storageBucket": "database-alina.firebasestorage.app",
   "messagingSenderId": "703398000000",
-  "measurementId": ""
+  "appId": "1:703398000000:web:fc63f22e0ffcd3f4cffd65",
+  "firestoreDatabaseId": "ai-studio-6b77bf92-34e1-47c6-b6b9-94247a7e4913"
 }
