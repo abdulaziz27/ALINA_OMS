@@ -9,7 +9,7 @@ import fs from 'fs';
 import crypto from 'crypto';
 import { fileURLToPath } from 'url';
 import { initializeApp, getApp, getApps } from 'firebase/app';
-import { initializeFirestore, getFirestore, doc, setDoc, getDoc, terminate } from 'firebase/firestore';
+import { getFirestore, doc, setDoc, getDoc } from 'firebase/firestore/lite';
 
 import firebaseConfigFile from './firebase-applet-config.json';
 
@@ -34,13 +34,7 @@ function getFirebase() {
 
   const fbApp = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
 
-  try {
-    firestoreDb = initializeFirestore(fbApp, {
-      experimentalForceLongPolling: true,
-    }, firebaseConfig.firestoreDatabaseId);
-  } catch (e) {
-    firestoreDb = getFirestore(fbApp, firebaseConfig.firestoreDatabaseId);
-  }
+  firestoreDb = getFirestore(fbApp, firebaseConfig.firestoreDatabaseId);
 
   return firestoreDb;
 }
