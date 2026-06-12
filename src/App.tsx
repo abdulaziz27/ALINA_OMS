@@ -1976,6 +1976,23 @@ export default function App() {
             </button>
           </form>
 
+          {/* Akun Akses Default Card */}
+          <div className="bg-pink-50/50 rounded-xl p-3 border border-pink-100/50 space-y-1.5 leading-relaxed text-left select-text">
+            <p className="text-[10px] uppercase font-black tracking-wider text-[#EC4899]">📌 Akun Akses Default Sistem:</p>
+            <div className="grid grid-cols-2 gap-x-2 gap-y-1 text-[9px] text-gray-600 font-mono">
+              <div className="border-r border-pink-100/80 pr-1">
+                <span className="font-bold text-gray-800">1. Role OWNER</span>
+                <p className="text-[9px]">owner@alina.com</p>
+                <div className="mt-0.5">Pass: <span className="font-black bg-pink-100/80 text-pink-700 px-1 rounded select-all cursor-pointer">HIJxF1N4</span></div>
+              </div>
+              <div className="pl-1">
+                <span className="font-bold text-gray-800">2. Role ADMIN</span>
+                <p className="text-[9px]">admin@alina.com</p>
+                <div className="mt-0.5">Pass: <span className="font-black bg-pink-100/80 text-pink-700 px-1 rounded select-all cursor-pointer">4L1N4xAdmin</span></div>
+              </div>
+            </div>
+          </div>
+
 
 
           <div className="text-center font-mono text-[9px] text-gray-400 flex items-center justify-center gap-1.5">
