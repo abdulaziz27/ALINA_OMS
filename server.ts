@@ -12,25 +12,29 @@ import { initializeFirestore, doc, setDoc, getDoc, terminate } from 'firebase/fi
 
 import firebaseConfigFile from './firebase-applet-config.json';
 
-function createFirebaseInstance() {
-  const firebaseConfig = {
-    apiKey: process.env.FIREBASE_API_KEY || firebaseConfigFile.apiKey,
-    authDomain: process.env.FIREBASE_AUTH_DOMAIN || firebaseConfigFile.authDomain,
-    projectId: process.env.FIREBASE_PROJECT_ID || firebaseConfigFile.projectId,
-    storageBucket: process.env.FIREBASE_STORAGE_BUCKET || firebaseConfigFile.storageBucket,
-    messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID || firebaseConfigFile.messagingSenderId,
-    appId: process.env.FIREBASE_APP_ID || firebaseConfigFile.appId,
-    firestoreDatabaseId: process.env.FIREBASE_DATABASE_ID || firebaseConfigFile.firestoreDatabaseId || "(default)"
-  };
-  if (!firebaseConfig.projectId) {
-    throw new Error("Firebase Project ID is missing.");
+let fbApp: any = null;
+let firestoreDb: any = null;
+
+function getFirebase() {
+  if (!fbApp) {
+    const firebaseConfig = {
+      apiKey: process.env.FIREBASE_API_KEY || firebaseConfigFile.apiKey,
+      authDomain: process.env.FIREBASE_AUTH_DOMAIN || firebaseConfigFile.authDomain,
+      projectId: process.env.FIREBASE_PROJECT_ID || firebaseConfigFile.projectId,
+      storageBucket: process.env.FIREBASE_STORAGE_BUCKET || firebaseConfigFile.storageBucket,
+      messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID || firebaseConfigFile.messagingSenderId,
+      appId: process.env.FIREBASE_APP_ID || firebaseConfigFile.appId,
+      firestoreDatabaseId: process.env.FIREBASE_DATABASE_ID || firebaseConfigFile.firestoreDatabaseId || "(default)"
+    };
+    if (!firebaseConfig.projectId) {
+      throw new Error("Firebase Project ID is missing.");
+    }
+    fbApp = initializeApp(firebaseConfig);
+    firestoreDb = initializeFirestore(fbApp, {
+      experimentalForceLongPolling: true,
+    }, firebaseConfig.firestoreDatabaseId);
   }
-  const appName = `alina-inst-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
-  const app = initializeApp(firebaseConfig, appName);
-  const db = initializeFirestore(app, {
-    experimentalForceLongPolling: true,
-  }, firebaseConfig.firestoreDatabaseId);
-  return { app, db };
+  return firestoreDb;
 }
 
 // Global lock to queue concurrent DB operations, fixing the race condition!
@@ -390,12 +394,8 @@ async function readAndPullDatabase(forcePull?: boolean): Promise<typeof DEFAULT_
   
   isFetchingDb = true;
   dbFetchPromise = (async () => {
-    let appObj: any = null;
-    let dbObj: any = null;
     try {
-      const { app, db } = createFirebaseInstance();
-      appObj = app;
-      dbObj = db;
+      const dbObj = getFirebase();
       const docRef = doc(dbObj, 'alina_db', 'main');
       
       // Use the timeout wrapper to avoid hanging Vercel/Cloud Run functions on poor network connections
@@ -407,13 +407,6 @@ async function readAndPullDatabase(forcePull?: boolean): Promise<typeof DEFAULT_
       }
     } catch(e) {
       console.error("Firestore read error or timeout:", e);
-    } finally {
-      if (dbObj) {
-        try { await terminate(dbObj); } catch(err) { console.error("Error terminating DB:", err); }
-      }
-      if (appObj) {
-        try { await deleteApp(appObj); } catch(err) { console.error("Error deleting App:", err); }
-      }
     }
     // Fallback gracefully to existing cache or DEFAULT_DB if Firestore is slow or unreachable
     cachedDb = cachedDb || DEFAULT_DB;
@@ -432,12 +425,8 @@ async function readAndPullDatabase(forcePull?: boolean): Promise<typeof DEFAULT_
 async function saveDatabaseAndSync(data: typeof DEFAULT_DB) {
   cachedDb = data;
   lastDbFetchTime = Date.now();
-  let appObj: any = null;
-  let dbObj: any = null;
   try {
-    const { app, db } = createFirebaseInstance();
-    appObj = app;
-    dbObj = db;
+    const dbObj = getFirebase();
     const docRef = doc(dbObj, 'alina_db', 'main');
     
     // Protect setDoc write operation from hanging indefinitely by enforcing a 2500ms timeout
@@ -446,13 +435,6 @@ async function saveDatabaseAndSync(data: typeof DEFAULT_DB) {
   } catch (error: any) {
     console.error("Failed to write to Firestore (Continuing server-side in memory):", error);
     // Gracefully handle Firestore failures or Quota limit exceed errors so the app remains fully functional in-memory.
-  } finally {
-    if (dbObj) {
-      try { await terminate(dbObj); } catch(err) { console.error("Error terminating DB during save:", err); }
-    }
-    if (appObj) {
-      try { await deleteApp(appObj); } catch(err) { console.error("Error deleting App during save:", err); }
-    }
   }
 }
 
