@@ -10,7 +10,7 @@ import crypto from 'crypto';
 import { initializeApp } from 'firebase/app';
 import { getFirestore, doc, setDoc, getDoc } from 'firebase/firestore';
 
-const firebaseConfig = JSON.parse(fs.readFileSync('./firebase-applet-config.json', 'utf8'));
+import firebaseConfig from './firebase-applet-config.json';
 const fbApp = initializeApp(firebaseConfig);
 const firestore = getFirestore(fbApp, firebaseConfig.firestoreDatabaseId);
 

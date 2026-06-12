@@ -2003,11 +2003,15 @@ export default function App() {
         
         fetchDatabaseState();
       } else {
-        const errorData = await response.json();
-        setLoginError(errorData.error || 'Invalid credentials.');
+        let errorMsg = 'Invalid credentials.';
+        try {
+          const errorData = await response.json();
+          errorMsg = errorData.error || errorMsg;
+        } catch(e) {}
+        setLoginError('Error API Server: ' + errorMsg);
       }
-    } catch (err) {
-      setLoginError('Error connecting to the Express service, using cached database state.');
+    } catch (err: any) {
+      setLoginError('Gagal terhubung ke API Vercel/Express Server. Server mungkin bermasalah atau koneksi offline.');
     }
   };
 
