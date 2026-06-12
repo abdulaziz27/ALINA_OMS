@@ -480,7 +480,7 @@ const originalPost = app.post.bind(app);
 app.post = function(path, ...handlers) {
   const handler = handlers.pop();
   handlers.push(async (req, res, next) => {
-    enqueueDbTask(() => new Promise(async (resolve) => {
+    await enqueueDbTask(() => new Promise(async (resolve) => {
       try {
         await handler(req, res, next);
       } catch (err: any) {
