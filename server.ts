@@ -442,28 +442,7 @@ app.post = function(path, ...handlers) {
   return originalPost(path, ...handlers);
 }
 
-const originalGet = app.get.bind(app);
-app.get = function(path, ...handlers) {
-  if (handlers.length === 0) {
-    return originalGet(path);
-  }
-  const handler = handlers.pop();
-  handlers.push(async (req, res, next) => {
-    enqueueDbTask(() => new Promise(async (resolve) => {
-      try {
-        await handler(req, res, next);
-      } catch (err: any) {
-        console.error("API GET Error in wrapper:", err);
-        if (!res.headersSent) {
-          res.status(500).json({ error: err.message || "Internal Server Error" });
-        }
-      } finally {
-         resolve(null);
-      }
-    }));
-  });
-  return originalGet(path, ...handlers);
-}
+
 
 
 // ----------------------------------------------------------------------
