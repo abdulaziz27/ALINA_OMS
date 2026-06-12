@@ -721,13 +721,13 @@ export default function App() {
     };
   }, [currentUser]);
 
-  // Realtime Background Synchronization (Polls server database every 4 seconds)
+  // Realtime Background Synchronization (Polls server database every 15 seconds)
   useEffect(() => {
     if (!currentUser) return;
 
     const realTimeInterval = setInterval(() => {
       fetchDatabaseState();
-    }, 4000);
+    }, 15000);
 
     return () => {
       clearInterval(realTimeInterval);
@@ -1216,12 +1216,11 @@ export default function App() {
         return true;
       } else {
         const data = await res.json();
-        alert(data.error || 'Server error');
+        console.error('Server error on save:', data.error);
         return false;
       }
     } catch (e) {
-      console.error(e);
-      alert('Network error');
+      console.error('Network catch during save:', e);
     }
     return false;
   };

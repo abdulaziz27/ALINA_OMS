@@ -348,11 +348,15 @@ const DEFAULT_DB = {
 // Reads data from db.json file, or seeds and returns default
 
 let cachedDb: typeof DEFAULT_DB | null = null;
+let lastDbFetchTime = 0;
 let isFetchingDb = false;
 let dbFetchPromise: Promise<typeof DEFAULT_DB> | null = null;
 
 async function readAndPullDatabase(): Promise<typeof DEFAULT_DB> {
-  if (cachedDb) return cachedDb;
+  const CACHE_TTL = 3000; // 3 seconds max cache
+  if (cachedDb && (Date.now() - lastDbFetchTime < CACHE_TTL)) {
+    return cachedDb;
+  }
   
   if (isFetchingDb && dbFetchPromise) return dbFetchPromise;
   
@@ -364,14 +368,15 @@ async function readAndPullDatabase(): Promise<typeof DEFAULT_DB> {
       const snap = await getDoc(docRef);
       if (snap.exists()) {
         cachedDb = snap.data() as typeof DEFAULT_DB;
+        lastDbFetchTime = Date.now();
         return cachedDb;
       }
     } catch(e) {
       console.error("Firestore read error:", e);
     }
-    // Fallback to default
+    // Fallback to default, do NOT spam saveDatabaseAndSync to avoid quotas if it crashed
     cachedDb = DEFAULT_DB;
-    await saveDatabaseAndSync(DEFAULT_DB);
+    lastDbFetchTime = Date.now();
     return DEFAULT_DB;
   })();
   
@@ -385,6 +390,7 @@ async function readAndPullDatabase(): Promise<typeof DEFAULT_DB> {
 
 async function saveDatabaseAndSync(data: typeof DEFAULT_DB) {
   cachedDb = data;
+  lastDbFetchTime = Date.now();
   try {
     const fsInstance = getFirebase();
     const docRef = doc(fsInstance, 'alina_db', 'main');
@@ -422,8 +428,13 @@ app.post = function(path, ...handlers) {
     enqueueDbTask(() => new Promise(async (resolve) => {
       try {
         await handler(req, res, next);
+      } catch (err: any) {
+        console.error("API Error in wrapper:", err);
+        if (!res.headersSent) {
+          res.status(500).json({ error: err.message || "Internal Server Error" });
+        }
       } finally {
-        resolve();
+        resolve(null);
       }
     }));
   });
@@ -440,8 +451,13 @@ app.get = function(path, ...handlers) {
     enqueueDbTask(() => new Promise(async (resolve) => {
       try {
         await handler(req, res, next);
+      } catch (err: any) {
+        console.error("API GET Error in wrapper:", err);
+        if (!res.headersSent) {
+          res.status(500).json({ error: err.message || "Internal Server Error" });
+        }
       } finally {
-         resolve();
+         resolve(null);
       }
     }));
   });
@@ -475,10 +491,11 @@ app.post('/api/auth/login', async (req, res) => {
 
   // Update last login
   user.Last_Login = new Date().toISOString();
-  await saveDatabaseAndSync(db);
-
+  
   // Log audit trail
-  appendAuditLog(db, user.Full_Name, user.Role, `Logged in successfully`, 'Security', req.headers['user-agent']);
+  appendAuditLog(db, user.Full_Name, user.Role, `Logged in successfully`, 'Security', req.headers['user-agent'] as string);
+  
+  await saveDatabaseAndSync(db);
 
   return res.json({
     user: {
