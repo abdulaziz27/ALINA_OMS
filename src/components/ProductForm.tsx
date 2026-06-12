@@ -177,7 +177,7 @@ const getVariantsByCategory = (cat: string): string[] => {
 interface ProductFormProps {
   productsList: Product[];
   currentUser: { Full_Name: string; Email: string; Role: UserRole } | null;
-  onSaveProduct: (prod: Partial<Product>, isNew: boolean, id?: string) => Promise<boolean>;
+  onSaveProduct: (prod: Partial<Product>, isNew: boolean, id?: string) => Promise<boolean | { success: boolean; error?: string }>;
   onDeleteProduct: (id: string) => Promise<boolean>;
   onImportProducts: (products: any[]) => Promise<boolean>;
   categoryList: string[];
@@ -331,10 +331,23 @@ export default function ProductForm({
       QR_Code: sku
     };
 
-    const success = await onSaveProduct(payload, isCreatingNew, selectedProduct?.Product_ID);
-    if (success) {
-      handleCloseModal();
-      alert('Data sudah tersimpan');
+    try {
+      const res = await onSaveProduct(payload, isCreatingNew, selectedProduct?.Product_ID);
+      const isSuccess = typeof res === 'boolean' ? res : (res && res.success);
+      const errorMsg = typeof res === 'object' && res ? res.error : 'Terjadi kendala jaringan atau server';
+      
+      if (isSuccess) {
+        handleCloseModal();
+        triggerNotif('success', 'Data produk berhasil disimpan!');
+        alert('Data sudah tersimpan');
+      } else {
+        triggerNotif('error', `Gagal menyimpan produk: ${errorMsg}`);
+        alert(`Gagal menyimpan produk: ${errorMsg}`);
+      }
+    } catch (err: any) {
+      console.error('Error submitting form:', err);
+      triggerNotif('error', `Gagal menyimpan produk: ${err.message || 'Unknown error'}`);
+      alert(`Gagal menyimpan produk: ${err.message || 'Unknown error'}`);
     }
   };
 

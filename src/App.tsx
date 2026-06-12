@@ -1199,7 +1199,7 @@ export default function App() {
   // ----------------------------------------------------------------------
   
   // Product Form Save
-  const handleSaveProduct = async (prod: Partial<Product>, isNew: boolean, id?: string): Promise<boolean> => {
+  const handleSaveProduct = async (prod: Partial<Product>, isNew: boolean, id?: string): Promise<{ success: boolean; error?: string }> => {
     try {
       const res = await fetch('/api/products', {
         method: 'POST',
@@ -1213,16 +1213,16 @@ export default function App() {
       });
       if (res.ok) {
         await fetchDatabaseState();
-        return true;
+        return { success: true };
       } else {
         const data = await res.json();
         console.error('Server error on save:', data.error);
-        return false;
+        return { success: false, error: data.error || 'Server error' };
       }
-    } catch (e) {
+    } catch (e: any) {
       console.error('Network catch during save:', e);
+      return { success: false, error: e.message || 'Network error' };
     }
-    return false;
   };
 
   const handleDeleteProduct = async (id: string): Promise<boolean> => {
@@ -4423,21 +4423,36 @@ export default function App() {
                     isOfflineMode={false}
                     onRestore={async (importedDb) => {
                       try {
-                        saveLocalDB(importedDb);
-                        setProducts(importedDb.products || []);
-                        setOrders(importedDb.orders || []);
-                        setCustomers(importedDb.customers || []);
-                        setStockIn(importedDb.stockIn || []);
-                        setStockOut(importedDb.stockOut || []);
-                        setStockOpname(importedDb.stockOpname || []);
-                        setUsers(importedDb.users || []);
-                        setActivityLog(importedDb.activityLog || []);
-                        if (importedDb.sheetsConfig) {
-                          setSheetsConfig(importedDb.sheetsConfig);
+                        const res = await fetch('/api/settings/restore', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ 
+                            importedDb, 
+                            user: { name: currentUser?.Full_Name, role: currentUser?.Role } 
+                          })
+                        });
+                        if (res.ok) {
+                          safeLocalStorage.setItem('alina_local_full_db', JSON.stringify(importedDb));
+                          setProducts(importedDb.products || []);
+                          setOrders(importedDb.orders || []);
+                          setCustomers(importedDb.customers || []);
+                          setStockIn(importedDb.stockIn || []);
+                          setStockOut(importedDb.stockOut || []);
+                          setStockOpname(importedDb.stockOpname || []);
+                          setUsers(importedDb.users || []);
+                          setActivityLog(importedDb.activityLog || []);
+                          if (importedDb.sheetsConfig) {
+                            setSheetsConfig(importedDb.sheetsConfig);
+                          }
+                          return true;
+                        } else {
+                          const data = await res.json();
+                          alert('Gagal memulihkan database: ' + (data.error || 'Server error'));
+                          return false;
                         }
-                        return true;
                       } catch (err) {
                         console.error("Gagal melakukan pemulihan backup database:", err);
+                        alert('Gagal terhubung ke server untuk memulihkan database.');
                         return false;
                       }
                     }}

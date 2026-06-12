@@ -352,9 +352,9 @@ let lastDbFetchTime = 0;
 let isFetchingDb = false;
 let dbFetchPromise: Promise<typeof DEFAULT_DB> | null = null;
 
-async function readAndPullDatabase(): Promise<typeof DEFAULT_DB> {
+async function readAndPullDatabase(forcePull?: boolean): Promise<typeof DEFAULT_DB> {
   const CACHE_TTL = 3000; // 3 seconds max cache
-  if (cachedDb && (Date.now() - lastDbFetchTime < CACHE_TTL)) {
+  if (!forcePull && cachedDb && (Date.now() - lastDbFetchTime < CACHE_TTL)) {
     return cachedDb;
   }
   
@@ -396,23 +396,24 @@ async function saveDatabaseAndSync(data: typeof DEFAULT_DB) {
     const docRef = doc(fsInstance, 'alina_db', 'main');
     await setDoc(docRef, data);
     console.log("[Sync Engine] Successfully synchronized with Firestore!");
-  } catch (error) {
-    console.error("Failed to write to Firestore:", error);
-    throw error;
+  } catch (error: any) {
+    console.error("Failed to write to Firestore (Continuing server-side in memory):", error);
+    // Gracefully handle Firestore failures or Quota limit exceed errors so the app remains fully functional in-memory.
   }
 }
 
 // Log actions dynamically
-function appendAuditLog(db: any, userName: string, userRole: 'OWNER' | 'ADMIN', activity: string, module: string, userAgent?: string) {
+function appendAuditLog(db: any, userName: string | undefined, userRole: any, activity: string, module: string, userAgent?: string) {
   const log: ActivityLog = {
     Log_ID: `LOG-${Date.now().toString().slice(-6)}-${Math.floor(Math.random() * 1000)}`,
-    User_Name: userName,
-    User_Role: userRole,
+    User_Name: userName || "System",
+    User_Role: (userRole || "ADMIN").toUpperCase() as any,
     Activity: activity,
     Module: module,
     Timestamp: new Date().toISOString(),
     Device: userAgent || "Web Client"
   };
+  if (!db.activityLog) db.activityLog = [];
   db.activityLog.unshift(log);
   if (db.activityLog.length > 500) {
     db.activityLog = db.activityLog.slice(0, 500); // keep it lean
@@ -476,7 +477,7 @@ app.post('/api/auth/login', async (req, res) => {
     return res.status(400).json({ error: 'Email and Password are required' });
   }
 
-  const db = await readAndPullDatabase();
+  const db = await readAndPullDatabase(true);
   const user = db.users.find((u: User) => u.Email.toLowerCase() === email.toLowerCase());
 
   if (!user || user.Status !== 'Active') {
@@ -527,7 +528,7 @@ app.get('/api/db', async (req, res) => {
   res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
   res.setHeader('Pragma', 'no-cache');
   res.setHeader('Expires', '0');
-  const db = await readAndPullDatabase();
+  const db = await readAndPullDatabase(true);
   // Strip password hashes for client safety
   const safeUsers = db.users.map((u: User) => {
     const { Password_Hash, ...safe } = u;
@@ -543,8 +544,12 @@ app.post('/api/products', async (req, res) => {
 
   if (action === 'CREATE') {
     // Generate Product_ID
-    const nextIdNum = db.products.length + 1;
-    const prodId = `PROD-${String(nextIdNum).padStart(3, '0')}`;
+    let nextIdNum = db.products.length + 1;
+    let prodId = `PROD-${String(nextIdNum).padStart(3, '0')}`;
+    while (db.products.some((p: any) => p.Product_ID === prodId)) {
+      nextIdNum++;
+      prodId = `PROD-${String(nextIdNum).padStart(3, '0')}`;
+    }
     
     const newProduct: Product = {
       Product_ID: prodId,
@@ -659,8 +664,12 @@ app.post('/api/products/import', async (req, res) => {
       };
       updated++;
     } else {
-      const nextIdNum = db.products.length + 1;
-      const prodId = `PROD-${String(nextIdNum).padStart(3, '0')}`;
+      let nextIdNum = db.products.length + 1;
+      let prodId = `PROD-${String(nextIdNum).padStart(3, '0')}`;
+      while (db.products.some((pr: any) => pr.Product_ID === prodId)) {
+        nextIdNum++;
+        prodId = `PROD-${String(nextIdNum).padStart(3, '0')}`;
+      }
       db.products.push({
         Product_ID: prodId,
         SKU: p.SKU,
@@ -692,8 +701,12 @@ app.post('/api/customers', async (req, res) => {
   const db = await readAndPullDatabase();
 
   if (action === 'CREATE') {
-    const nextIdNum = db.customers.length + 1;
-    const custId = `CUST-${String(nextIdNum).padStart(3, '0')}`;
+    let nextIdNum = db.customers.length + 1;
+    let custId = `CUST-${String(nextIdNum).padStart(3, '0')}`;
+    while (db.customers.some((c: any) => c.Customer_ID === custId)) {
+      nextIdNum++;
+      custId = `CUST-${String(nextIdNum).padStart(3, '0')}`;
+    }
 
     const newCustomer: Customer = {
       Customer_ID: custId,
@@ -1122,7 +1135,20 @@ app.post('/api/settings/sheets-config', async (req, res) => {
 
 // Sync data simulation (and remote posting if configured)
 app.post('/api/settings/sync-now', async (req, res) => {
-  res.json({ success: true, message: "Sinkronisasi berhasil dengan Firestore!" });
+  res.json({ success: true, message: "Sinkronisasi berhasil with Firestore!" });
+});
+
+app.post('/api/settings/restore', async (req, res) => {
+  const { importedDb, user } = req.body;
+  if (!user || user.role !== 'OWNER') {
+    return res.status(403).json({ error: 'Akses ditolak: Hanya OWNER yang dapat memulihkan backup database.' });
+  }
+  if (!importedDb || !importedDb.products || !importedDb.users) {
+    return res.status(400).json({ error: 'Format database tidak valid: Data produk atau user tidak ditemukan.' });
+  }
+  await saveDatabaseAndSync(importedDb);
+  appendAuditLog(importedDb, user.name, user.role, "Restored database from JSON Backup", "Security");
+  res.json({ success: true });
 });
 
 // 10. USER MANAGEMENT (OWNER ONLY)
@@ -1135,8 +1161,12 @@ app.post('/api/users', async (req, res) => {
   }
 
   if (action === 'CREATE') {
-    const nextIdNum = db.users.length + 1;
-    const uid = `USR-${String(nextIdNum).padStart(3, '0')}`;
+    let nextIdNum = db.users.length + 1;
+    let uid = `USR-${String(nextIdNum).padStart(3, '0')}`;
+    while (db.users.some((u: any) => u.User_ID === uid)) {
+      nextIdNum++;
+      uid = `USR-${String(nextIdNum).padStart(3, '0')}`;
+    }
 
     if (db.users.some((u: User) => u.Email.toLowerCase() === targetUser.Email.toLowerCase())) {
       return res.status(400).json({ error: 'Email already exists.' });
