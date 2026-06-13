@@ -177,7 +177,7 @@ const getVariantsByCategory = (cat: string): string[] => {
 interface ProductFormProps {
   productsList: Product[];
   currentUser: { Full_Name: string; Email: string; Role: UserRole } | null;
-  onSaveProduct: (prod: Partial<Product>, isNew: boolean, id?: string) => Promise<boolean | { success: boolean; error?: string }>;
+  onSaveProduct: (prod: Partial<Product>, isNew: boolean, id?: string) => Promise<boolean>;
   onDeleteProduct: (id: string) => Promise<boolean>;
   onImportProducts: (products: any[]) => Promise<boolean>;
   categoryList: string[];
@@ -331,23 +331,12 @@ export default function ProductForm({
       QR_Code: sku
     };
 
-    try {
-      const res = await onSaveProduct(payload, isCreatingNew, selectedProduct?.Product_ID);
-      const isSuccess = typeof res === 'boolean' ? res : (res && res.success);
-      const errorMsg = typeof res === 'object' && res ? res.error : 'Terjadi kendala jaringan atau server';
-      
-      if (isSuccess) {
-        handleCloseModal();
-        triggerNotif('success', 'Data produk berhasil disimpan!');
-        alert('Data sudah tersimpan');
-      } else {
-        triggerNotif('error', `Gagal menyimpan produk: ${errorMsg}`);
-        alert(`Gagal menyimpan produk: ${errorMsg}`);
-      }
-    } catch (err: any) {
-      console.error('Error submitting form:', err);
-      triggerNotif('error', `Gagal menyimpan produk: ${err.message || 'Unknown error'}`);
-      alert(`Gagal menyimpan produk: ${err.message || 'Unknown error'}`);
+    const success = await onSaveProduct(payload, isCreatingNew, selectedProduct?.Product_ID);
+    if (success) {
+      handleCloseModal();
+      alert('Data sudah tersimpan');
+    } else {
+      alert('Gagal menyimpan produk. SKU mungkin sudah terdaftar.');
     }
   };
 
@@ -427,23 +416,6 @@ export default function ProductForm({
       </html>
     `);
     printWindow.document.close();
-  };
-
-  const handleDownloadTemplateCSV = () => {
-    let csvContent = "data:text/csv;charset=utf-8,";
-    csvContent += "SKU,Product_Name,Category,Variant,Color,Size,Cost_Price,Selling_Price,Current_Stock,Minimum_Stock,Status\n";
-    // Add two descriptive example rows
-    csvContent += `"ALN-CEL-0101","CELAMIS REGULAR ALL SIZE (NAVY)","Celamis Regular","All Size","Navy","All Size",20000,40000,100,10,"Active"\n`;
-    csvContent += `"ALN-CEL-0102","CELAMIS RIB JUMBO (MAROON)","Celamis Rib","Jumbo","Maroon","Jumbo",22000,42000,50,10,"Active"\n`;
-
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.href = encodedUri;
-    link.download = "ALINA_IMPORT_TEMPLATE.csv";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    triggerNotif('success', 'Berhasil mengunduh template CSV!');
   };
 
   const handleExportCSV = () => {
@@ -574,55 +546,6 @@ export default function ProductForm({
               className="hidden"
             />
           </label>
-        </div>
-      </div>
-
-      {/* CSV Import Guide & Template Card */}
-      <div className="bg-pink-50/20 rounded-[28px] border border-pink-100/60 p-5 shadow-sm text-xs space-y-4 text-left">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-          <div>
-            <h5 className="font-extrabold text-pink-700 flex items-center gap-2 uppercase tracking-wider text-sm">
-              <PackageOpen className="w-5 h-5 text-[#EC4899] animate-pulse" /> Panduan & Template Import XLS / CSV
-            </h5>
-            <p className="text-[11px] text-gray-500 mt-0.5">
-              Siapkan file list data produk Anda dengan mengunduh template standar di bawah ini, atau gunakan format kolom yang tepat agar integrasi berjalan otomatis secara online.
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={handleDownloadTemplateCSV}
-            className="w-full sm:w-auto shrink-0 bg-[#EC4899] hover:bg-[#D93B84] text-white font-extrabold py-2.5 px-4 rounded-xl cursor-pointer transition text-xs flex items-center justify-center gap-1.5 shadow-sm"
-          >
-            <Download className="w-4 h-4" /> Unduh Template CSV Baru
-          </button>
-        </div>
-
-        {/* Column Specs & Details Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4.5 bg-white p-4.5 rounded-2xl border border-pink-100/35 text-[11px] shadow-inner">
-          <div className="space-y-1.5">
-            <strong className="text-pink-600 block font-black uppercase tracking-wider text-[10px]">📋 Kolom Wajib (Headers)</strong>
-            <ul className="list-disc pl-4 space-y-1 text-gray-600">
-              <li><code className="text-pink-700 font-bold font-mono">SKU</code>: Kode SKU unik (contoh: <code className="bg-pink-50 text-[#EC4899] px-1 rounded text-[10px]">ALN-CEL-0101</code>)</li>
-              <li><code className="text-pink-700 font-bold font-mono">Product_Name</code>: Nama lengkap produk</li>
-            </ul>
-          </div>
-          <div className="space-y-1.5">
-            <strong className="text-pink-600 block font-black uppercase tracking-wider text-[10px]">🏷️ Brand Kategori & Variant Valid</strong>
-            <p className="text-gray-600">Daftar kategori resmi yang didukung sistem Alina:</p>
-            <div className="text-[10px] text-gray-500 mt-1 max-h-24 overflow-y-auto bg-pink-50/20 p-2 rounded-xl border border-pink-150/40 grid grid-cols-2 gap-1">
-              {categoryList.map(cat => (
-                <div key={cat} className="truncate select-none font-medium text-gray-650">• {cat}</div>
-              ))}
-            </div>
-          </div>
-          <div className="space-y-1.5">
-            <strong className="text-pink-600 block font-black uppercase tracking-wider text-[10px]">💰 Aturan Angka & Harga</strong>
-            <ul className="list-disc pl-4 space-y-1 text-gray-600">
-              <li><code className="text-pink-700 font-bold font-mono">Cost_Price</code>: Harga beli modal (angka murni)</li>
-              <li><code className="text-pink-700 font-bold font-mono">Selling_Price</code>: Harga jual (angka murni)</li>
-              <li><code className="text-pink-700 font-bold font-mono">Current_Stock</code>: Nilai stok awal (kosong/0 default)</li>
-            </ul>
-          </div>
         </div>
       </div>
 
