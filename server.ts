@@ -11,16 +11,7 @@ import { fileURLToPath } from 'url';
 import { initializeApp, getApp, getApps } from 'firebase/app';
 import { getFirestore, doc, setDoc, getDoc } from 'firebase/firestore/lite';
 
-// Safe dynamic Firebase configuration loader to prevent ES module JSON import assertion crashes on Vercel
-let firebaseConfigFile: any = {};
-try {
-  const configPath = path.join(process.cwd(), 'firebase-applet-config.json');
-  if (fs.existsSync(configPath)) {
-    firebaseConfigFile = JSON.parse(fs.readFileSync(configPath, 'utf8'));
-  }
-} catch (err) {
-  console.warn("Failed to load firebase-applet-config.json dynamically:", err);
-}
+import firebaseConfigFile from './firebase-applet-config.json';
 
 let firestoreDb: any = null;
 
@@ -61,7 +52,7 @@ function enqueueDbTask(task) {
 import { 
   User, Product, Customer, StockIn, StockOut, 
   StockOpname, Order, Shipping, ActivityLog, SheetsConfig, OrderStatus 
-} from './src/types';
+} from './src/types.ts';
 
 const app = express();
 const PORT = 3000;
