@@ -94,7 +94,7 @@ export function generateAutoSKU(category: string, existingSkus: string[]): strin
     prefix = 'CKR';
   } else if (cat.includes('kids')) {
     prefix = 'KDS';
-  } else if (cat.includes('woolpeach') || cat.includes('wollycrape') || cat.includes('anak')) {
+  } else if (cat.includes('woolpeach') || cat.includes('wolly') || cat.includes('anak')) {
     prefix = 'JLB';
   }
   

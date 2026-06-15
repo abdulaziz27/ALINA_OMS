@@ -107,8 +107,8 @@ const DEFAULT_OFFLINE_DB = {
       SKU: "ALN-JLB-0001",
       Barcode: "ALN-JLB-0001",
       QR_Code: "ALN-JLB-0001",
-      Product_Name: "Jilbab Woolpeach M Dusty Violet",
-      Category: "Jilbab Woolpeach",
+      Product_Name: "Jilbab Woolpeach Pad M Dusty Violet",
+      Category: "Jilbab Woolpeach Pad",
       Variant: "M",
       Color: "Dusty Violet",
       Size: "M",
@@ -123,8 +123,8 @@ const DEFAULT_OFFLINE_DB = {
       SKU: "ALN-JLB-0002",
       Barcode: "ALN-JLB-0002",
       QR_Code: "ALN-JLB-0002",
-      Product_Name: "Jilbab Wollycrape L Blush Pink",
-      Category: "Jilbab Wollycrape",
+      Product_Name: "Jilbab Wollycrepe Pad L Blush Pink",
+      Category: "Jilbab Wollycrepe Pad",
       Variant: "L",
       Color: "Blush Pink",
       Size: "L",
@@ -1083,9 +1083,11 @@ const getColorsByCategory = (cat: string): ColorPreset[] => {
       return celamisKidsColors;
     case 'Celamis Kids Rib':
       return celamisKidsRibColors;
-    case 'Jilbab Woolpeach':
+    case 'Jilbab Woolpeach Pad':
+    case 'Jilbab Woolpeach Softpad':
       return jilbabWoolpeachColors;
-    case 'Jilbab Wollycrape':
+    case 'Jilbab Wollycrepe Pad':
+    case 'Jilbab Wollycrepe Softpad':
       return jilbabWollycrapeColors;
     case 'Jilbab Anak':
       return jilbabAnakColors;
@@ -1104,8 +1106,10 @@ const getVariantsByCategory = (cat: string): string[] => {
     case 'Celamis Kids':
     case 'Celamis Kids Rib':
       return ['Kids 1', 'Kids 2', 'Kids 3'];
-    case 'Jilbab Woolpeach':
-    case 'Jilbab Wollycrape':
+    case 'Jilbab Woolpeach Pad':
+    case 'Jilbab Woolpeach Softpad':
+    case 'Jilbab Wollycrepe Pad':
+    case 'Jilbab Wollycrepe Softpad':
       return ['M', 'L', 'XL'];
     case 'Jilbab Anak':
       return ['Jilbab Anak 1', 'Jilbab Anak 2', 'Jilbab Anak 3'];
@@ -1258,8 +1262,10 @@ const categoryList = [
   "Celamis Short Pants",
   "Celamis Kids",
   "Celamis Kids Rib",
-  "Jilbab Woolpeach",
-  "Jilbab Wollycrape",
+  "Jilbab Woolpeach Pad",
+  "Jilbab Wollycrepe Pad",
+  "Jilbab Woolpeach Softpad",
+  "Jilbab Wollycrepe Softpad",
   "Jilbab Anak"
 ];
 

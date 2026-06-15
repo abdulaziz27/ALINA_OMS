@@ -7,7 +7,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   Plus, Edit, Save, Trash2, Printer, Download, RefreshCw, 
   Upload, Search, FileDown, CheckCircle, PackageOpen, Tag, Code,
-  AlertTriangle, X
+  AlertTriangle, X, Layers, PieChart
 } from 'lucide-react';
 import { Product, UserRole } from '../types.ts';
 import { generateCode128SvgPath, generateAutoSKU } from '../barcodeUtils.ts';
@@ -144,9 +144,11 @@ const getColorsByCategory = (cat: string): ColorPreset[] => {
       return celamisKidsColors;
     case 'Celamis Kids Rib':
       return celamisKidsRibColors;
-    case 'Jilbab Woolpeach':
+    case 'Jilbab Woolpeach Pad':
+    case 'Jilbab Woolpeach Softpad':
       return jilbabWoolpeachColors;
-    case 'Jilbab Wollycrape':
+    case 'Jilbab Wollycrepe Pad':
+    case 'Jilbab Wollycrepe Softpad':
       return jilbabWollycrapeColors;
     case 'Jilbab Anak':
       return jilbabAnakColors;
@@ -164,8 +166,10 @@ const getVariantsByCategory = (cat: string): string[] => {
     case 'Celamis Kids':
     case 'Celamis Kids Rib':
       return ['Kids 1', 'Kids 2', 'Kids 3'];
-    case 'Jilbab Woolpeach':
-    case 'Jilbab Wollycrape':
+    case 'Jilbab Woolpeach Pad':
+    case 'Jilbab Woolpeach Softpad':
+    case 'Jilbab Wollycrepe Pad':
+    case 'Jilbab Wollycrepe Softpad':
       return ['M', 'L', 'XL'];
     case 'Jilbab Anak':
       return ['Jilbab Anak 1', 'Jilbab Anak 2', 'Jilbab Anak 3'];
@@ -195,7 +199,72 @@ export default function ProductForm({
   const [isEditing, setIsEditing] = useState(false);
   const [isCreatingNew, setIsCreatingNew] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedClassification, setSelectedClassification] = useState<string>('All');
+  const [selectedVariantFilter, setSelectedVariantFilter] = useState<string>('All');
+
+  const getProductClassification = (catName: string): 'Celamis' | 'Jilbab' | 'Lainnya' => {
+    const cat = catName.toLowerCase();
+    if (cat.includes('celamis')) return 'Celamis';
+    if (cat.includes('jilbab')) return 'Jilbab';
+    return 'Lainnya';
+  };
+
   const [productToDelete, setProductToDelete] = useState<Product | null>(null);
+
+  const categoryStats = React.useMemo(() => {
+    const stats: Record<string, { skusCount: number; totalStock: number }> = {};
+    productsList.forEach(p => {
+      const cat = p.Category || 'Lainnya';
+      if (!stats[cat]) {
+        stats[cat] = { skusCount: 0, totalStock: 0 };
+      }
+      stats[cat].skusCount += 1;
+      stats[cat].totalStock += (p.Current_Stock || 0);
+    });
+    return Object.entries(stats).map(([catName, data]) => ({
+      category: catName,
+      skusCount: data.skusCount,
+      totalStock: data.totalStock
+    })).sort((a, b) => b.totalStock - a.totalStock);
+  }, [productsList]);
+
+  const variantStats = React.useMemo(() => {
+    const stats: Record<string, { skusCount: number; totalStock: number }> = {};
+    productsList.forEach(p => {
+      const vr = p.Variant || 'Lainnya';
+      if (!stats[vr]) {
+        stats[vr] = { skusCount: 0, totalStock: 0 };
+      }
+      stats[vr].skusCount += 1;
+      stats[vr].totalStock += (p.Current_Stock || 0);
+    });
+    return Object.entries(stats).map(([vName, data]) => ({
+      variant: vName,
+      skusCount: data.skusCount,
+      totalStock: data.totalStock
+    })).sort((a, b) => b.totalStock - a.totalStock);
+  }, [productsList]);
+
+  const combinationStats = React.useMemo(() => {
+    const stats: Record<string, { category: string; variant: string; skusCount: number; totalStock: number }> = {};
+    productsList.forEach(p => {
+      const cat = p.Category || 'Lainnya';
+      const vr = p.Variant || 'All Size';
+      const key = `${cat} - ${vr}`;
+      if (!stats[key]) {
+        stats[key] = { category: cat, variant: vr, skusCount: 0, totalStock: 0 };
+      }
+      stats[key].skusCount += 1;
+      stats[key].totalStock += (p.Current_Stock || 0);
+    });
+    return Object.entries(stats).map(([key, data]) => ({
+      key,
+      category: data.category,
+      variant: data.variant,
+      skusCount: data.skusCount,
+      totalStock: data.totalStock
+    })).sort((a, b) => b.totalStock - a.totalStock);
+  }, [productsList]);
   
   // Form fields
   const [sku, setSku] = useState('');
@@ -485,11 +554,24 @@ export default function ProductForm({
     reader.readAsText(file);
   };
 
-  const filteredProducts = productsList.filter(p => 
-    p.Product_Name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    p.SKU.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    p.Category.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredProducts = productsList.filter(p => {
+    const matchesSearch = 
+      p.Product_Name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      p.SKU.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      p.Category.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    let matchesClassification = true;
+    if (selectedClassification !== 'All') {
+      matchesClassification = getProductClassification(p.Category) === selectedClassification;
+    }
+
+    let matchesVariant = true;
+    if (selectedVariantFilter !== 'All') {
+      matchesVariant = p.Variant === selectedVariantFilter;
+    }
+
+    return matchesSearch && matchesClassification && matchesVariant;
+  });
 
   return (
     <div className="space-y-6">
@@ -546,6 +628,67 @@ export default function ProductForm({
               className="hidden"
             />
           </label>
+        </div>
+      </div>
+
+      {/* Filters: Klasifikasi dan Varian Detail */}
+      <div className="bg-white p-4 rounded-[24px] border border-pink-100/60 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 text-xs font-sans">
+        <div className="flex flex-col gap-1.5 text-left">
+          <span className="font-extrabold text-gray-400 uppercase tracking-widest text-[9px]">Klasifikasi Produk</span>
+          <div className="flex items-center gap-1 p-1 bg-pink-50/40 border border-pink-100/30 rounded-xl w-fit">
+            {[
+              { id: 'All', label: 'Semua Klasifikasi' },
+              { id: 'Celamis', label: 'Celamis' },
+              { id: 'Jilbab', label: 'Jilbab' }
+            ].map(tab => {
+              const active = selectedClassification === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => {
+                    setSelectedClassification(tab.id);
+                    setSelectedVariantFilter('All');
+                  }}
+                  className={`px-3.5 py-1.5 rounded-lg font-bold transition-all text-[11px] cursor-pointer ${
+                    active 
+                      ? 'bg-[#EC4899] text-white shadow-sm font-black scale-102' 
+                      : 'text-gray-500 hover:text-gray-800 hover:bg-pink-100/35'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-1.5 text-left w-full md:w-64">
+          <span className="font-extrabold text-gray-400 uppercase tracking-widest text-[9px]">Varian Spesifik ({selectedClassification === 'All' ? 'Semua' : selectedClassification})</span>
+          <select
+            value={selectedVariantFilter}
+            onChange={(e) => setSelectedVariantFilter(e.target.value)}
+            className="w-full bg-pink-50/20 text-gray-700 font-bold border border-pink-100 rounded-xl py-2 px-3 focus:outline-none focus:border-pink-500 text-xs shadow-inner"
+          >
+            <option value="All">Semua Varian</option>
+            {Array.from(
+              new Set(
+                productsList
+                  .filter(p => {
+                    if (selectedClassification === 'All') return true;
+                    return getProductClassification(p.Category) === selectedClassification;
+                  })
+                  .map(p => p.Variant)
+              )
+            )
+              .filter(Boolean)
+              .sort()
+              .map(v => (
+                <option key={v} value={v}>
+                  {v}
+                </option>
+              ))}
+          </select>
         </div>
       </div>
 
@@ -725,6 +868,92 @@ export default function ProductForm({
             <p className="text-center py-10 text-gray-400 text-xs font-semibold">Tidak ada produk ditemukan.</p>
           )}
         </div>
+      </div>
+
+      {/* Dynamic Summary Cards for each Category and Variant */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 text-left font-sans">
+        
+        {/* Combination Summation Card (2/3 width on large screens) */}
+        <div className="bg-white rounded-[32px] border border-pink-100/75 p-5 shadow-sm space-y-4 lg:col-span-2">
+          <div className="flex items-center gap-2.5 pb-2 border-b border-pink-50">
+            <div className="p-2 bg-pink-50 rounded-xl">
+              <Layers className="w-4 h-4 text-[#EC4899]" />
+            </div>
+            <div>
+              <h4 className="font-extrabold text-sm uppercase tracking-wider text-gray-700">Ringkasan Kategori & Varian (Total)</h4>
+              <span className="text-[10px] text-gray-400 block font-medium">Pengelompokan total fisik stok untuk setiap kombinasi Kategori dan Varian</span>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-[380px] overflow-y-auto pr-1">
+            {combinationStats.map((stat) => (
+              <div key={stat.key} className="bg-pink-50/15 rounded-2xl p-3.5 border border-pink-100/20 flex items-center justify-between gap-4 hover:border-pink-200/60 hover:bg-pink-50/30 transition shadow-xs">
+                <div className="space-y-0.5">
+                  <span className="font-bold text-gray-800 text-[11px] block leading-tight">
+                    {stat.category} - {stat.variant} (total)
+                  </span>
+                  <span className="text-[9px] text-[#EC4899] font-black uppercase tracking-wider bg-pink-100/30 px-2 py-0.5 rounded-md">
+                    {stat.skusCount} SKU
+                  </span>
+                </div>
+                <div className="text-right shrink-0">
+                  <span className="text-xs font-black text-[#EC4899] bg-pink-50/90 border border-pink-100/30 px-3 py-1.5 rounded-xl font-mono shadow-inner">
+                    {stat.totalStock.toLocaleString()} Pcs
+                  </span>
+                </div>
+              </div>
+            ))}
+            {combinationStats.length === 0 && (
+              <p className="text-center py-6 col-span-2 text-gray-400 text-xs font-semibold">Belum ada data kombinasi produk.</p>
+            )}
+          </div>
+        </div>
+
+        {/* Separated Individual Summaries (1/3 width on large screens) */}
+        <div className="space-y-6 lg:col-span-1">
+          {/* Category Summation Card */}
+          <div className="bg-white rounded-[32px] border border-pink-100/75 p-5 shadow-sm space-y-4">
+            <div className="flex items-center gap-2 pb-2 border-b border-pink-50">
+              <div className="p-1.5 bg-pink-50 rounded-xl">
+                <Layers className="w-3.5 h-3.5 text-[#EC4899]" />
+              </div>
+              <div>
+                <h4 className="font-bold text-xs uppercase tracking-wider text-gray-700">Total Per Kategori</h4>
+              </div>
+            </div>
+            
+            <div className="space-y-2 max-h-[145px] overflow-y-auto pr-1">
+              {categoryStats.map((stat) => (
+                <div key={stat.category} className="flex items-center justify-between gap-2 py-1 text-xs border-b border-pink-50/30 last:border-0">
+                  <span className="font-semibold text-gray-600 text-[11px] truncate">{stat.category}</span>
+                  <span className="font-bold text-[#EC4899] shrink-0 font-mono text-[11px]">{stat.totalStock.toLocaleString()} Pcs</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Variant Summation Card */}
+          <div className="bg-white rounded-[32px] border border-pink-100/75 p-5 shadow-sm space-y-4">
+            <div className="flex items-center gap-2 pb-2 border-b border-pink-50">
+              <div className="p-1.5 bg-pink-50 rounded-xl">
+                <PieChart className="w-3.5 h-3.5 text-[#EC4899]" />
+              </div>
+              <div>
+                <h4 className="font-bold text-xs uppercase tracking-wider text-gray-700">Total Per Varian</h4>
+              </div>
+            </div>
+            
+            <div className="space-y-2 max-h-[145px] overflow-y-auto pr-1">
+              {variantStats.map((stat) => (
+                <div key={stat.variant} className="flex items-center justify-between gap-2 py-1 text-xs border-b border-pink-50/30 last:border-0">
+                  <span className="font-semibold text-gray-600 text-[11px] truncate">Varian {stat.variant}</span>
+                  <span className="font-bold text-[#EC4899] shrink-0 font-mono text-[11px]">{stat.totalStock.toLocaleString()} Pcs</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
       </div>
 
       {/* Floating Liquid Glass Modal Popup Overlay for Creating and Editing Products */}
