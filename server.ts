@@ -80,8 +80,8 @@ async function startServer() {
     }
   }, 10000); // pull every 10 seconds
 
-  app.listen(PORT, "0.0.0.0", () => {
-    console.log(`ALINA Enterprise running at http://0.0.0.0:${PORT}`);
+  app.listen(PORT, "localhost", () => {
+    console.log(`ALINA Enterprise running at http://localhost:${PORT}`);
   });
 }
 
