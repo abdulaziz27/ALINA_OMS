@@ -1,5 +1,5 @@
 import express from 'express';
-import { readDatabase, saveDatabase } from '../services/db';
+import { readDatabase, saveDatabase, updateProductImage } from '../services/db';
 import { requireApiKey } from '../middleware/authMiddleware';
 
 const router = express.Router();
@@ -362,8 +362,7 @@ router.patch('/products/:sku/image', async (req, res) => {
       return res.status(400).json({ success: false, error: 'imageUrl is required' });
     }
 
-    // Dynamic import to avoid circular dependency issues if any, or just use require
-    const { updateProductImage } = require('../services/db');
+    // Use imported updateProductImage directly
     const updated = await updateProductImage(sku, imageUrl);
 
     if (!updated) {
