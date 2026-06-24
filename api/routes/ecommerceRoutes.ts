@@ -322,4 +322,59 @@ router.get('/orders/:orderNumber/status', (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /products/{sku}/image:
+ *   patch:
+ *     summary: Update product image URL
+ *     description: Update the Image_URL of a specific SKU from the e-commerce CMS.
+ *     parameters:
+ *       - in: path
+ *         name: sku
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The Product SKU
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               imageUrl:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Image updated successfully.
+ *       400:
+ *         description: Missing imageUrl.
+ *       404:
+ *         description: Product not found.
+ */
+// 5. PATCH /products/:sku/image: Update product image
+router.patch('/products/:sku/image', async (req, res) => {
+  try {
+    const { sku } = req.params;
+    const { imageUrl } = req.body;
+    
+    if (!imageUrl) {
+      return res.status(400).json({ success: false, error: 'imageUrl is required' });
+    }
+
+    // Dynamic import to avoid circular dependency issues if any, or just use require
+    const { updateProductImage } = require('../services/db');
+    const updated = await updateProductImage(sku, imageUrl);
+
+    if (!updated) {
+      return res.status(404).json({ success: false, error: 'Product not found' });
+    }
+
+    res.json({ success: true, message: 'Image URL updated successfully' });
+  } catch (error) {
+    console.error('Error updating product image:', error);
+    res.status(500).json({ success: false, error: 'Internal Server Error' });
+  }
+});
+
 export default router;

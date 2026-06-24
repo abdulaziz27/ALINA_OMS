@@ -748,3 +748,12 @@ export function appendAuditLog(userName: string, userRole: 'OWNER' | 'ADMIN', ac
   saveDatabase(db);
 }
 
+export async function updateProductImage(sku: string, imageUrl: string): Promise<boolean> {
+  const db = readDatabase();
+  const index = db.products.findIndex(p => p.SKU === sku);
+  if (index === -1) return false;
+  
+  db.products[index].Image_URL = imageUrl;
+  await saveDatabaseAndSync(db);
+  return true;
+}

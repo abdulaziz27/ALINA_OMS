@@ -22,6 +22,7 @@ export interface Product {
   SKU: string;
   Barcode: string;
   QR_Code: string;
+  Image_URL?: string;
   Product_Name: string;
   Category: string;
   Variant: string;      // Category specific (e.g. All Size, Jumbo, M, L)
