@@ -493,11 +493,14 @@ export async function pullFromGoogleSheets(db: any, throwOnError: boolean = fals
     };
 
     if (data.Products && Array.isArray(data.Products) && data.Products.length > 0) {
-      const validProducts = data.Products.filter((p: any) => p.Product_ID || p.SKU || p.product_ID || p.sku).map((p: any) => ({
-        Product_ID: p.Product_ID || p.product_ID || '',
-        SKU: p.SKU || p.sku || '',
-        Barcode: p.Barcode || p.barcode || p.SKU || '',
-        QR_Code: p.QR_Code || p.qr_Code || p.SKU || '',
+      const validProducts = data.Products.filter((p: any) => p.Product_ID || p.SKU || p.product_ID || p.sku).map((p: any) => {
+        const sku = p.SKU || p.sku || '';
+        const existingProduct = db.products?.find((ep: any) => ep.SKU === sku);
+        return {
+          Product_ID: p.Product_ID || p.product_ID || '',
+          SKU: sku,
+          Barcode: p.Barcode || p.barcode || sku || '',
+          QR_Code: p.QR_Code || p.qr_Code || sku || '',
         Product_Name: p.Product_Name || p.product_Name || '',
         Category: p.Category || p.category || '',
         Variant: p.Variant || p.variant || '',
@@ -507,8 +510,10 @@ export async function pullFromGoogleSheets(db: any, throwOnError: boolean = fals
         Selling_Price: parseNumber(p.Selling_Price),
         Current_Stock: parseNumber(p.Current_Stock),
         Minimum_Stock: parseNumber(p.Minimum_Stock),
-        Status: p.Status || 'Active'
-      }));
+        Status: p.Status || 'Active',
+        Image_URL: p.Image_URL || p.image_URL || p.imageUrl || existingProduct?.Image_URL || undefined
+        };
+      });
       
       if (validProducts.length > 0) {
         // Enforce unique Product_IDs
