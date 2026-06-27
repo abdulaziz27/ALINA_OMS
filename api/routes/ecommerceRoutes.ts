@@ -50,7 +50,6 @@ router.use(requireApiKey);
  *                         type: string
  *                       Image_URL:
  *                         type: string
- *                         nullable: true
  *       401:
  *         description: Unauthorized. Missing or invalid x-api-key.
  */
@@ -71,7 +70,7 @@ router.get('/products', (req, res) => {
         Selling_Price: p.Selling_Price,
         Current_Stock: p.Current_Stock,
         QR_Code: p.QR_Code,
-        Image_URL: p.Image_URL || null
+        Image_URL: p.Image_URL
       }));
       
     res.json({ success: true, count: activeProducts.length, data: activeProducts });
