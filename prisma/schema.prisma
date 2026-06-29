@@ -1,0 +1,123 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  User_ID      String   @unique
+  Full_Name    String
+  Email        String   @unique
+  Password_Hash String
+  Role         String
+  Status       String
+  Last_Login   String
+  Created_Date String
+  Permissions  String // JSON stringified array of permissions
+}
+
+model Product {
+  id            Int      @id @default(autoincrement())
+  Product_ID    String   @unique
+  SKU           String   @unique
+  Barcode       String
+  QR_Code       String
+  Image_URL     String?
+  Product_Name  String
+  Category      String
+  Variant       String
+  Color         String
+  Size          String
+  Cost_Price    Int
+  Selling_Price Int
+  Current_Stock Int
+  Minimum_Stock Int
+  Status        String
+}
+
+model Customer {
+  id            Int      @id @default(autoincrement())
+  Customer_ID   String   @unique
+  Customer_Name String
+  Customer_Type String
+  Phone         String
+  Email         String
+  Address       String
+  City          String
+  Status        String
+}
+
+model StockIn {
+  id             Int      @id @default(autoincrement())
+  Transaction_ID String
+  Date           String
+  SKU            String
+  Product_Name   String
+  Qty            Int
+  Notes          String
+  Source_Type    String?
+  Quality_Type   String?
+}
+
+model StockOut {
+  id               Int      @id @default(autoincrement())
+  Transaction_ID   String
+  Date             String
+  SKU              String
+  Product_Name     String
+  Customer         String
+  Qty              Int
+  Notes            String
+  Destination_Type String?
+  Quality_Type     String?
+}
+
+model StockOpname {
+  id             Int      @id @default(autoincrement())
+  Opname_ID      String
+  Month          String
+  SKU            String
+  Product_Name   String
+  System_Stock   Int
+  Physical_Stock Int
+  Difference     Int
+  Date           String
+}
+
+model Order {
+  id           Int      @id @default(autoincrement())
+  Order_Number String
+  Order_Date   String
+  Customer     String
+  Channel      String
+  SKU          String
+  Product      String
+  Qty          Int
+  Price        Int
+  Total        Int
+  Status       String
+}
+
+model Shipping {
+  id              Int      @id @default(autoincrement())
+  Tracking_Number String   @unique
+  Courier         String
+  Order_Number    String
+  Shipping_Date   String
+  Status          String
+}
+
+model ActivityLog {
+  id         Int      @id @default(autoincrement())
+  Log_ID     String
+  User_Name  String
+  User_Role  String
+  Activity   String
+  Module     String
+  Timestamp  String
+  Device     String
+}

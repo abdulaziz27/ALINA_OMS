@@ -7,7 +7,7 @@
       "Password_Hash": "c570e667306851a91d3068d3daaeb637a292d2f2130b202345cff7f5d69b4bc2",
       "Role": "OWNER",
       "Status": "Active",
-      "Last_Login": "2026-06-24T07:25:48.374Z",
+      "Last_Login": "2026-06-27T14:27:15.312Z",
       "Created_Date": "2026-01-01T00:00:00Z",
       "Permissions": [
         "dashboard",
@@ -1688,9 +1688,10 @@
       "Size": "All Size",
       "Cost_Price": 0,
       "Selling_Price": 55000,
-      "Current_Stock": 46,
+      "Current_Stock": 44,
       "Minimum_Stock": 50,
-      "Status": "Active"
+      "Status": "Active",
+      "Image_URL": "https://ecommerce-mereka.com/images/tas-hitam-01.jpg"
     },
     {
       "Product_ID": "PROD-104",
@@ -2320,6 +2321,18 @@
       "Price": 65000,
       "Total": 780000,
       "Status": "Shipped"
+    },
+    {
+      "Order_Number": "ECOMM-1782552691330",
+      "Order_Date": "2026-06-27T09:31:31.330Z",
+      "Customer": "",
+      "Channel": "Retail",
+      "SKU": "ALN-CSP-0001",
+      "Product": "",
+      "Qty": 2,
+      "Price": 0,
+      "Total": 0,
+      "Status": "Pending"
     }
   ],
   "shipping": [
@@ -2339,6 +2352,24 @@
     }
   ],
   "activityLog": [
+    {
+      "Log_ID": "LOG-582080-331",
+      "User_Name": "Alina Owner",
+      "User_Role": "OWNER",
+      "Activity": "Logged out",
+      "Module": "Security",
+      "Timestamp": "2026-06-27T23:56:22.080Z",
+      "Device": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"
+    },
+    {
+      "Log_ID": "LOG-435320-627",
+      "User_Name": "Alina Owner",
+      "User_Role": "OWNER",
+      "Activity": "Logged in successfully",
+      "Module": "Security",
+      "Timestamp": "2026-06-27T14:27:15.320Z",
+      "Device": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36"
+    },
     {
       "Log_ID": "LOG-948385-832",
       "User_Name": "Alina Owner",

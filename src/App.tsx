@@ -46,7 +46,6 @@ import RestockAlertBanner from './components/layout/RestockAlertBanner.tsx';
 import { calculateRestockForecast } from './utils/forecastUtils.ts';
 import { printInvoice } from './utils/printUtils.ts';
 
-import { pullDirectlyFromGoogleSheetsOnClient } from './lib/sheetsSyncEngine.ts';
 import { DEFAULT_OFFLINE_DB, saveLocalDB, appendOfflineLog, isOfflineForcedGlobal, handleOfflineApiRoute, customFetch, originalFetch, safeLocalStorage } from './lib/offlineEngine.ts';
 
 export const SESSION_TIMEOUT = 8 * 60 * 60 * 1000;
@@ -464,21 +463,6 @@ export default function App() {
       }
     } catch (e) {
       console.warn("Failed to connect to backend REST database:", e);
-      // Fallback: If backend is fully offline, but we have locally saved sheets credentials, pull directly!
-      const localSavedConfigStr = safeLocalStorage.getItem('alina_sheets_config');
-      if (localSavedConfigStr) {
-        try {
-          const localSavedConfig = JSON.parse(localSavedConfigStr);
-          if (localSavedConfig.scriptUrl) {
-            setSheetsConfig({ ...localSavedConfig, isLinked: true });
-            await pullDirectlyFromGoogleSheetsOnClient(localSavedConfig.scriptUrl, {
-              setProducts, setCustomers, setStockIn, setStockOut, setStockOpname, setOrders, setShipping, setUsers, setActivityLog
-            });
-          }
-        } catch (err) {
-          console.error("Failed parsing local sheets config during offline fallback:", err);
-        }
-      }
     }
   };
 
