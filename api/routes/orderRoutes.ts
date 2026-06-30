@@ -23,7 +23,7 @@ router.post('/', async (req, res) => {
         if (!productItem) throw new Error(`Product with SKU ${productSku} not found.`);
 
         const qtyVal = Number(item.Qty);
-        const priceVal = Number(item.Price || productItem.Selling_Price);
+        const priceVal = Number(item.Price || productItem.Retail_Price);
         const totalVal = qtyVal * priceVal;
         const status = order.Status || 'New Order';
 
@@ -107,7 +107,7 @@ router.post('/', async (req, res) => {
           await tx.shipping.create({
             data: {
               Tracking_Number: `TRK-${Date.now().toString().slice(-6)}-${Math.floor(Math.random()*10)}`,
-              Courier: order.Courier || 'Wahana',
+              Courier: order.Courier,
               Order_Number: orderNumber,
               Shipping_Date: new Date().toISOString(),
               Status: 'In Transit'

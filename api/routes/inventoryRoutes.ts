@@ -33,13 +33,13 @@ router.post('/stock-in', async (req, res) => {
         Product_Name: product.Product_Name,
         Qty: Number(qty),
         Notes: notes || '',
-        Source_Type: source_type || 'Konveksi',
-        Quality_Type: quality_type || 'Good'
+        Source_Type: source_type,
+        Quality_Type: quality_type
       }
     });
   });
 
-  const auditMsg = `Stock In: +${qty} [${source_type || 'Konveksi'} - ${quality_type || 'Good'}] for SKU ${sku} (${product.Product_Name})`;
+  const auditMsg = `Stock In: +${qty} [${source_type} - ${quality_type}] for SKU ${sku} (${product.Product_Name})`;
   await appendAuditLog(user.name, user.role, auditMsg, 'WMS');
   res.json({ success: true, currentStock: newStock });
 });
@@ -67,16 +67,16 @@ router.post('/stock-out', async (req, res) => {
         Date: new Date().toISOString(),
         SKU: sku,
         Product_Name: product.Product_Name,
-        Customer: customer || 'General Out',
+        Customer: customer || '',
         Qty: Number(qty),
         Notes: notes || '',
-        Destination_Type: destination_type || 'Sales',
-        Quality_Type: quality_type || 'Good'
+        Destination_Type: destination_type,
+        Quality_Type: quality_type
       }
     });
   });
 
-  const auditMsg = `Stock Out: -${qty} [${destination_type || 'Sales'} - ${quality_type || 'Good'}] for SKU ${sku} (${product.Product_Name})`;
+  const auditMsg = `Stock Out: -${qty} [${destination_type} - ${quality_type}] for SKU ${sku} (${product.Product_Name})`;
   await appendAuditLog(user.name, user.role, auditMsg, 'WMS');
   res.json({ success: true, currentStock: newStock });
 });

@@ -5,6 +5,7 @@ import CreateOrderForm from '../components/orders/CreateOrderForm.tsx';
 import OrderListTable from '../components/orders/OrderListTable.tsx';
 
 interface OrdersPageProps {
+  lookups?: any[];
   orders: Order[];
   products: Product[];
   customers: Customer[];
@@ -43,6 +44,7 @@ interface OrdersPageProps {
 }
 
 export default function OrdersPage({
+  lookups = [],
   orders,
   products,
   customers,
@@ -86,7 +88,7 @@ export default function OrdersPage({
         
         {/* Create Order Card */}
         <div className="lg:col-span-4">
-          <CreateOrderForm 
+          <CreateOrderForm lookups={lookups} 
             customers={customers}
             ordCustomer={ordCustomer}
             setOrdCustomer={setOrdCustomer}

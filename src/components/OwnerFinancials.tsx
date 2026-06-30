@@ -55,7 +55,7 @@ export default function OwnerFinancials({
   }, 0);
 
   const totalInventorySalesValue = productsList.reduce((acc, current) => {
-    return acc + (current.Current_Stock * current.Selling_Price);
+    return acc + (current.Current_Stock * current.Retail_Price);
   }, 0);
 
   // 2. DYNAMIC CHANNEL PERFORMANCE

@@ -4,6 +4,7 @@ import { Truck, Search, CheckCircle2 } from 'lucide-react';
 import { Order, Shipping, User } from '../types.ts';
 
 interface ShippingPageProps {
+  lookups?: any[];
   orders: Order[];
   hasPermission: (perm: string) => boolean;
   selectedShipOrder: string | null;
@@ -21,6 +22,7 @@ interface ShippingPageProps {
 }
 
 export default function ShippingPage({
+  lookups = [],
   orders,
   hasPermission,
   selectedShipOrder,

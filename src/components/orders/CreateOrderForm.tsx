@@ -8,6 +8,7 @@ import { Plus, Trash2 } from 'lucide-react';
 import { Customer } from '../../types.ts';
 
 interface CreateOrderFormProps {
+  lookups?: any[];
   customers: Customer[];
   ordCustomer: string;
   setOrdCustomer: (val: string) => void;
@@ -36,6 +37,7 @@ interface CreateOrderFormProps {
 }
 
 export default function CreateOrderForm({
+  lookups = [],
   customers,
   ordCustomer,
   setOrdCustomer,
@@ -91,15 +93,9 @@ export default function CreateOrderForm({
             onChange={(e) => setOrdChannel(e.target.value as any)}
             className="w-full bg-white border border-pink-100 text-gray-700 rounded-xl py-2 px-3 focus:outline-none font-bold"
           >
-            <option value="Reseller">Reseller</option>
-            <option value="Agen">Agen</option>
-            <option value="Marketer">Marketer</option>
-            <option value="Distributor">Distributor</option>
-            <option value="Ecer">Ecer</option>
-            <option value="Konsinyasi">Konsinyasi</option>
-            <option value="Retail IG">Retail IG</option>
-            <option value="Shopee">Shopee</option>
-            <option value="TikTok & Tokopedia">TikTok & Tokopedia</option>
+            {lookups.filter(l => l.Category === 'ORDER_CHANNEL').map(l => (
+                  <option key={l.id} value={l.Value}>{l.Value}</option>
+                ))}
           </select>
         </div>
 

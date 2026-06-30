@@ -195,12 +195,15 @@ export default function ProductEditor({
   // Local Form fields
   const [sku, setSku] = useState('');
   const [prodName, setProdName] = useState('');
+  const [imageUrl, setImageUrl] = useState('');
   const [category, setCategory] = useState('Celamis Regular');
   const [variant, setVariant] = useState('');
   const [color, setColor] = useState('');
   const [size, setSize] = useState('All Size');
   const [costPrice, setCostPrice] = useState<number | string>('');
   const [sellingPrice, setSellingPrice] = useState<number | string>('');
+  const [resellerPrice, setResellerPrice] = useState<number | string>('');
+  const [distributorPrice, setDistributorPrice] = useState<number | string>('');
   const [minStock, setMinStock] = useState<number | string>(10);
   const [currentStock, setCurrentStock] = useState<number | string>('');
   const [status, setStatus] = useState<'Active' | 'Discontinued'>('Active');
@@ -217,12 +220,15 @@ export default function ProductEditor({
     if (isEditing && selectedProduct) {
       setSku(selectedProduct.SKU);
       setProdName(selectedProduct.Product_Name);
+        setImageUrl(selectedProduct.Image_URL || '');
       setCategory(selectedProduct.Category);
       setVariant(selectedProduct.Variant);
       setColor(selectedProduct.Color);
       setSize(selectedProduct.Size);
       setCostPrice(selectedProduct.Cost_Price);
-      setSellingPrice(selectedProduct.Selling_Price);
+      setSellingPrice(selectedProduct.Retail_Price);
+        setResellerPrice(selectedProduct.Reseller_Price || '');
+        setDistributorPrice(selectedProduct.Distributor_Price || '');
       setMinStock(selectedProduct.Minimum_Stock);
       setCurrentStock(selectedProduct.Current_Stock);
       setStatus(selectedProduct.Status);
@@ -234,6 +240,8 @@ export default function ProductEditor({
       setColor('Hitam');
       setCostPrice('');
       setSellingPrice('');
+      setResellerPrice('');
+      setDistributorPrice('');
       setMinStock(10);
       setCurrentStock('');
       setStatus('Active');
@@ -297,12 +305,15 @@ export default function ProductEditor({
     const payload: Partial<Product> = {
       SKU: sku,
       Product_Name: prodName,
+      Image_URL: imageUrl,
       Category: category,
       Variant: variant,
       Color: color,
       Size: size,
       Cost_Price: Number(costPrice),
-      Selling_Price: Number(sellingPrice),
+      Retail_Price: Number(sellingPrice),
+      Reseller_Price: Number(resellerPrice),
+      Distributor_Price: Number(distributorPrice),
       Current_Stock: Number(currentStock),
       Minimum_Stock: Number(minStock),
       Status: status,
@@ -424,7 +435,7 @@ export default function ProductEditor({
                 {isCreatingNew ? '💡 BUAT SKU BARU' : '📝 EDIT DETAIL PRODUK'}
               </h4>
               <div className="flex items-center gap-1.5">
-                {isEditing && currentUser?.Role === 'OWNER' && (
+                {isEditing && currentUser?.Role === 'Owner Alina' && (
                   <button
                     type="button"
                     onClick={handleDeleteClick}
@@ -546,13 +557,13 @@ export default function ProductEditor({
             <div className="border-t border-pink-100/60 pt-3.5 space-y-2">
               <label className="font-extrabold text-pink-600 block uppercase tracking-widest text-[9px]">SKEMA HARGA HARIAN</label>
               <div className="grid grid-cols-1 gap-3">
-                {currentUser?.Role === 'OWNER' && (
+                {currentUser?.Role === 'Owner Alina' && (
                   <div className="space-y-1">
                     <label className="font-bold text-gray-600 block">HARGA MODAL (Owner Only)</label>
                     <input
                       type="number"
                       required
-                      disabled={currentUser?.Role !== 'OWNER'}
+                      disabled={currentUser?.Role !== 'Owner Alina'}
                       value={costPrice}
                       onChange={(e) => setCostPrice(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                       className="w-full bg-white border border-pink-100 rounded-xl py-2 px-3 focus:outline-none font-mono text-gray-800 text-xs disabled:bg-gray-100 disabled:text-gray-400"
@@ -654,7 +665,9 @@ export default function ProductEditor({
                       Color: color,
                       Size: size,
                       Cost_Price: Number(costPrice),
-                      Selling_Price: Number(sellingPrice),
+                      Retail_Price: Number(sellingPrice),
+                      Reseller_Price: Number(resellerPrice),
+                      Distributor_Price: Number(distributorPrice),
                       Current_Stock: Number(currentStock),
                       Minimum_Stock: Number(minStock),
                       Status: status,

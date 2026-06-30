@@ -18,7 +18,7 @@ export const appendAuditLog = async (userName: string, role: string, activity: s
       data: {
         Log_ID: logId,
         User_Name: userName || 'System',
-        User_Role: role || 'ADMIN',
+        User_Role: role || 'Admin Gudang Alina',
         Activity: activity,
         Module: module,
         Timestamp: ts,

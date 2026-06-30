@@ -44,7 +44,7 @@ router.post('/login', async (req, res) => {
 router.post('/logout', async (req, res) => {
   const { userName, role } = req.body;
   if (userName) {
-    await appendAuditLog(userName, role || 'ADMIN', `Logged out`, 'Security', req.headers['user-agent']);
+    await appendAuditLog(userName, role || 'Admin Gudang Alina', `Logged out`, 'Security', req.headers['user-agent']);
   }
   res.json({ success: true });
 });

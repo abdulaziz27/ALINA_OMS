@@ -64,7 +64,7 @@ export default function DashboardPage({
       </div>
 
       {/* Secure OWNER view triggers */}
-      {currentUser.Role === 'OWNER' ? (
+      {currentUser.Role === 'Owner Alina' ? (
         <div className="space-y-4">
           <div className="flex justify-between items-center">
             <span className="bg-pink-100 text-[#EC4899] text-[9px] font-black px-3 py-1 rounded-full uppercase">Secure Owner Financial Panel</span>

@@ -23,12 +23,15 @@ router.post('/', async (req, res) => {
         Barcode: product.Barcode || product.SKU,
         QR_Code: product.QR_Code || product.SKU,
         Product_Name: product.Product_Name,
+        Image_URL: product.Image_URL || null,
         Category: product.Category,
         Variant: product.Variant,
         Color: product.Color,
         Size: product.Size,
         Cost_Price: Number(product.Cost_Price),
-        Selling_Price: Number(product.Selling_Price),
+        Retail_Price: Number(product.Retail_Price),
+        Reseller_Price: Number(product.Reseller_Price),
+        Distributor_Price: Number(product.Distributor_Price),
         Current_Stock: Number(product.Current_Stock) || 0,
         Minimum_Stock: Number(product.Minimum_Stock) || 0,
         Status: product.Status || 'Active'
@@ -62,7 +65,9 @@ router.post('/', async (req, res) => {
         Color: product.Color,
         Size: product.Size,
         Cost_Price: Number(product.Cost_Price),
-        Selling_Price: Number(product.Selling_Price),
+        Retail_Price: Number(product.Retail_Price),
+        Reseller_Price: Number(product.Reseller_Price),
+        Distributor_Price: Number(product.Distributor_Price),
         Current_Stock: Number(product.Current_Stock),
         Minimum_Stock: Number(product.Minimum_Stock),
         Status: product.Status
@@ -74,7 +79,7 @@ router.post('/', async (req, res) => {
   }
 
   if (action === 'DELETE') {
-    if (user.role !== 'OWNER') {
+    if (user.role !== 'Owner Alina') {
       return res.status(403).json({ error: 'Access denied: Only OWNER can delete products.' });
     }
     const existing = await prisma.product.findUnique({ where: { Product_ID: id } });
@@ -114,7 +119,9 @@ router.post('/import', async (req, res) => {
           Color: p.Color || existing.Color,
           Size: p.Size || existing.Size,
           Cost_Price: p.Cost_Price !== undefined ? Number(p.Cost_Price) : existing.Cost_Price,
-          Selling_Price: p.Selling_Price !== undefined ? Number(p.Selling_Price) : existing.Selling_Price,
+          Retail_Price: p.Retail_Price !== undefined ? Number(p.Retail_Price) : existing.Retail_Price,
+          Reseller_Price: p.Reseller_Price !== undefined ? Number(p.Reseller_Price) : existing.Reseller_Price,
+          Distributor_Price: p.Distributor_Price !== undefined ? Number(p.Distributor_Price) : existing.Distributor_Price,
           Current_Stock: p.Current_Stock !== undefined ? Number(p.Current_Stock) : existing.Current_Stock,
           Minimum_Stock: p.Minimum_Stock !== undefined ? Number(p.Minimum_Stock) : existing.Minimum_Stock,
           Status: p.Status || existing.Status
@@ -130,14 +137,16 @@ router.post('/import', async (req, res) => {
           Barcode: p.SKU,
           QR_Code: p.SKU,
           Product_Name: p.Product_Name,
-          Category: p.Category || 'Celamis',
-          Variant: p.Variant || 'All Size',
-          Color: p.Color || 'Natural',
-          Size: p.Size || 'All Size',
-          Cost_Price: p.Cost_Price !== undefined ? Number(p.Cost_Price) : 20000,
-          Selling_Price: p.Selling_Price !== undefined ? Number(p.Selling_Price) : 40000,
-          Current_Stock: p.Current_Stock !== undefined ? Number(p.Current_Stock) : 0,
-          Minimum_Stock: p.Minimum_Stock !== undefined ? Number(p.Minimum_Stock) : 10,
+          Category: p.Category,
+          Variant: p.Variant,
+          Color: p.Color,
+          Size: p.Size,
+          Cost_Price: Number(p.Cost_Price) || 0,
+          Retail_Price: Number(p.Retail_Price) || 0,
+          Reseller_Price: Number(p.Reseller_Price) || 0,
+          Distributor_Price: Number(p.Distributor_Price) || 0,
+          Current_Stock: Number(p.Current_Stock) || 0,
+          Minimum_Stock: Number(p.Minimum_Stock) || 0,
           Status: 'Active'
         }
       });

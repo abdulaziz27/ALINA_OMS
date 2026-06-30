@@ -62,10 +62,10 @@ export default function ProductForm({
 
   const handleExportCSV = () => {
     let csvContent = "data:text/csv;charset=utf-8,";
-    csvContent += "SKU,Product_Name,Category,Variant,Color,Size,Cost_Price,Selling_Price,Current_Stock,Minimum_Stock,Status\n";
+    csvContent += "SKU,Product_Name,Category,Variant,Color,Size,Cost_Price,Retail_Price,Current_Stock,Minimum_Stock,Status\n";
 
     productsList.forEach(p => {
-      csvContent += `"${p.SKU}","${p.Product_Name}","${p.Category}","${p.Variant}","${p.Color}","${p.Size}",${p.Cost_Price},${p.Selling_Price},${p.Current_Stock},${p.Minimum_Stock},"${p.Status}"\n`;
+      csvContent += `"${p.SKU}","${p.Product_Name}","${p.Category}","${p.Variant}","${p.Color}","${p.Size}",${p.Cost_Price},${p.Retail_Price},${p.Current_Stock},${p.Minimum_Stock},"${p.Status}"\n`;
     });
 
     const encodedUri = encodeURI(csvContent);
@@ -107,7 +107,7 @@ export default function ProductForm({
             Color: columns[4]?.replace(/"/g, '') || 'Pastel',
             Size: columns[5]?.replace(/"/g, '') || 'All Size',
             Cost_Price: Number(columns[6]) || 20000,
-            Selling_Price: Number(columns[7]) || 40000,
+            Retail_Price: Number(columns[7]) || 40000,
             Current_Stock: Number(columns[8]) || 0,
             Minimum_Stock: Number(columns[9]) || 10,
             Status: columns[10]?.replace(/"/g, '') || 'Active'

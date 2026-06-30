@@ -9,6 +9,7 @@ import orderRoutes from './orderRoutes.ts';
 import shippingRoutes from './shippingRoutes.ts';
 import userRoutes from './userRoutes.ts';
 import settingsRoutes from './settingsRoutes.ts';
+import lookupRoutes from './lookupRoutes.ts';
 
 const router = Router();
 
@@ -23,5 +24,6 @@ router.use('/api/orders', orderRoutes);
 router.use('/api/shipping', shippingRoutes);
 router.use('/api/users', userRoutes);
 router.use('/api/settings', settingsRoutes);
+router.use('/api/lookups', lookupRoutes);
 
 export default router;

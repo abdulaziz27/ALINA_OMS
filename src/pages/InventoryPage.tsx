@@ -4,6 +4,7 @@ import { Package, Barcode, ChevronDown, CheckCircle, Search, X } from 'lucide-re
 import { Product, StockIn, StockOut, Customer } from '../types.ts';
 
 interface InventoryPageProps {
+  lookups?: any[];
   products: Product[];
   customers: Customer[];
   stockIn: StockIn[];
@@ -37,6 +38,7 @@ interface InventoryPageProps {
 }
 
 export default function InventoryPage({
+  lookups = [],
   products,
   customers,
   stockIn,
@@ -303,9 +305,9 @@ export default function InventoryPage({
                             onChange={(e) => setTrxDestination(e.target.value as any)}
                             className="w-full bg-white border border-pink-100 rounded-xl py-1.5 px-2 focus:outline-none text-[10px] font-bold"
                           >
-                            <option value="Sales">Sales (Kirim ke Customer)</option>
-                            <option value="Return to Konveksi">Return to Konveksi (Retur Reject/Sisa)</option>
-                            <option value="Reject Disposal">Reject Disposal (Afkir/Dibuang)</option>
+                            {lookups.filter(l => l.Category === 'STOCK_DESTINATION').map(l => (
+                              <option key={l.id} value={l.Value}>{l.Value}</option>
+                            ))}
                           </select>
                         </div>
 

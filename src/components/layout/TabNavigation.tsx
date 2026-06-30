@@ -47,7 +47,7 @@ export default function TabNavigation({
             { id: 'shipping', name: 'Shipping', icon: Truck },
             { id: 'reports', name: 'Reports', icon: TrendingUp },
             { id: 'customers', name: 'Customers', icon: Users },
-            ...(currentUser?.Role === 'OWNER' ? [{ id: 'users', name: 'Users', icon: Lock }] : []),
+            ...(currentUser?.Role === 'Owner Alina' ? [{ id: 'users', name: 'Users', icon: Lock }] : []),
             { id: 'settings', name: 'Sheets', icon: Settings },
           ].filter(item => hasPermission(item.id)).map((item) => {
             const Icon = item.icon;

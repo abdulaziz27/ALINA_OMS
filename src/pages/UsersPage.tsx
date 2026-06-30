@@ -32,7 +32,7 @@ export default function UsersPage({
                       setEditingUser({
                         Full_Name: '',
                         Email: '',
-                        Role: 'ADMIN',
+                        Role: 'Admin Gudang Alina',
                         Status: 'Active',
                         Password: '',
                         Permissions: ["dashboard", "products", "inventory", "opname", "orders", "shipping", "reports", "customers", "settings"]
@@ -57,7 +57,7 @@ export default function UsersPage({
                           </div>
 
                           <span className={`inline-block text-[9px] font-black uppercase px-2 py-0.5 rounded ${
-                            u.Role === 'OWNER' ? 'bg-pink-100 text-[#EC4899]' : 'bg-blue-100 text-blue-700'
+                            u.Role === 'Owner Alina' ? 'bg-pink-100 text-[#EC4899]' : 'bg-blue-100 text-blue-700'
                           }`}>
                             {u.Role}
                           </span>
@@ -73,7 +73,7 @@ export default function UsersPage({
                         <div className="pt-2 border-t border-pink-50/50">
                           <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Akses Modul:</p>
                           <div className="flex flex-wrap gap-1">
-                            {u.Role === 'OWNER' ? (
+                            {u.Role === 'Owner Alina' ? (
                               <span className="text-[9px] bg-pink-100 text-[#EC4899] font-bold px-2 py-0.5 rounded-full border border-pink-200">Semua Akses (OWNER)</span>
                             ) : !u.Permissions || u.Permissions.length === 0 ? (
                               <span className="text-[9px] bg-gray-100 text-gray-500 font-bold px-2 py-0.5 rounded-full border border-gray-200">Semua Akses (Staff Default)</span>

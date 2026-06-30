@@ -61,7 +61,7 @@ export default function UserModal({
             <div className="space-y-1">
               <label className="text-gray-500">Role Sistem</label>
               <select
-                value={editingUser.Role || 'ADMIN'}
+                value={editingUser.Role || 'Admin Gudang Alina'}
                 onChange={(e) => setEditingUser(prev => ({ ...prev!, Role: e.target.value as any }))}
                 className="w-full bg-white border border-pink-100 text-gray-700 rounded-xl py-2 px-3 focus:outline-none"
               >
@@ -86,7 +86,7 @@ export default function UserModal({
           {/* Hak Akses Modul Checkboxes */}
           <div className="space-y-2 border-t border-pink-100 pt-3">
             <label className="text-gray-500 font-bold block text-xs uppercase tracking-wider">Akses Modul / Layar</label>
-            {editingUser.Role === 'OWNER' ? (
+            {editingUser.Role === 'Owner Alina' ? (
               <div className="bg-pink-50 text-[#EC4899] text-[11px] font-bold p-3 rounded-2xl border border-pink-100">
                 💡 Akun OWNER otomatis memiliki hak akses penuh ke seluruh modul sistem operasional Alina.
               </div>

@@ -32,8 +32,10 @@ model Product {
   Variant       String
   Color         String
   Size          String
-  Cost_Price    Int
-  Selling_Price Int
+  Cost_Price        Int      @default(0)
+  Retail_Price      Int      @default(0)
+  Reseller_Price    Int      @default(0)
+  Distributor_Price Int      @default(0)
   Current_Stock Int
   Minimum_Stock Int
   Status        String
@@ -120,4 +122,11 @@ model ActivityLog {
   Module     String
   Timestamp  String
   Device     String
+}
+
+model SystemLookup {
+  id       Int     @id @default(autoincrement())
+  Category String
+  Value    String
+  IsActive Boolean @default(true)
 }

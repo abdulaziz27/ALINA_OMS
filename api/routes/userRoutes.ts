@@ -7,7 +7,7 @@ const router = Router();
 router.post('/', async (req, res) => {
   const { action, targetUser, user, id } = req.body;
 
-  if (user.role !== 'OWNER') {
+  if (user.role !== 'Owner Alina') {
     return res.status(403).json({ error: 'Access denied: Only OWNER can manage users.' });
   }
 
@@ -24,7 +24,7 @@ router.post('/', async (req, res) => {
         Full_Name: targetUser.Full_Name,
         Email: targetUser.Email,
         Password_Hash: hashPassword(targetUser.Password || "alina123"),
-        Role: targetUser.Role || 'ADMIN',
+        Role: targetUser.Role || 'Admin Gudang Alina',
         Status: targetUser.Status || 'Active',
         Last_Login: '',
         Created_Date: new Date().toISOString(),

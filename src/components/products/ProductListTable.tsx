@@ -184,10 +184,10 @@ export default function ProductListTable({
                 <th className="py-3 px-3">SKU / Produk</th>
                 <th className="py-3 px-3">Kategori</th>
                 <th className="py-3 px-3 text-right">Harga Modal</th>
-                <th className="py-3 px-3 text-right">Harga Jual</th>
+                <th className="py-3 px-3 text-right">Harga Ritel</th>
                 <th className="py-3 px-3 text-center">Stok</th>
                 <th className="py-3 px-3 text-center">Status</th>
-                {currentUser?.Role === 'OWNER' && <th className="py-3 px-3 text-center">Aksi</th>}
+                {currentUser?.Role === 'Owner Alina' && <th className="py-3 px-3 text-center">Aksi</th>}
               </tr>
             </thead>
             <tbody className="divide-y divide-pink-50/50">
@@ -208,10 +208,10 @@ export default function ProductListTable({
                       <div className="text-[10px] text-gray-400">{p.Variant}</div>
                     </td>
                     <td className="py-3.5 px-3 text-right font-mono text-gray-600">
-                      {currentUser?.Role === 'OWNER' ? `Rp ${p.Cost_Price.toLocaleString()}` : '***'}
+                      {currentUser?.Role === 'Owner Alina' ? `Rp ${p.Cost_Price.toLocaleString()}` : '***'}
                     </td>
                     <td className="py-3.5 px-3 text-right font-mono text-gray-900 font-bold">
-                      Rp {p.Selling_Price.toLocaleString()}
+                      Rp {p.Retail_Price.toLocaleString()}
                     </td>
                     <td className="py-3.5 px-3 text-center">
                       <span className={`inline-block px-2.5 py-0.5 rounded-full font-black ${
@@ -228,7 +228,7 @@ export default function ProductListTable({
                         {p.Status === 'Active' ? 'Aktif' : 'Non-Aktif'}
                       </span>
                     </td>
-                    {currentUser?.Role === 'OWNER' && (
+                    {currentUser?.Role === 'Owner Alina' && (
                       <td className="py-3.5 px-3 text-center" onClick={(e) => e.stopPropagation()}>
                         <button
                           type="button"
@@ -246,7 +246,7 @@ export default function ProductListTable({
 
               {filteredProducts.length === 0 && (
                 <tr>
-                  <td colSpan={currentUser?.Role === 'OWNER' ? 7 : 6} className="text-center py-10 text-gray-400">Tidak ada produk ditemukan.</td>
+                  <td colSpan={currentUser?.Role === 'Owner Alina' ? 7 : 6} className="text-center py-10 text-gray-400">Tidak ada produk ditemukan.</td>
                 </tr>
               )}
             </tbody>
@@ -278,7 +278,7 @@ export default function ProductListTable({
                     }`}>
                       {p.Status === 'Active' ? 'Aktif' : 'Non-Aktif'}
                     </span>
-                    {currentUser?.Role === 'OWNER' && (
+                    {currentUser?.Role === 'Owner Alina' && (
                       <button
                         type="button"
                         onClick={() => setProductToDelete(p)}
@@ -310,9 +310,9 @@ export default function ProductListTable({
                 <div className="flex justify-between items-center bg-pink-50/30 p-2.5 rounded-xl border border-pink-100/20 text-xs gap-3">
                   <div>
                     <span className="text-gray-400 text-[9px] block uppercase font-mono tracking-wider">Harga Jual</span>
-                    <span className="font-extrabold text-gray-900">Rp {p.Selling_Price.toLocaleString()}</span>
+                    <span className="font-extrabold text-gray-900">Rp {p.Retail_Price.toLocaleString()}</span>
                   </div>
-                  {currentUser?.Role === 'OWNER' && (
+                  {currentUser?.Role === 'Owner Alina' && (
                     <div className="text-right">
                       <span className="text-gray-400 text-[9px] block uppercase font-mono tracking-wider">Harga Modal</span>
                       <span className="font-mono font-bold text-pink-600">Rp {p.Cost_Price.toLocaleString()}</span>

@@ -66,7 +66,7 @@ export const DEFAULT_OFFLINE_DB = {
       Color: "Pink Pastel",
       Size: "All Size",
       Cost_Price: 25000,
-      Selling_Price: 45000,
+      Retail_Price: 45000,
       Current_Stock: 120,
       Minimum_Stock: 30,
       Status: "Active"
@@ -82,7 +82,7 @@ export const DEFAULT_OFFLINE_DB = {
       Color: "Dark Magenta",
       Size: "Jumbo",
       Cost_Price: 28000,
-      Selling_Price: 49000,
+      Retail_Price: 49000,
       Current_Stock: 85,
       Minimum_Stock: 25,
       Status: "Active"
@@ -98,7 +98,7 @@ export const DEFAULT_OFFLINE_DB = {
       Color: "Salmon Rose",
       Size: "Kids 1",
       Cost_Price: 15000,
-      Selling_Price: 28000,
+      Retail_Price: 28000,
       Current_Stock: 10,
       Minimum_Stock: 20,
       Status: "Active"
@@ -114,7 +114,7 @@ export const DEFAULT_OFFLINE_DB = {
       Color: "Dusty Violet",
       Size: "M",
       Cost_Price: 32000,
-      Selling_Price: 58000,
+      Retail_Price: 58000,
       Current_Stock: 140,
       Minimum_Stock: 15,
       Status: "Active"
@@ -130,7 +130,7 @@ export const DEFAULT_OFFLINE_DB = {
       Color: "Blush Pink",
       Size: "L",
       Cost_Price: 38000,
-      Selling_Price: 65000,
+      Retail_Price: 65000,
       Current_Stock: 18,
       Minimum_Stock: 25,
       Status: "Active"
@@ -299,7 +299,7 @@ export async function handleOfflineApiRoute(url: string, init?: RequestInit): Pr
   if (path === '/api/auth/logout' && method === 'POST') {
     const { userName, role } = body;
     if (userName) {
-      appendOfflineLog(db, userName, role || 'ADMIN', 'Logged out (Offline Mode)');
+      appendOfflineLog(db, userName, role || 'Admin Gudang Alina', 'Logged out (Offline Mode)');
       saveLocalDB(db);
     }
     return new Response(JSON.stringify({ success: true }), {
@@ -324,7 +324,7 @@ export async function handleOfflineApiRoute(url: string, init?: RequestInit): Pr
         Color: product.Color,
         Size: product.Size,
         Cost_Price: Number(product.Cost_Price),
-        Selling_Price: Number(product.Selling_Price),
+        Retail_Price: Number(product.Retail_Price),
         Current_Stock: Number(product.Current_Stock) || 0,
         Minimum_Stock: Number(product.Minimum_Stock) || 0,
         Status: product.Status || 'Active'
@@ -361,7 +361,7 @@ export async function handleOfflineApiRoute(url: string, init?: RequestInit): Pr
           Color: product.Color,
           Size: product.Size,
           Cost_Price: Number(product.Cost_Price),
-          Selling_Price: Number(product.Selling_Price),
+          Retail_Price: Number(product.Retail_Price),
           Current_Stock: Number(product.Current_Stock),
           Minimum_Stock: Number(product.Minimum_Stock),
           Status: product.Status
@@ -401,7 +401,7 @@ export async function handleOfflineApiRoute(url: string, init?: RequestInit): Pr
         db.products[existingIdx] = {
           ...db.products[existingIdx],
           Product_Name: p.Product_Name,
-          Selling_Price: p.Selling_Price !== undefined ? Number(p.Selling_Price) : db.products[existingIdx].Selling_Price,
+          Retail_Price: p.Retail_Price !== undefined ? Number(p.Retail_Price) : db.products[existingIdx].Retail_Price,
           Current_Stock: p.Current_Stock !== undefined ? Number(p.Current_Stock) : db.products[existingIdx].Current_Stock
         };
         updated++;
@@ -419,7 +419,7 @@ export async function handleOfflineApiRoute(url: string, init?: RequestInit): Pr
           Color: p.Color || 'Natural',
           Size: p.Size || 'All Size',
           Cost_Price: p.Cost_Price !== undefined ? Number(p.Cost_Price) : 20000,
-          Selling_Price: p.Selling_Price !== undefined ? Number(p.Selling_Price) : 40000,
+          Retail_Price: p.Retail_Price !== undefined ? Number(p.Retail_Price) : 40000,
           Current_Stock: p.Current_Stock !== undefined ? Number(p.Current_Stock) : 0,
           Minimum_Stock: p.Minimum_Stock !== undefined ? Number(p.Minimum_Stock) : 10,
           Status: 'Active'
@@ -598,7 +598,7 @@ export async function handleOfflineApiRoute(url: string, init?: RequestInit): Pr
           const productItem = db.products.find((p: any) => p.SKU === productSku);
           if (productItem) {
             const qtyVal = Number(item.Qty);
-            const priceVal = Number(item.Price || productItem.Selling_Price);
+            const priceVal = Number(item.Price || productItem.Retail_Price);
             const totalVal = qtyVal * priceVal;
 
             const newOrder = {
@@ -623,7 +623,7 @@ export async function handleOfflineApiRoute(url: string, init?: RequestInit): Pr
         const productItem = db.products.find((p: any) => p.SKU === productSku);
         if (productItem) {
           const qtyVal = Number(order.Qty);
-          const priceVal = Number(order.Price || productItem.Selling_Price);
+          const priceVal = Number(order.Price || productItem.Retail_Price);
           const totalVal = qtyVal * priceVal;
 
           const newOrder = {
@@ -786,7 +786,7 @@ export async function handleOfflineApiRoute(url: string, init?: RequestInit): Pr
         Full_Name: targetUser.Full_Name,
         Email: targetUser.Email,
         Password: targetUser.Password || "alina123",
-        Role: targetUser.Role || 'ADMIN',
+        Role: targetUser.Role || 'Admin Gudang Alina',
         Status: targetUser.Status || 'Active',
         Last_Login: '',
         Created_Date: new Date().toISOString(),

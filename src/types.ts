@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-export type UserRole = 'OWNER' | 'ADMIN';
+export type UserRole = 'Owner Alina' | 'Admin Gudang Alina';
 
 export interface User {
   User_ID: string;
@@ -29,7 +29,9 @@ export interface Product {
   Color: string;
   Size: string;
   Cost_Price: number;
-  Selling_Price: number;
+  Retail_Price: number;
+  Reseller_Price: number;
+  Distributor_Price: number;
   Current_Stock: number;
   Minimum_Stock: number;
   Status: 'Active' | 'Discontinued';

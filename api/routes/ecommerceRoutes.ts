@@ -30,7 +30,9 @@ router.get('/products', async (req, res) => {
         Variant: true,
         Color: true,
         Size: true,
-        Selling_Price: true,
+        Retail_Price: true,
+        Reseller_Price: true,
+        Distributor_Price: true,
         Current_Stock: true,
         QR_Code: true,
         Image_URL: true
@@ -121,7 +123,7 @@ router.post('/orders', async (req, res) => {
         });
         
         // Calculate amount
-        const amount = product.Selling_Price * item.qty;
+        const amount = product.Retail_Price * item.qty;
 
         // Create order entry
         await tx.order.create({
@@ -130,7 +132,7 @@ router.post('/orders', async (req, res) => {
             Customer: orderPayload.customerName,
             SKU: item.sku,
             Qty: item.qty,
-            Price: product.Selling_Price, 
+            Price: product.Retail_Price,
             Total: amount, 
             Status: 'Pending',
             Order_Date: now,
