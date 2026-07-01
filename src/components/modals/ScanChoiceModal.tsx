@@ -32,10 +32,10 @@ export default function ScanChoiceModal({
         </button>
 
         <div className="space-y-1">
-          <span className="text-[10px] bg-pink-50 text-[#EC4899] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider font-mono">
+          <span className="text-sm bg-pink-50 text-pink-500 px-2.5 py-1 rounded-full font-bold uppercase tracking-wider font-mono">
             Pilih Moda Scan Kamera
           </span>
-          <h3 className="font-extrabold text-[#EC4899] text-base">ALINE LIVE SCAN SCANNER</h3>
+          <h3 className="font-extrabold text-pink-500 text-base">ALINE LIVE SCAN SCANNER</h3>
           <p className="text-xs text-gray-500 font-sans font-medium">
             Pilih jenis transaksi pergudangan Alina sebelum memindai tag pakaian atau Kode.
           </p>

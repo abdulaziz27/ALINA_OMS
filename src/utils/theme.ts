@@ -25,10 +25,10 @@ export const T = (theme: AppTheme) => {
       : 'bg-gradient-to-tr from-[#EC4899] to-[#F9A8D4]',
 
     // Primary Text styles
-    text: isIos ? 'text-slate-900' : isAyam ? 'text-orange-600' : isKucing ? 'text-amber-800' : 'text-[#EC4899]',
+    text: isIos ? 'text-slate-900' : isAyam ? 'text-orange-600' : isKucing ? 'text-amber-800' : 'text-pink-500',
     textMuted: isIos ? 'text-slate-500' : isAyam ? 'text-orange-500 font-bold' : isKucing ? 'text-amber-700 font-bold' : 'text-pink-600',
-    textHover: isIos ? 'hover:text-black' : isAyam ? 'hover:text-orange-500' : isKucing ? 'hover:text-amber-700' : 'hover:text-[#EC4899]',
-    bg: isIos ? 'bg-black' : isAyam ? 'bg-orange-600' : isKucing ? 'bg-amber-800' : 'bg-[#EC4899]',
+    textHover: isIos ? 'hover:text-black' : isAyam ? 'hover:text-orange-500' : isKucing ? 'hover:text-amber-700' : 'hover:text-pink-500',
+    bg: isIos ? 'bg-black' : isAyam ? 'bg-orange-600' : isKucing ? 'bg-amber-800' : 'bg-pink-500',
     bgHover: isIos ? 'hover:bg-gray-900' : isAyam ? 'hover:bg-orange-700' : isKucing ? 'hover:bg-amber-900' : 'hover:bg-pink-600',
     
     // Light backgrounds
@@ -41,7 +41,7 @@ export const T = (theme: AppTheme) => {
     border: isIos ? 'border-slate-200/50' : isAyam ? 'border-orange-100' : isKucing ? 'border-amber-200/40' : 'border-pink-100',
     borderHover: isIos ? 'hover:border-slate-400' : isAyam ? 'hover:border-orange-300' : isKucing ? 'hover:border-amber-300' : 'hover:border-pink-300',
     borderSolid: isIos ? 'border-slate-200' : isAyam ? 'border-orange-200' : isKucing ? 'border-amber-200' : 'border-pink-200',
-    borderLeftAccent: isIos ? 'border-slate-900' : isAyam ? 'border-orange-600' : isKucing ? 'border-amber-800' : 'border-[#EC4899]',
+    borderLeftAccent: isIos ? 'border-slate-900' : isAyam ? 'border-orange-600' : isKucing ? 'border-amber-800' : 'border-pink-500',
     borderFocus: isIos ? 'focus:border-slate-900 focus:ring-slate-900/10' : isAyam ? 'focus:border-orange-500 focus:ring-orange-500/10' : isKucing ? 'focus:border-amber-700 focus:ring-amber-700/10' : 'focus:border-pink-500 focus:ring-pink-500/10',
 
     // Shadows
@@ -76,12 +76,12 @@ export const T = (theme: AppTheme) => {
       : 'bg-gradient-to-r from-[#EC4899] to-[#F9A8D4]',
 
     bannerText: isIos 
-      ? 'text-[10px] bg-white/10 text-slate-100 font-bold tracking-wide' 
+      ? 'text-sm bg-white/10 text-slate-100 font-bold tracking-wide' 
       : isAyam 
-      ? 'text-[10px] bg-orange-700/40 text-orange-50 font-bold shadow-sm'
+      ? 'text-sm bg-orange-700/40 text-orange-50 font-bold shadow-sm'
       : isKucing
-      ? 'text-[10px] bg-white/15 text-amber-100 font-bold shadow-sm'
-      : 'text-[10px] bg-white/20 text-white',
+      ? 'text-sm bg-white/15 text-amber-100 font-bold shadow-sm'
+      : 'text-sm bg-white/20 text-white',
 
     // Buttons
     buttonSecondary: isIos
@@ -90,7 +90,7 @@ export const T = (theme: AppTheme) => {
       ? 'bg-white hover:bg-orange-50 text-orange-600 border border-orange-200 shadow-sm'
       : isKucing
       ? 'bg-white hover:bg-amber-50 text-amber-900 border border-amber-200 shadow-sm'
-      : 'bg-white hover:bg-pink-50 text-[#EC4899] border border-pink-100/60 shadow-sm',
+      : 'bg-white hover:bg-pink-50 text-pink-500 border border-pink-100/60 shadow-sm',
 
     // Speech and dynamic messages
     petSpeech: isDefault 

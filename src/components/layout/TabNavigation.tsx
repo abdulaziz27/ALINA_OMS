@@ -24,15 +24,15 @@ export default function TabNavigation({
 }: TabNavigationProps) {
   if (activeTab === 'dashboard') {
     return (
-      <div className="space-y-2 text-left mb-4 bg-white p-3.5 rounded-[24px] border border-pink-100/80 shadow-sm animate-[fadeIn_0.2s_ease-out]">
+      <div className="space-y-2 text-left mb-4 bg-white p-3.5 rounded-[24px] border border-pink-100/80 shadow-sm">
         <div className="flex items-center justify-between px-1">
           <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-[#EC4899] animate-pulse" />
-            <h3 className="text-[10px] font-extrabold uppercase tracking-widest text-[#EC4899]">
+            <span className="w-2 h-2 rounded-full bg-pink-500" />
+            <h3 className="text-sm font-extrabold uppercase tracking-widest text-pink-500">
               Menu Operasional Alina
             </h3>
           </div>
-          <span className="text-[9px] text-gray-400 font-mono">
+          <span className="text-xs text-gray-400 font-mono">
             Role: {currentUser?.Role}
           </span>
         </div>
@@ -53,21 +53,6 @@ export default function TabNavigation({
             const Icon = item.icon;
             const isCurrent = activeTab === item.id;
             
-            // Mascot active decoration map
-            const animalDecorations: Record<string, { ayam: string; kucing: string }> = {
-              dashboard: { ayam: '🐔', kucing: '🐱' },
-              products: { ayam: '🥚', kucing: '🧶' },
-              inventory: { ayam: '🐣', kucing: '🐾' },
-              opname: { ayam: '🐓', kucing: '🐟' },
-              orders: { ayam: '🌾', kucing: '🐭' },
-              shipping: { ayam: '🪶', kucing: '📦' },
-              reports: { ayam: '🐓📊', kucing: '🐾📈' },
-              customers: { ayam: '🐤', kucing: '😸' },
-              users: { ayam: '👨‍🌾', kucing: '🧙‍♂️' },
-              settings: { ayam: '🪵', kucing: '🥫' }
-            };
-
-            const currentDeco = animalDecorations[item.id];
 
             return (
               <motion.button
@@ -78,31 +63,19 @@ export default function TabNavigation({
                 whileTap={{ scale: 0.96 }}
                 className={`flex flex-col items-center justify-center p-2 rounded-xl bg-white border shadow-sm transition-all cursor-pointer text-center group min-h-[72px] ${
                   isCurrent 
-                    ? 'border-[#EC4899] ring-2 ring-pink-100 shadow-pink-50'
+                    ? 'border-pink-500 ring-2 ring-pink-100 shadow-pink-50'
                     : 'border-pink-100/50 hover:border-pink-200'
                 }`}
               >
                 <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center relative transition-all duration-200 ${
                   isCurrent
-                    ? 'bg-[#EC4899] text-white'
-                    : 'bg-[#FFF3F8] text-[#EC4899] group-hover:bg-[#EC4899] group-hover:text-white'
+                    ? 'bg-pink-500 text-white'
+                    : 'bg-pink-50 text-pink-500 group-hover:bg-pink-500 group-hover:text-white'
                 }`}>
                   <Icon className="w-4 h-4 sm:w-4.5 sm:h-4.5 stroke-[2.2]" />
-                  
-                  {/* Animal Mascot overlay absolute indicator badges */}
-                  {appTheme === 'ayam' && currentDeco && (
-                    <span className="absolute -bottom-1 -right-1 text-[9px] select-none animate-bounce">
-                      {currentDeco.ayam}
-                    </span>
-                  )}
-                  {appTheme === 'kucing' && currentDeco && (
-                    <span className="absolute -bottom-1 -right-1 text-[9px] select-none scale-105">
-                      {currentDeco.kucing}
-                    </span>
-                  )}
                 </div>
-                <span className={`mt-1.5 text-[9px] sm:text-[10px] font-extrabold tracking-tight leading-none line-clamp-1 ${
-                  isCurrent ? 'text-[#EC4899]' : 'text-gray-600 group-hover:text-[#EC4899]'
+                <span className={`mt-1.5 text-xs sm:text-sm font-extrabold tracking-tight leading-none line-clamp-1 ${
+                  isCurrent ? 'text-pink-500' : 'text-gray-600 group-hover:text-pink-500'
                 }`}>
                   {item.name}
                 </span>
@@ -115,17 +88,17 @@ export default function TabNavigation({
   }
 
   return (
-    <div className="flex items-center justify-between bg-white/80 p-3 rounded-2xl border border-pink-100/70 shadow-sm text-left mb-1 animate-[fadeIn_0.25s_ease-out]">
+    <div className="flex items-center justify-between bg-white/80 p-3 rounded-2xl border border-pink-100/70 shadow-sm text-left mb-1">
       <button
         onClick={() => setActiveTab('dashboard')}
-        className="flex items-center gap-2 bg-white hover:bg-pink-500 hover:text-white text-[#EC4899] transition-all font-extrabold px-4 py-2 rounded-xl text-xs cursor-pointer shadow-sm border border-pink-100/80 group"
+        className="flex items-center gap-2 bg-white hover:bg-pink-500 hover:text-white text-pink-500 transition-all font-extrabold px-4 py-2 rounded-xl text-xs cursor-pointer shadow-sm border border-pink-100/80 group"
       >
         <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
         <span>Kembali ke Dashboard</span>
       </button>
       <div className="flex items-center gap-2 bg-pink-50 px-3 py-1 rounded-full border border-pink-100/40">
-        <span className="w-1.5 h-1.5 rounded-full bg-[#EC4899] animate-pulse" />
-        <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#EC4899] font-mono">
+        <span className="w-1.5 h-1.5 rounded-full bg-pink-500" />
+        <span className="text-sm font-extrabold uppercase tracking-wider text-pink-500 font-mono">
           Layar {activeTab.toUpperCase()}
         </span>
       </div>

@@ -74,7 +74,7 @@ export default function InventoryPage({
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 text-left items-start">
                 
                 {/* Log list */}
-                <div className="lg:col-span-12 bg-[#FFF8FB] p-5 rounded-[32px] border border-pink-100 mb-2">
+                <div className="lg:col-span-12 bg-pink-50 p-5 rounded-[32px] border border-pink-100 mb-2">
                   <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div>
                       <h3 className="font-extrabold text-lg text-gray-900 tracking-tight">TRANSAKSI BARANG MASUK / KELUAR</h3>
@@ -115,11 +115,11 @@ export default function InventoryPage({
                 <div className="lg:col-span-5 bg-white border border-pink-100 p-6 rounded-[32px] shadow-sm space-y-4">
                   <h3 className="font-bold text-xs uppercase tracking-wider text-pink-700 pb-2 border-b border-pink-50">Log Form Transaksi Gudang</h3>
                   
-                  <div className="grid grid-cols-2 gap-2 p-1 bg-[#FFF3F8] rounded-xl border border-pink-100/60 font-semibold select-none text-xs">
+                  <div className="grid grid-cols-2 gap-2 p-1 bg-pink-50 rounded-xl border border-pink-100/60 font-semibold select-none text-xs">
                     <button
                       onClick={() => setSelectedTrxType('IN')}
                       className={`py-2 px-3 rounded-lg text-center cursor-pointer ${
-                        selectedTrxType === 'IN' ? 'bg-[#EC4899] text-white' : 'text-gray-500 hover:text-pink-600'
+                        selectedTrxType === 'IN' ? 'bg-pink-500 text-white' : 'text-gray-500 hover:text-pink-600'
                       }`}
                     >
                       STOCK IN (Barang Masuk)
@@ -135,16 +135,16 @@ export default function InventoryPage({
                   </div>
 
                   <form onSubmit={handleRecordStockTrxSubmit} className="space-y-4 text-xs font-medium text-gray-700">
-                    <div className="bg-[#FFF8FB] p-3 rounded-2xl border border-pink-50 relative space-y-2">
+                    <div className="bg-pink-50 p-3 rounded-2xl border border-pink-50 relative space-y-2">
                       <div className="flex justify-between items-center">
-                        <label className="font-bold uppercase text-[10px] text-gray-500">Pilih Kode SKU (Barang)</label>
+                        <label className="font-bold uppercase text-sm text-gray-500">Pilih Kode SKU (Barang)</label>
                         <button
                           type="button"
                           onClick={() => triggerCameraScanner("Muted Sku Reader", (sku) => {
                             setTrxSku(sku);
                             setActiveTab('inventory');
                           })}
-                          className="text-[#EC4899] font-bold text-[10px] hover:underline"
+                          className="text-pink-500 font-bold text-sm hover:underline"
                         >
                           Scan Barcode HP
                         </button>
@@ -165,10 +165,10 @@ export default function InventoryPage({
                                   <div className="space-y-0.5 pointer-events-none">
                                     <div className="flex items-center gap-2">
                                       <span className="font-mono font-black text-gray-900 text-xs tracking-wide">{p.SKU}</span>
-                                      <span className="bg-pink-100 text-[#EC4899] font-bold px-1.5 py-0.2 rounded text-[9px]">Sisa: {p.Current_Stock} Pcs</span>
+                                      <span className="bg-pink-100 text-pink-500 font-bold px-1.5 py-0.2 rounded text-xs">Sisa: {p.Current_Stock} Pcs</span>
                                     </div>
                                     <div className="font-bold text-gray-700 text-xs">{p.Product_Name}</div>
-                                    <div className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Warna: {p.Color}</div>
+                                    <div className="text-sm text-gray-400 font-bold uppercase tracking-wider">Warna: {p.Color}</div>
                                   </div>
                                 );
                               }
@@ -177,7 +177,7 @@ export default function InventoryPage({
                           ) : (
                             <span className="text-gray-400 font-bold text-xs">-- PILIH KELOMPOK BARANG --</span>
                           )}
-                          <span className="text-[#EC4899] text-xs">▼</span>
+                          <span className="text-pink-500 text-xs">▼</span>
                         </button>
 
                         {/* Hidden Input to trigger HTML validation if required and not selected */}
@@ -251,7 +251,7 @@ export default function InventoryPage({
                                           <span className="font-mono font-black text-gray-900 text-xs tracking-wide">
                                             {p.SKU}
                                           </span>
-                                          <span className="bg-pink-100 text-[#EC4899] font-bold px-2 py-0.5 rounded text-[10px] font-sans">
+                                          <span className="bg-pink-100 text-pink-500 font-bold px-2 py-0.5 rounded text-sm font-sans">
                                             Sisa: {p.Current_Stock} Pcs
                                           </span>
                                         </div>
@@ -262,7 +262,7 @@ export default function InventoryPage({
                                         </div>
 
                                         {/* Baris Ketiga: Warna */}
-                                        <div className="flex items-center gap-2 text-gray-500 text-[10px] font-medium tracking-wide">
+                                        <div className="flex items-center gap-2 text-gray-500 text-sm font-medium tracking-wide">
                                           <span 
                                             className="w-2.5 h-2.5 rounded-full border border-gray-300 shadow-sm"
                                             style={{ backgroundColor: getColorsByCategory(p.Category).find(c => c.name === p.Color)?.hex || '#D1D5DB' }}
@@ -299,11 +299,11 @@ export default function InventoryPage({
                     {selectedTrxType === 'OUT' && (
                       <div className="grid grid-cols-2 gap-3 p-3 bg-red-50/50 rounded-2xl border border-red-100/40">
                         <div className="space-y-1">
-                          <label className="font-extrabold text-red-700 uppercase tracking-wider text-[10px] block mb-1">Tujuan Barang Keluar</label>
+                          <label className="font-extrabold text-red-700 uppercase tracking-wider text-sm block mb-1">Tujuan Barang Keluar</label>
                           <select
                             value={trxDestination}
                             onChange={(e) => setTrxDestination(e.target.value as any)}
-                            className="w-full bg-white border border-pink-100 rounded-xl py-1.5 px-2 focus:outline-none text-[10px] font-bold"
+                            className="w-full bg-white border border-pink-100 rounded-xl py-1.5 px-2 focus:outline-none text-sm font-bold"
                           >
                             {lookups.filter(l => l.Category === 'STOCK_DESTINATION').map(l => (
                               <option key={l.id} value={l.Value}>{l.Value}</option>
@@ -312,12 +312,12 @@ export default function InventoryPage({
                         </div>
 
                         <div className="space-y-1">
-                          <label className="font-extrabold text-red-700 uppercase tracking-wider text-[10px] block mb-1">Kondisi Barang</label>
+                          <label className="font-extrabold text-red-700 uppercase tracking-wider text-sm block mb-1">Kondisi Barang</label>
                           <div className="grid grid-cols-2 gap-1 bg-white p-1 rounded-xl border border-red-100/40">
                             <button
                               type="button"
                               onClick={() => setTrxOutQuality('Good')}
-                              className={`py-1.5 text-center rounded-lg text-[10px] font-bold cursor-pointer transition ${
+                              className={`py-1.5 text-center rounded-lg text-sm font-bold cursor-pointer transition ${
                                 trxOutQuality === 'Good' ? 'bg-emerald-500 text-white shadow-sm' : 'text-gray-500 hover:text-emerald-500'
                               }`}
                             >
@@ -326,7 +326,7 @@ export default function InventoryPage({
                             <button
                               type="button"
                               onClick={() => setTrxOutQuality('Reject')}
-                              className={`py-1.5 text-center rounded-lg text-[10px] font-bold cursor-pointer transition ${
+                              className={`py-1.5 text-center rounded-lg text-sm font-bold cursor-pointer transition ${
                                 trxOutQuality === 'Reject' ? 'bg-amber-600 text-white shadow-sm' : 'text-gray-500 hover:text-amber-600'
                               }`}
                             >
@@ -340,13 +340,13 @@ export default function InventoryPage({
                     {selectedTrxType === 'IN' && (
                       <div className="grid grid-cols-2 gap-3 p-3 bg-pink-50/50 rounded-2xl border border-pink-100/60">
                         <div className="space-y-1">
-                          <label className="font-extrabold text-pink-700 uppercase tracking-wider text-[10px] block mb-1">Asal Barang</label>
+                          <label className="font-extrabold text-pink-700 uppercase tracking-wider text-sm block mb-1">Asal Barang</label>
                           <div className="grid grid-cols-2 gap-1 bg-white p-1 rounded-xl border border-pink-100">
                             <button
                               type="button"
                               onClick={() => setTrxSource('Konveksi')}
-                              className={`py-1.5 text-center rounded-lg text-[10px] font-bold cursor-pointer transition ${
-                                trxSource === 'Konveksi' ? 'bg-[#EC4899] text-white shadow-sm' : 'text-gray-500 hover:text-pink-600'
+                              className={`py-1.5 text-center rounded-lg text-sm font-bold cursor-pointer transition ${
+                                trxSource === 'Konveksi' ? 'bg-pink-500 text-white shadow-sm' : 'text-gray-500 hover:text-pink-600'
                               }`}
                             >
                               Konveksi
@@ -354,8 +354,8 @@ export default function InventoryPage({
                             <button
                               type="button"
                               onClick={() => setTrxSource('Return')}
-                              className={`py-1.5 text-center rounded-lg text-[10px] font-bold cursor-pointer transition ${
-                                trxSource === 'Return' ? 'bg-[#EC4899] text-white shadow-sm' : 'text-gray-500 hover:text-pink-600'
+                              className={`py-1.5 text-center rounded-lg text-sm font-bold cursor-pointer transition ${
+                                trxSource === 'Return' ? 'bg-pink-500 text-white shadow-sm' : 'text-gray-500 hover:text-pink-600'
                               }`}
                             >
                               Return
@@ -364,12 +364,12 @@ export default function InventoryPage({
                         </div>
 
                         <div className="space-y-1">
-                          <label className="font-extrabold text-pink-700 uppercase tracking-wider text-[10px] block mb-1">Kondisi Barang</label>
+                          <label className="font-extrabold text-pink-700 uppercase tracking-wider text-sm block mb-1">Kondisi Barang</label>
                           <div className="grid grid-cols-2 gap-1 bg-white p-1 rounded-xl border border-pink-100">
                             <button
                               type="button"
                               onClick={() => setTrxQuality('Good')}
-                              className={`py-1.5 text-center rounded-lg text-[10px] font-bold cursor-pointer transition ${
+                              className={`py-1.5 text-center rounded-lg text-sm font-bold cursor-pointer transition ${
                                 trxQuality === 'Good' ? 'bg-emerald-500 text-white shadow-sm' : 'text-gray-500 hover:text-emerald-500'
                               }`}
                             >
@@ -378,7 +378,7 @@ export default function InventoryPage({
                             <button
                               type="button"
                               onClick={() => setTrxQuality('Reject')}
-                              className={`py-1.5 text-center rounded-lg text-[10px] font-bold cursor-pointer transition ${
+                              className={`py-1.5 text-center rounded-lg text-sm font-bold cursor-pointer transition ${
                                 trxQuality === 'Reject' ? 'bg-amber-600 text-white shadow-sm' : 'text-gray-500 hover:text-amber-600'
                               }`}
                             >
@@ -427,7 +427,7 @@ export default function InventoryPage({
                     <button
                       type="submit"
                       className={`w-full text-white font-bold py-3 px-4 rounded-xl cursor-pointer transition shadow-md ${
-                        selectedTrxType === 'IN' ? 'bg-[#EC4899] hover:bg-[#D93B84]' : 'bg-red-500 hover:bg-red-650'
+                        selectedTrxType === 'IN' ? 'bg-pink-500 hover:bg-pink-600' : 'bg-red-500 hover:bg-red-650'
                       }`}
                     >
                       Kirim Laporan {selectedTrxType === 'IN' ? 'Barang Masuk' : 'Barang Keluar'}
@@ -439,13 +439,13 @@ export default function InventoryPage({
                 <div className="lg:col-span-7 bg-white border border-pink-100 rounded-[32px] p-5 shadow-sm space-y-4">
                   <div className="flex justify-between items-center pb-2 border-b border-pink-50">
                     <h3 className="font-bold text-xs uppercase tracking-wider text-gray-700">Audit Transaksi Masuk</h3>
-                    <span className="text-[10px] font-mono text-gray-400 font-bold">{stockIn.length} entries</span>
+                    <span className="text-sm font-mono text-gray-400 font-bold">{stockIn.length} entries</span>
                   </div>
 
                   <div className="overflow-x-auto max-h-56">
                     <table className="w-full text-left text-xs border-collapse">
                       <thead>
-                        <tr className="border-b border-pink-50 font-mono text-gray-400 uppercase tracking-widest text-[10px]">
+                        <tr className="border-b border-pink-50 font-mono text-gray-400 uppercase tracking-widest text-sm">
                           <th className="py-2 px-1">ID / Waktu</th>
                           <th className="py-2 px-1">Produk SKU</th>
                           <th className="py-2 px-1 text-center">Qty</th>
@@ -454,8 +454,8 @@ export default function InventoryPage({
                       </thead>
                       <tbody className="divide-y divide-pink-50/50">
                         {stockIn.map((item, idxx) => (
-                          <tr key={item.Transaction_ID || `stkin-${idxx}`} className="hover:bg-[#FFF8FB] text-gray-700">
-                            <td className="py-2.5 px-1 font-mono text-[9px] text-[#EC4899]">
+                          <tr key={item.Transaction_ID || `stkin-${idxx}`} className="hover:bg-pink-50 text-gray-700">
+                            <td className="py-2.5 px-1 font-mono text-xs text-pink-500">
                               <strong>{item.Transaction_ID}</strong>
                               <div>{new Date(item.Date).toLocaleDateString()}</div>
                             </td>
@@ -463,20 +463,20 @@ export default function InventoryPage({
                             <td className="py-2.5 px-1 text-center text-emerald-600 font-extrabold font-mono font-bold">+{item.Qty}</td>
                             <td className="py-2.5 px-1">
                               <div className="flex flex-wrap gap-1 items-center mb-1">
-                                <span className="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase bg-pink-100 text-pink-700 border border-pink-200">
+                                <span className="px-1.5 py-0.5 rounded text-xs font-bold uppercase bg-pink-100 text-pink-700 border border-pink-200">
                                   {item.Source_Type || 'Konveksi'}
                                 </span>
                                 {item.Quality_Type === 'Reject' ? (
-                                  <span className="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase bg-amber-100 text-amber-800 border border-amber-200" title="Stok reject tidak dimasukkan ke dalam stok jual">
+                                  <span className="px-1.5 py-0.5 rounded text-xs font-bold uppercase bg-amber-100 text-amber-800 border border-amber-200" title="Stok reject tidak dimasukkan ke dalam stok jual">
                                     🔴 Reject / Cacat (Stok Tidak Bertambah)
                                   </span>
                                 ) : (
-                                  <span className="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                  <span className="px-1.5 py-0.5 rounded text-xs font-bold uppercase bg-emerald-100 text-emerald-800 border border-emerald-200">
                                     🟢 Bagus (Good Stock)
                                   </span>
                                 )}
                               </div>
-                              <span className="text-gray-500 italic text-[10px] block">{item.Notes || '-'}</span>
+                              <span className="text-gray-500 italic text-sm block">{item.Notes || '-'}</span>
                             </td>
                           </tr>
                         ))}
@@ -486,13 +486,13 @@ export default function InventoryPage({
 
                   <div className="flex justify-between items-center pb-2 border-b border-pink-50 pt-3">
                     <h3 className="font-bold text-xs uppercase tracking-wider text-gray-700">Audit Transaksi Keluar</h3>
-                    <span className="text-[10px] font-mono text-gray-400 font-bold">{stockOut.length} entries</span>
+                    <span className="text-sm font-mono text-gray-400 font-bold">{stockOut.length} entries</span>
                   </div>
 
                   <div className="overflow-x-auto max-h-56">
                     <table className="w-full text-left text-xs border-collapse">
                       <thead>
-                        <tr className="border-b border-pink-50 font-mono text-gray-400 uppercase tracking-widest text-[10px]">
+                        <tr className="border-b border-pink-50 font-mono text-gray-400 uppercase tracking-widest text-sm">
                           <th className="py-2 px-1">ID / Waktu</th>
                           <th className="py-2 px-1">Atas SKU</th>
                           <th className="py-2 px-1 text-center">Qty</th>
@@ -501,8 +501,8 @@ export default function InventoryPage({
                       </thead>
                       <tbody className="divide-y divide-pink-50/50">
                         {stockOut.map((item, idxx) => (
-                          <tr key={item.Transaction_ID || `stkout-${idxx}`} className="hover:bg-[#FFF8FB] text-gray-700">
-                            <td className="py-2.5 px-1 font-mono text-[9px] text-red-500">
+                          <tr key={item.Transaction_ID || `stkout-${idxx}`} className="hover:bg-pink-50 text-gray-700">
+                            <td className="py-2.5 px-1 font-mono text-xs text-red-500">
                               <strong>{item.Transaction_ID}</strong>
                               <div>{new Date(item.Date).toLocaleDateString()}</div>
                             </td>
@@ -511,20 +511,20 @@ export default function InventoryPage({
                             <td className="py-2.5 px-1">
                               <div className="font-bold text-gray-800 text-[11px] mb-0.5">{item.Customer}</div>
                               <div className="flex flex-wrap gap-1 items-center mb-1">
-                                <span className="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase bg-red-100 text-red-700 border border-red-200">
+                                <span className="px-1.5 py-0.5 rounded text-xs font-bold uppercase bg-red-100 text-red-700 border border-red-200">
                                   {item.Destination_Type || 'Sales'}
                                 </span>
                                 {item.Quality_Type === 'Reject' ? (
-                                  <span className="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase bg-amber-100 text-amber-800 border border-amber-200">
+                                  <span className="px-1.5 py-0.5 rounded text-xs font-bold uppercase bg-amber-100 text-amber-800 border border-amber-200">
                                     🔴 Reject / Cacat
                                   </span>
                                 ) : (
-                                  <span className="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                  <span className="px-1.5 py-0.5 rounded text-xs font-bold uppercase bg-emerald-100 text-emerald-800 border border-emerald-200">
                                     🟢 Bagus (Good Stock)
                                   </span>
                                 )}
                               </div>
-                              <span className="text-gray-500 italic text-[10px] block">{item.Notes || '-'}</span>
+                              <span className="text-gray-500 italic text-sm block">{item.Notes || '-'}</span>
                             </td>
                           </tr>
                         ))}

@@ -28,7 +28,7 @@ export default function OpnamePage({
               <div className="space-y-6 text-left">
                 
                 {/* Headers configuration */}
-                <div className="bg-[#FFF8FB] p-5 rounded-[32px] border border-pink-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div className="bg-pink-50 p-5 rounded-[32px] border border-pink-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                   <div className="space-y-1">
                     <h3 className="font-black text-lg tracking-tight text-gray-900">STOCK OPNAME BULANAN ALINA GUDAK</h3>
                     <p className="text-xs text-gray-500 leading-relaxed">
@@ -41,7 +41,7 @@ export default function OpnamePage({
                     <select
                       value={activeStockOpnameMonth}
                       onChange={(e) => setActiveStockOpnameMonth(e.target.value)}
-                      className="bg-pink-50 text-[#EC4899] font-bold py-1 px-3.5 rounded-lg outline-none cursor-pointer text-xs"
+                      className="bg-pink-50 text-pink-500 font-bold py-1 px-3.5 rounded-lg outline-none cursor-pointer text-xs"
                     >
                       <option value="Januari 2026">Januari 2026</option>
                       <option value="Februari 2026">Februari 2026</option>
@@ -57,7 +57,7 @@ export default function OpnamePage({
                 <div className="bg-white rounded-[32px] border border-pink-100 p-5 shadow-sm space-y-4">
                   <div className="flex justify-between items-center border-b border-pink-50 pb-2">
                     <h4 className="font-bold text-xs uppercase tracking-wider text-gray-700">Rekonsiliasi Bulan: {activeStockOpnameMonth}</h4>
-                    <span className="text-[10px] text-gray-400 font-mono font-bold">Wajib verifikasi per SKU</span>
+                    <span className="text-sm text-gray-400 font-mono font-bold">Wajib verifikasi per SKU</span>
                   </div>
 
                   {/* Responsive Dual View for Stock Opname to prevent horizontal scrolling on mobile */}
@@ -66,7 +66,7 @@ export default function OpnamePage({
                     <div className="hidden md:block overflow-x-auto">
                       <table className="w-full text-left text-xs border-collapse">
                         <thead>
-                          <tr className="border-b border-pink-50 font-mono text-gray-400 uppercase tracking-widest text-[10px]">
+                          <tr className="border-b border-pink-50 font-mono text-gray-400 uppercase tracking-widest text-sm">
                             <th className="py-2.5 px-2">Identitas Item / SKU</th>
                             <th className="py-2.5 px-2 text-center">Stok Sistem</th>
                             <th className="py-2.5 px-2 text-center">Jumlah Hitung Fisik (Physical)</th>
@@ -104,10 +104,10 @@ export default function OpnamePage({
                             }
 
                             return (
-                              <tr key={p.SKU || `opn-${idxP}`} className="hover:bg-[#FFF8FB] text-gray-750 font-medium">
+                              <tr key={p.SKU || `opn-${idxP}`} className="hover:bg-pink-50 text-gray-750 font-medium">
                                 <td className="py-3 px-2">
                                   <div className="font-bold text-gray-900">{p.Product_Name}</div>
-                                  <div className="text-[10px] font-mono text-[#EC4899]">{p.SKU}</div>
+                                  <div className="text-sm font-mono text-pink-500">{p.SKU}</div>
                                 </td>
                                 <td className="py-3 px-2 text-center font-mono font-bold text-gray-900">
                                   {currentSystemStock} Pcs
@@ -123,13 +123,13 @@ export default function OpnamePage({
                                       placeholder="Enter count..."
                                       value={userVal}
                                       onChange={(e) => setOpnameQuantities(prev => ({ ...prev, [p.SKU]: e.target.value }))}
-                                      className="w-24 bg-[#FFF8FB] border border-pink-100 rounded-lg py-1 px-2.5 outline-none font-mono text-center font-bold text-gray-900"
+                                      className="w-24 bg-pink-50 border border-pink-100 rounded-lg py-1 px-2.5 outline-none font-mono text-center font-bold text-gray-900"
                                     />
                                   )}
                                 </td>
                                 <td className="py-3 px-3 text-center">
                                   {hasRecorded ? (
-                                    <span className={`inline-block py-1.5 px-4 rounded-xl text-[10px] font-bold ${colorClass}`}>
+                                    <span className={`inline-block py-1.5 px-4 rounded-xl text-sm font-bold ${colorClass}`}>
                                       {tagText}: {displayDiff} Pcs
                                     </span>
                                   ) : (
@@ -138,11 +138,11 @@ export default function OpnamePage({
                                 </td>
                                 <td className="py-3 px-2 text-right">
                                   {hasRecorded ? (
-                                    <span className="text-[10px] text-gray-400 font-mono">Recorded {new Date(historicalRecord.Date).toLocaleDateString()}</span>
+                                    <span className="text-sm text-gray-400 font-mono">Recorded {new Date(historicalRecord.Date).toLocaleDateString()}</span>
                                   ) : (
                                     <button
                                       onClick={() => handleSaveOpnameSubmit(p.SKU, userVal)}
-                                      className="bg-[#111827] hover:bg-black text-white font-semibold py-1 px-3 rounded-lg text-[10px] transition cursor-pointer"
+                                      className="bg-[#111827] hover:bg-black text-white font-semibold py-1 px-3 rounded-lg text-sm transition cursor-pointer"
                                     >
                                       Post Count &rarr;
                                     </button>
@@ -190,24 +190,24 @@ export default function OpnamePage({
                             {/* Product Info */}
                             <div>
                               <div className="font-extrabold text-[#111827] text-sm leading-tight">{p.Product_Name}</div>
-                              <div className="text-[10px] font-mono text-[#EC4899] font-bold mt-1">SKU: {p.SKU}</div>
+                              <div className="text-sm font-mono text-pink-500 font-bold mt-1">SKU: {p.SKU}</div>
                             </div>
 
                             {/* Details Grid */}
                             <div className="grid grid-cols-2 gap-3 pt-2 border-t border-pink-50/40">
                               <div className="p-2 bg-gray-50 rounded-xl space-y-0.5 border border-gray-100/60">
-                                <span className="text-[9px] font-bold text-gray-400 uppercase">Stok Sistem</span>
+                                <span className="text-xs font-bold text-gray-400 uppercase">Stok Sistem</span>
                                 <div className="font-mono font-extrabold text-gray-900 text-xs">{currentSystemStock} Pcs</div>
                               </div>
                               <div className="p-2 bg-gray-50 rounded-xl space-y-0.5 border border-gray-100/60">
-                                <span className="text-[9px] font-bold text-gray-400 uppercase">Selisih (Diff)</span>
+                                <span className="text-xs font-bold text-gray-400 uppercase">Selisih (Diff)</span>
                                 <div>
                                   {hasRecorded ? (
-                                    <span className={`inline-block py-0.5 px-2 rounded-lg text-[9px] font-bold ${colorClass}`}>
+                                    <span className={`inline-block py-0.5 px-2 rounded-lg text-xs font-bold ${colorClass}`}>
                                       {tagText}: {displayDiff}
                                     </span>
                                   ) : (
-                                    <span className="text-gray-400 italic text-[10px]">Belum diproses</span>
+                                    <span className="text-gray-400 italic text-sm">Belum diproses</span>
                                   )}
                                 </div>
                               </div>
@@ -216,7 +216,7 @@ export default function OpnamePage({
                             {/* Count action bottom area */}
                             <div className="pt-2 border-t border-pink-50/30 flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-2">
                               <div>
-                                <span className="text-[9px] font-bold text-gray-400 block mb-1 uppercase">Jumlah Hitung Fisik</span>
+                                <span className="text-xs font-bold text-gray-400 block mb-1 uppercase">Jumlah Hitung Fisik</span>
                                 {hasRecorded ? (
                                   <span className="font-mono text-gray-800 font-black bg-gray-150 border border-gray-200 py-1.5 px-3 rounded-lg inline-block leading-none text-xs">
                                     {historicalRecord.Physical_Stock} Pcs
@@ -227,20 +227,20 @@ export default function OpnamePage({
                                     placeholder="Isi stok fisik..."
                                     value={userVal}
                                     onChange={(e) => setOpnameQuantities(prev => ({ ...prev, [p.SKU]: e.target.value }))}
-                                    className="w-full sm:w-32 bg-[#FFF8FB] border border-pink-200 rounded-lg py-1.5 px-3 outline-none font-mono font-bold text-gray-900 text-xs"
+                                    className="w-full sm:w-32 bg-pink-50 border border-pink-200 rounded-lg py-1.5 px-3 outline-none font-mono font-bold text-gray-900 text-xs"
                                   />
                                 )}
                               </div>
 
                               <div className="flex items-end justify-end">
                                 {hasRecorded ? (
-                                  <span className="text-[9px] text-gray-400 font-bold block text-right mt-1">
+                                  <span className="text-xs text-gray-400 font-bold block text-right mt-1">
                                     ✓ Recorded {new Date(historicalRecord.Date).toLocaleDateString()}
                                   </span>
                                 ) : (
                                   <button
                                     onClick={() => handleSaveOpnameSubmit(p.SKU, userVal)}
-                                    className="w-full sm:w-auto bg-[#111827] hover:bg-black text-white font-black py-2 px-4 rounded-xl text-[10px] transition cursor-pointer uppercase tracking-wider text-center"
+                                    className="w-full sm:w-auto bg-[#111827] hover:bg-black text-white font-black py-2 px-4 rounded-xl text-sm transition cursor-pointer uppercase tracking-wider text-center"
                                   >
                                     Post Count &rarr;
                                   </button>

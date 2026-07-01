@@ -137,7 +137,7 @@ export default function ShippingPage({
                   <div className="lg:col-span-7 bg-white border border-pink-100 rounded-[32px] p-5 shadow-sm space-y-4">
                     <div className="flex justify-between items-center pb-2 border-b border-pink-50">
                       <h4 className="font-bold text-xs uppercase tracking-wider text-gray-700">Active Expeditions Logistics</h4>
-                      <span className="text-[10px] text-gray-400 font-mono font-bold">{shipping.length} shipments total</span>
+                      <span className="text-sm text-gray-400 font-mono font-bold">{shipping.length} shipments total</span>
                     </div>
 
                     <div className="space-y-3 min-h-[300px]">
@@ -148,14 +148,14 @@ export default function ShippingPage({
                           <div key={`${s.Tracking_Number || s.Order_Number}-${idx}`} className="bg-white border border-pink-50 rounded-2xl p-4 hover:shadow-sm transition space-y-2.5 text-xs text-[#111827]">
                             <div className="flex justify-between items-start gap-2">
                               <div>
-                                <span className="font-mono text-xs font-bold text-[#EC4899] block">
+                                <span className="font-mono text-xs font-bold text-pink-500 block">
                                   No. Order: {s.Order_Number}
                                 </span>
-                                <span className="text-[10px] text-gray-400 font-mono">
+                                <span className="text-sm text-gray-400 font-mono">
                                   {new Date(s.Shipping_Date).toLocaleString('id-ID')}
                                 </span>
                               </div>
-                              <span className={`inline-block py-1 px-2.5 rounded-full text-[9px] font-black uppercase tracking-wider ${
+                              <span className={`inline-block py-1 px-2.5 rounded-full text-xs font-black uppercase tracking-wider ${
                                 s.Status === 'Delivered' ? 'bg-emerald-50 text-emerald-600' : 'bg-blue-50 text-blue-600'
                               }`}>
                                 {s.Status}
@@ -164,13 +164,13 @@ export default function ShippingPage({
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-dashed border-pink-50 text-xs">
                               <div>
-                                <span className="text-gray-400 text-[10px] block uppercase font-mono tracking-wider mb-0.5">Ekspedisi / Resi</span>
+                                <span className="text-gray-400 text-sm block uppercase font-mono tracking-wider mb-0.5">Ekspedisi / Resi</span>
                                 <span className="font-bold text-gray-900 block">{s.Courier}</span>
-                                <span className="text-[10px] font-mono text-gray-500 block">{s.Tracking_Number || '-'}</span>
+                                <span className="text-sm font-mono text-gray-500 block">{s.Tracking_Number || '-'}</span>
                               </div>
                               <div>
-                                <span className="text-gray-400 text-[10px] block uppercase font-mono tracking-wider mb-0.5">Keterangan</span>
-                                <span className="italic text-gray-500 text-[10px]">Ready to delivered confirm.</span>
+                                <span className="text-gray-400 text-sm block uppercase font-mono tracking-wider mb-0.5">Keterangan</span>
+                                <span className="italic text-gray-500 text-sm">Ready to delivered confirm.</span>
                               </div>
                             </div>
 
@@ -191,12 +191,12 @@ export default function ShippingPage({
                                     alert(`Shipping deliver confirmation marked for order ${s.Order_Number}`);
                                     await fetchDatabaseState();
                                   }}
-                                  className="w-full sm:w-auto bg-[#EC4899] hover:bg-pink-600 text-white font-bold py-1.5 px-4 rounded-xl text-[10px] cursor-pointer transition text-center"
+                                  className="w-full sm:w-auto bg-pink-500 hover:bg-pink-600 text-white font-bold py-1.5 px-4 rounded-xl text-sm cursor-pointer transition text-center"
                                 >
                                   Mark Delivered ✓
                                 </button>
                               ) : (
-                                <span className="text-[10px] text-gray-400">Fulfillment Complete</span>
+                                <span className="text-sm text-gray-400">Fulfillment Complete</span>
                               )}
                             </div>
                           </div>

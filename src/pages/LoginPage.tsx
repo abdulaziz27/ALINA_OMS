@@ -55,11 +55,11 @@ export default function LoginPage({
             <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-[#EC4899] via-pink-400 to-white p-0.5 shadow-lg border border-pink-200 mb-1 flex items-center justify-center transform hover:rotate-6 transition-all duration-300 select-none">
               <div className="w-full h-full rounded-full bg-white flex flex-col items-center justify-center p-1 font-sans">
                 <span className="text-[14px] font-black tracking-tight bg-gradient-to-r from-[#EC4899] to-pink-400 bg-clip-text text-transparent leading-none">Alina</span>
-                <span className="text-[8px] font-bold text-[#EC4899] tracking-wider uppercase mt-0.5">Official</span>
+                <span className="text-xs font-bold text-pink-500 tracking-wider uppercase mt-0.5">Official</span>
               </div>
             </div>
           )}
-          <span className="text-[10px] bg-[#FFF3F8] text-[#EC4899] font-black tracking-widest px-3 py-1 rounded-full border border-pink-100/60 uppercase">
+          <span className="text-sm bg-pink-50 text-pink-500 font-black tracking-widest px-3 py-1 rounded-full border border-pink-100/60 uppercase">
             MOSLEM FASHION ERP
           </span>
           <h1 className="text-2xl font-extrabold tracking-tight text-[#111827]">ALINA WMS & OMS</h1>
@@ -77,7 +77,7 @@ export default function LoginPage({
                 placeholder="e.g. owner@alina.com"
                 value={loginEmail}
                 onChange={(e) => setLoginEmail(e.target.value)}
-                className="w-full bg-[#FFF8FB] border border-pink-100 hover:border-pink-300 rounded-xl py-2 px-3 pl-9 focus:outline-none focus:border-pink-500 text-gray-900 transition"
+                className="w-full bg-pink-50 border border-pink-100 hover:border-pink-300 rounded-xl py-2 px-3 pl-9 focus:outline-none focus:border-pink-500 text-gray-900 transition"
               />
               <Mail className="w-4 h-4 text-gray-400 absolute left-3 top-2.5" />
             </div>
@@ -93,7 +93,7 @@ export default function LoginPage({
                 placeholder="••••••••"
                 value={loginPassword}
                 onChange={(e) => setLoginPassword(e.target.value)}
-                className="w-full bg-[#FFF8FB] border border-pink-100 hover:border-pink-300 rounded-xl py-2 px-3 pl-9 focus:outline-none focus:border-pink-500 text-gray-900 transition"
+                className="w-full bg-pink-50 border border-pink-100 hover:border-pink-300 rounded-xl py-2 px-3 pl-9 focus:outline-none focus:border-pink-500 text-gray-900 transition"
               />
               <Lock className="w-4 h-4 text-gray-400 absolute left-3 top-2.5" />
             </div>
@@ -105,7 +105,7 @@ export default function LoginPage({
                 type="checkbox"
                 checked={isRememberLogin}
                 onChange={(e) => setIsRememberLogin(e.target.checked)}
-                className="w-3.5 h-3.5 rounded text-[#EC4899] focus:ring-pink-400"
+                className="w-3.5 h-3.5 rounded text-pink-500 focus:ring-pink-400"
               />
               Remember login context
             </label>
@@ -113,14 +113,14 @@ export default function LoginPage({
             <button 
               type="button"
               onClick={() => alert("Lupa password? Silakan hubungi akun OWNER utama (owner@alina.com) untuk mereset kredensial Anda.")}
-              className="text-[#EC4899] hover:underline font-bold"
+              className="text-pink-500 hover:underline font-bold"
             >
               Lupa Password?
             </button>
           </div>
 
           {loginError && (
-            <p className="text-red-500 font-bold text-[10px] text-center bg-red-50 py-2 rounded-xl">
+            <p className="text-red-500 font-bold text-sm text-center bg-red-50 py-2 rounded-xl">
               ⚠️ {loginError}
             </p>
           )}
@@ -128,14 +128,14 @@ export default function LoginPage({
           <button
             type="submit"
             id="login-submit-btn"
-            className="w-full bg-[#EC4899] hover:bg-[#D93B84] text-white font-bold py-3 px-4 rounded-xl cursor-pointer transition shadow-md border border-pink-400/20 tracking-wider text-xs uppercase"
+            className="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 px-4 rounded-xl cursor-pointer transition shadow-md border border-pink-400/20 tracking-wider text-xs uppercase"
           >
             Sign In to System
           </button>
         </form>
 
-        <div className="text-center font-mono text-[9px] text-gray-400 flex items-center justify-center gap-1.5">
-          ALINA MOSLEM FASHION SYSTEMS <Heart className="w-3 h-3 text-[#EC4899] fill-current" /> UTC-2026
+        <div className="text-center font-mono text-xs text-gray-400 flex items-center justify-center gap-1.5">
+          ALINA MOSLEM FASHION SYSTEMS <Heart className="w-3 h-3 text-pink-500 fill-current" /> UTC-2026
         </div>
       </motion.div>
     </div>

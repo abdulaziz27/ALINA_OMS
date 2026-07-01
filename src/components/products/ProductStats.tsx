@@ -73,11 +73,11 @@ export default function ProductStats({ productsList }: ProductStatsProps) {
       <div className="bg-white rounded-[32px] border border-pink-100/75 p-5 shadow-sm space-y-4 lg:col-span-2">
         <div className="flex items-center gap-2.5 pb-2 border-b border-pink-50">
           <div className="p-2 bg-pink-50 rounded-xl">
-            <Layers className="w-4 h-4 text-[#EC4899]" />
+            <Layers className="w-4 h-4 text-pink-500" />
           </div>
           <div>
             <h4 className="font-extrabold text-sm uppercase tracking-wider text-gray-700">Ringkasan Kategori & Varian (Total)</h4>
-            <span className="text-[10px] text-gray-400 block font-medium">Pengelompokan total fisik stok untuk setiap kombinasi Kategori dan Varian</span>
+            <span className="text-sm text-gray-400 block font-medium">Pengelompokan total fisik stok untuk setiap kombinasi Kategori dan Varian</span>
           </div>
         </div>
         
@@ -88,12 +88,12 @@ export default function ProductStats({ productsList }: ProductStatsProps) {
                 <span className="font-bold text-gray-800 text-[11px] block leading-tight">
                   {stat.category} - {stat.variant} (total)
                 </span>
-                <span className="text-[9px] text-[#EC4899] font-black uppercase tracking-wider bg-pink-100/30 px-2 py-0.5 rounded-md">
+                <span className="text-xs text-pink-500 font-black uppercase tracking-wider bg-pink-100/30 px-2 py-0.5 rounded-md">
                   {stat.skusCount} SKU
                 </span>
               </div>
               <div className="text-right shrink-0">
-                <span className="text-xs font-black text-[#EC4899] bg-pink-50/90 border border-pink-100/30 px-3 py-1.5 rounded-xl font-mono shadow-inner">
+                <span className="text-xs font-black text-pink-500 bg-pink-50/90 border border-pink-100/30 px-3 py-1.5 rounded-xl font-mono shadow-inner">
                   {stat.totalStock.toLocaleString()} Pcs
                 </span>
               </div>
@@ -111,7 +111,7 @@ export default function ProductStats({ productsList }: ProductStatsProps) {
         <div className="bg-white rounded-[32px] border border-pink-100/75 p-5 shadow-sm space-y-4">
           <div className="flex items-center gap-2 pb-2 border-b border-pink-50">
             <div className="p-1.5 bg-pink-50 rounded-xl">
-              <Layers className="w-3.5 h-3.5 text-[#EC4899]" />
+              <Layers className="w-3.5 h-3.5 text-pink-500" />
             </div>
             <div>
               <h4 className="font-bold text-xs uppercase tracking-wider text-gray-700">Total Per Kategori</h4>
@@ -122,7 +122,7 @@ export default function ProductStats({ productsList }: ProductStatsProps) {
             {categoryStats.map((stat) => (
               <div key={stat.category} className="flex items-center justify-between gap-2 py-1 text-xs border-b border-pink-50/30 last:border-0">
                 <span className="font-semibold text-gray-600 text-[11px] truncate">{stat.category}</span>
-                <span className="font-bold text-[#EC4899] shrink-0 font-mono text-[11px]">{stat.totalStock.toLocaleString()} Pcs</span>
+                <span className="font-bold text-pink-500 shrink-0 font-mono text-[11px]">{stat.totalStock.toLocaleString()} Pcs</span>
               </div>
             ))}
           </div>
@@ -132,7 +132,7 @@ export default function ProductStats({ productsList }: ProductStatsProps) {
         <div className="bg-white rounded-[32px] border border-pink-100/75 p-5 shadow-sm space-y-4">
           <div className="flex items-center gap-2 pb-2 border-b border-pink-50">
             <div className="p-1.5 bg-pink-50 rounded-xl">
-              <PieChart className="w-3.5 h-3.5 text-[#EC4899]" />
+              <PieChart className="w-3.5 h-3.5 text-pink-500" />
             </div>
             <div>
               <h4 className="font-bold text-xs uppercase tracking-wider text-gray-700">Total Per Varian</h4>
@@ -143,7 +143,7 @@ export default function ProductStats({ productsList }: ProductStatsProps) {
             {variantStats.map((stat) => (
               <div key={stat.variant} className="flex items-center justify-between gap-2 py-1 text-xs border-b border-pink-50/30 last:border-0">
                 <span className="font-semibold text-gray-600 text-[11px] truncate">Varian {stat.variant}</span>
-                <span className="font-bold text-[#EC4899] shrink-0 font-mono text-[11px]">{stat.totalStock.toLocaleString()} Pcs</span>
+                <span className="font-bold text-pink-500 shrink-0 font-mono text-[11px]">{stat.totalStock.toLocaleString()} Pcs</span>
               </div>
             ))}
           </div>

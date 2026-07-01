@@ -20,8 +20,8 @@ export default function CustomerModal({
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-      <form onSubmit={handleSaveCustomerSubmit} className="bg-[#FFF8FB] rounded-[32px] w-full max-w-md overflow-hidden shadow-2xl border border-pink-500/20 p-6 text-left space-y-4">
-        <h3 className="font-extrabold text-sm uppercase text-[#EC4899] border-b border-pink-50 pb-3">Profil Detil Pelanggan</h3>
+      <form onSubmit={handleSaveCustomerSubmit} className="bg-pink-50 rounded-[32px] w-full max-w-md overflow-hidden shadow-2xl border border-pink-500/20 p-6 text-left space-y-4">
+        <h3 className="font-extrabold text-sm uppercase text-pink-500 border-b border-pink-50 pb-3">Profil Detil Pelanggan</h3>
 
         <div className="space-y-3 text-xs font-semibold text-gray-750">
           <div className="space-y-1">
@@ -104,7 +104,7 @@ export default function CustomerModal({
         <div className="flex gap-2 pt-3">
           <button
             type="submit"
-            className="flex-1 bg-[#EC4899] hover:bg-[#D93B84] text-white font-bold py-2.5 px-4 rounded-xl cursor-pointer text-xs"
+            className="flex-1 bg-pink-500 hover:bg-pink-600 text-white font-bold py-2.5 px-4 rounded-xl cursor-pointer text-xs"
           >
             Simpan Pelanggan
           </button>

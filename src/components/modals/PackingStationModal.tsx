@@ -28,7 +28,7 @@ export default function PackingStationModal({
       <div className="bg-white rounded-[32px] w-full max-w-md overflow-hidden text-left shadow-2xl border border-pink-500/20 p-6 space-y-4">
         <div className="flex justify-between items-center border-b border-pink-50 pb-3">
           <div>
-            <span className="text-[9px] bg-[#FFF3F8] text-[#EC4899] font-black px-2 py-0.5 rounded uppercase">WMS Packing Station</span>
+            <span className="text-xs bg-pink-50 text-pink-500 font-black px-2 py-0.5 rounded uppercase">WMS Packing Station</span>
             <h3 className="font-extrabold text-sm text-gray-905 block mt-1">VERIFIKASI PACKING ORDER: {activePackOrder.Order_Number}</h3>
           </div>
           <button onClick={() => setActivePackOrder(null)} className="text-gray-400 hover:text-black font-extrabold text-sm">&times;</button>
@@ -40,7 +40,7 @@ export default function PackingStationModal({
             {orders.filter(item => item.Order_Number === activePackOrder.Order_Number).map((item, idx) => (
               <div key={idx} className="pt-1.5 first:pt-0 text-[11px]">
                 <p className="text-gray-800 font-extrabold uppercase">{item.Product}</p>
-                <p className="font-mono text-[10px] text-gray-500">SKU: {item.SKU} | Kuantitas: {item.Qty} Pcs @ {formatIDR(item.Price as number)}</p>
+                <p className="font-mono text-sm text-gray-500">SKU: {item.SKU} | Kuantitas: {item.Qty} Pcs @ {formatIDR(item.Price as number)}</p>
               </div>
             ))}
           </div>
@@ -50,13 +50,13 @@ export default function PackingStationModal({
           {Object.keys(packChecklist).map((key) => (
             <label 
               key={key} 
-              className="flex items-center gap-2.5 p-2 bg-[#FFF8FB] rounded-xl border border-pink-100/40 cursor-pointer hover:bg-[#FFF3F8]"
+              className="flex items-center gap-2.5 p-2 bg-pink-50 rounded-xl border border-pink-100/40 cursor-pointer hover:bg-pink-50"
             >
               <input
                 type="checkbox"
                 checked={packChecklist[key]}
                 onChange={() => handleTogglePackItem(key)}
-                className="w-4 h-4 text-[#EC4899] border-gray-300 rounded focus:ring-pink-500"
+                className="w-4 h-4 text-pink-500 border-gray-300 rounded focus:ring-pink-500"
               />
               <span className={`font-medium ${packChecklist[key] ? 'line-through text-gray-400' : 'text-gray-700'}`}>
                 {key}
@@ -68,7 +68,7 @@ export default function PackingStationModal({
         <div className="flex gap-2">
           <button
             onClick={handleConfirmPackCompleted}
-            className="flex-1 bg-[#EC4899] hover:bg-[#D93B84] text-white font-bold py-2.5 px-4 rounded-xl cursor-pointer text-xs flex items-center justify-center gap-1.5 shadow-md"
+            className="flex-1 bg-pink-500 hover:bg-pink-600 text-white font-bold py-2.5 px-4 rounded-xl cursor-pointer text-xs flex items-center justify-center gap-1.5 shadow-md"
           >
             <CheckCircle2 className="w-4 h-4" /> Seal & Seald Ready to Ship
           </button>

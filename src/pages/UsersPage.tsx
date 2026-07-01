@@ -24,7 +24,7 @@ export default function UsersPage({
                 {/* User settings summary */}
                 <div className="bg-white p-5 rounded-[32px] border border-pink-100 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                   <div className="space-y-1">
-                    <h3 className="font-black text-[#EC4899] text-xs uppercase tracking-wider">MANAGEMEN ADMINISTRATIVE USER</h3>
+                    <h3 className="font-black text-pink-500 text-xs uppercase tracking-wider">MANAGEMEN ADMINISTRATIVE USER</h3>
                     <p className="text-xs text-gray-500 leading-relaxed font-semibold">Buat, ganti profil password, atau matikan ijin autentikasi staff operasional Alina WMS & OMS.</p>
                   </div>
                   <button
@@ -39,7 +39,7 @@ export default function UsersPage({
                       });
                       setIsUserModalOpen(true);
                     }}
-                    className="bg-[#EC4899] hover:bg-[#D93B84] text-white font-bold py-2.5 px-6 rounded-xl text-xs flex items-center gap-1 cursor-pointer shadow-sm transition"
+                    className="bg-pink-500 hover:bg-pink-600 text-white font-bold py-2.5 px-6 rounded-xl text-xs flex items-center gap-1 cursor-pointer shadow-sm transition"
                   >
                     <Plus className="w-4 h-4" /> Tambah Staff Baru
                   </button>
@@ -53,11 +53,11 @@ export default function UsersPage({
                         <div className="flex justify-between items-start">
                           <div>
                             <h4 className="font-bold text-gray-900 text-sm leading-tight">{u.Full_Name}</h4>
-                            <span className="text-[10px] font-mono text-pink-500 block">{u.User_ID}</span>
+                            <span className="text-sm font-mono text-pink-500 block">{u.User_ID}</span>
                           </div>
 
-                          <span className={`inline-block text-[9px] font-black uppercase px-2 py-0.5 rounded ${
-                            u.Role === 'Owner Alina' ? 'bg-pink-100 text-[#EC4899]' : 'bg-blue-100 text-blue-700'
+                          <span className={`inline-block text-xs font-black uppercase px-2 py-0.5 rounded ${
+                            u.Role === 'Owner Alina' ? 'bg-pink-100 text-pink-500' : 'bg-blue-100 text-blue-700'
                           }`}>
                             {u.Role}
                           </span>
@@ -71,15 +71,15 @@ export default function UsersPage({
 
                         {/* Allowed permissions listing */}
                         <div className="pt-2 border-t border-pink-50/50">
-                          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Akses Modul:</p>
+                          <p className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-1">Akses Modul:</p>
                           <div className="flex flex-wrap gap-1">
                             {u.Role === 'Owner Alina' ? (
-                              <span className="text-[9px] bg-pink-100 text-[#EC4899] font-bold px-2 py-0.5 rounded-full border border-pink-200">Semua Akses (OWNER)</span>
+                              <span className="text-xs bg-pink-100 text-pink-500 font-bold px-2 py-0.5 rounded-full border border-pink-200">Semua Akses (OWNER)</span>
                             ) : !u.Permissions || u.Permissions.length === 0 ? (
-                              <span className="text-[9px] bg-gray-100 text-gray-500 font-bold px-2 py-0.5 rounded-full border border-gray-200">Semua Akses (Staff Default)</span>
+                              <span className="text-xs bg-gray-100 text-gray-500 font-bold px-2 py-0.5 rounded-full border border-gray-200">Semua Akses (Staff Default)</span>
                             ) : (
                               u.Permissions.map((p, idxP) => (
-                                <span key={`${p}-${idxP}`} className="text-[9px] bg-pink-50 text-pink-600 font-bold px-1.5 py-0.5 rounded border border-pink-100">
+                                <span key={`${p}-${idxP}`} className="text-xs bg-pink-50 text-pink-600 font-bold px-1.5 py-0.5 rounded border border-pink-100">
                                   {p === 'dashboard' ? 'Dashboard' :
                                    p === 'products' ? 'Catalog' :
                                    p === 'inventory' ? 'Stock Trx' :

@@ -35,7 +35,7 @@ export default function CustomersPage({
                       });
                       setIsCustomerModalOpen(true);
                     }}
-                    className="bg-[#EC4899] hover:bg-[#D93B84] text-white font-bold py-2 px-4 rounded-xl text-xs flex items-center gap-1.5 transition cursor-pointer"
+                    className="bg-pink-500 hover:bg-pink-600 text-white font-bold py-2 px-4 rounded-xl text-xs flex items-center gap-1.5 transition cursor-pointer"
                   >
                     <Plus className="w-4 h-4" /> Tambah Customer
                   </button>
@@ -51,10 +51,10 @@ export default function CustomersPage({
                         <div className="flex items-start justify-between">
                           <div>
                             <h4 className="font-extrabold text-sm text-gray-900 leading-tight">{c.Customer_Name}</h4>
-                            <span className="text-[10px] uppercase font-bold text-pink-500 font-mono tracking-wider">{c.Customer_ID}</span>
+                            <span className="text-sm uppercase font-bold text-pink-500 font-mono tracking-wider">{c.Customer_ID}</span>
                           </div>
                           
-                          <span className={`inline-block text-[9px] font-black uppercase px-2.5 py-0.5 rounded-full ${
+                          <span className={`inline-block text-xs font-black uppercase px-2.5 py-0.5 rounded-full ${
                             c.Customer_Type === 'Shopee' || c.Customer_Type === 'TikTok & Tokopedia'
                               ? 'bg-orange-50 text-orange-600'
                               : 'bg-indigo-50 text-indigo-600'

@@ -127,7 +127,7 @@ export default function BackupCenter({
     <div id="alina-backup-center" className="bg-white rounded-[32px] border border-pink-100 p-6 shadow-sm space-y-5 text-left">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-3 border-b border-pink-50">
         <div className="space-y-1">
-          <span className="text-[9px] bg-indigo-50 text-indigo-600 font-extrabold tracking-widest uppercase px-2.5 py-0.5 rounded-full inline-flex items-center gap-1">
+          <span className="text-xs bg-indigo-50 text-indigo-600 font-extrabold tracking-widest uppercase px-2.5 py-0.5 rounded-full inline-flex items-center gap-1">
             <HardDrive className="w-3 h-3" /> offline-first backplane
           </span>
           <h3 className="font-bold text-sm text-gray-800 uppercase tracking-tight flex items-center gap-2">
@@ -156,7 +156,7 @@ export default function BackupCenter({
               <Download className="w-4 h-4" />
             </div>
             <h4 className="font-bold text-xs text-gray-700">Ekspor Database Alina</h4>
-            <p className="text-[10px] text-gray-400 leading-relaxed">
+            <p className="text-sm text-gray-400 leading-relaxed">
               Unduh seluruh snapshot data produk, pelanggan, riwayat stok, orders, dan log audit saat ini ke format .json standar yang aman.
             </p>
           </div>
@@ -177,7 +177,7 @@ export default function BackupCenter({
               <Upload className="w-4 h-4" />
             </div>
             <h4 className="font-bold text-xs text-gray-700">Impor Database Alina</h4>
-            <p className="text-[10px] text-gray-400 leading-relaxed">
+            <p className="text-sm text-gray-400 leading-relaxed">
               Unggah file backup .json Alina yang sudah diekspor sebelumnya untuk memulihkan seluruh data Anda secara instan di browser/divais mana pun.
             </p>
           </div>
@@ -204,18 +204,18 @@ export default function BackupCenter({
         {/* Danger Reset Card */}
         <div className="p-4 rounded-2xl bg-pink-50/10 border border-pink-100/50 flex flex-col justify-between space-y-3">
           <div className="space-y-1">
-            <div className="w-8 h-8 rounded-full bg-pink-50 flex items-center justify-center text-[#EC4899]">
+            <div className="w-8 h-8 rounded-full bg-pink-50 flex items-center justify-center text-pink-500">
               <Trash2 className="w-4 h-4" />
             </div>
             <h4 className="font-bold text-xs text-pink-700">Penghapusan & Seed Data</h4>
-            <p className="text-[10px] text-gray-400 leading-relaxed">
+            <p className="text-sm text-gray-400 leading-relaxed">
               Ingin melakukan uji coba ulang dari nol? Hapus seluruh data modifikasi dan reset database lokal kembali ke setelan sampel awal.
             </p>
           </div>
           <button
             onClick={handleResetDatabase}
             disabled={loading}
-            className="w-full bg-pink-100 hover:bg-pink-200 text-[#EC4899] border border-pink-200 font-bold py-2 px-3 rounded-xl cursor-pointer transition text-[11px] text-center flex items-center justify-center gap-1.5 mt-3"
+            className="w-full bg-pink-100 hover:bg-pink-200 text-pink-500 border border-pink-200 font-bold py-2 px-3 rounded-xl cursor-pointer transition text-[11px] text-center flex items-center justify-center gap-1.5 mt-3"
           >
             <RefreshCw className="w-3.5 h-3.5" />
             Reset ke Data Awal
@@ -228,16 +228,16 @@ export default function BackupCenter({
           statusMsg.type === 'success' 
             ? 'bg-emerald-50 border-emerald-100 text-emerald-800' 
             : statusMsg.type === 'error'
-            ? 'bg-pink-50 border-pink-100 text-[#EC4899]'
+            ? 'bg-pink-50 border-pink-100 text-pink-500'
             : 'bg-indigo-50 border-indigo-100 text-indigo-800'
         }`}>
           {statusMsg.type === 'success' ? (
             <CheckCircle2 className="w-4.5 h-4.5 mt-0.5 text-emerald-500 flex-shrink-0" />
           ) : (
-            <AlertTriangle className="w-4.5 h-4.5 mt-0.5 text-[#EC4899] flex-shrink-0" />
+            <AlertTriangle className="w-4.5 h-4.5 mt-0.5 text-pink-500 flex-shrink-0" />
           )}
           <div className="space-y-1">
-            <span className="font-extrabold block uppercase tracking-tight text-[10px]">
+            <span className="font-extrabold block uppercase tracking-tight text-sm">
               {statusMsg.type === 'success' ? 'Berhasil' : 'Pemberitahuan Sistem'}
             </span>
             <p className="leading-relaxed text-[11px]">{statusMsg.text}</p>
@@ -245,7 +245,7 @@ export default function BackupCenter({
         </div>
       )}
 
-      <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100 flex items-start gap-2 text-[10px] text-gray-400 leading-relaxed">
+      <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100 flex items-start gap-2 text-sm text-gray-400 leading-relaxed">
         <HelpCircle className="w-4 h-4 mt-0.5 text-gray-400 flex-shrink-0" />
         <p>
           <strong>💡 Tips:</strong> Backup lah data Alina Anda secara berkala (misalnya seminggu sekali/setelah tutup buku harian) dengan menu Ekspor d atas, lalu simpan file .json tersebut di laptop/Google Drive Anda. Jika browser di-clear/history dihapus, Anda tinggal mengimpornya kembali untuk memulihkan seluruh laporan & riwayat pesanan WMS/OMS Anda dalam sekejap!

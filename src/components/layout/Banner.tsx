@@ -21,7 +21,7 @@ export default function Banner({
   return (
     <div className={`${currentTheme.bannerGradient} text-white p-6 rounded-[32px] shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4 relative overflow-hidden text-left shadow-md`}>
       <div className="space-y-2 max-w-xl z-10">
-        <span className={`text-[10px] ${currentTheme.bannerText} px-3 py-1 rounded-full font-bold uppercase tracking-wider`}>
+        <span className={`text-sm ${currentTheme.bannerText} px-3 py-1 rounded-full font-bold uppercase tracking-wider`}>
           Live Ops Dashboard {currentTheme.deco && `• ${currentTheme.deco}`}
         </span>
         <h2 className="text-xl font-extrabold tracking-tight">

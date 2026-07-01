@@ -431,7 +431,7 @@ export default function ProductEditor({
             
             {/* Header Modal popup */}
             <div className="flex justify-between items-center pb-3 border-b border-pink-100/60 mb-2">
-              <h4 className="font-black text-[#EC4899] uppercase tracking-widest text-xs">
+              <h4 className="font-black text-pink-500 uppercase tracking-widest text-xs">
                 {isCreatingNew ? '💡 BUAT SKU BARU' : '📝 EDIT DETAIL PRODUK'}
               </h4>
               <div className="flex items-center gap-1.5">
@@ -459,8 +459,8 @@ export default function ProductEditor({
             {/* SKU Section (LOCKED & AUTO-GENERATED) */}
             <div className="bg-gray-50 p-3.5 rounded-2xl space-y-2 border border-gray-100">
               <div className="flex items-center justify-between">
-                <label className="font-bold text-gray-500 uppercase text-[10px] tracking-wider">SUITE SKU CODE (Otomatis)</label>
-                <span className="text-[9px] bg-pink-100 text-[#EC4899] font-black px-2 py-0.5 rounded-full font-mono uppercase">
+                <label className="font-bold text-gray-500 uppercase text-sm tracking-wider">SUITE SKU CODE (Otomatis)</label>
+                <span className="text-xs bg-pink-100 text-pink-500 font-black px-2 py-0.5 rounded-full font-mono uppercase">
                   LOCKED
                 </span>
               </div>
@@ -507,11 +507,11 @@ export default function ProductEditor({
 
             {/* Product Name (Derived Automatically) */}
             <div className="space-y-1 bg-pink-50/40 p-3 rounded-2xl border border-pink-100/60">
-              <label className="font-bold text-pink-600 block uppercase tracking-widest text-[9px]">Nama Produk Master (Otomatis)</label>
+              <label className="font-bold text-pink-600 block uppercase tracking-widest text-xs">Nama Produk Master (Otomatis)</label>
               <div className="font-extrabold text-sm text-gray-900 uppercase tracking-wide">
                 {prodName || 'Pilih Kategori dan Warna...'}
               </div>
-              <p className="text-[10px] text-gray-400">Nama produk disusun secara otomatis dari kombinasi Brand Kategori + Variant + (Warna) agar seragam.</p>
+              <p className="text-sm text-gray-400">Nama produk disusun secara otomatis dari kombinasi Brand Kategori + Variant + (Warna) agar seragam.</p>
             </div>
 
             {/* Color Dot Picker */}
@@ -519,8 +519,8 @@ export default function ProductEditor({
               {/* Dot Color Picker */}
               <div className="space-y-1.5">
                 <div className="flex justify-between items-center">
-                  <label className="font-extrabold text-pink-600 block uppercase tracking-widest text-[9px] mb-1">Pilihan Warna Muslimah (Dot Warna)</label>
-                  <span className="text-[9px] bg-pink-100 text-[#EC4899] font-black px-2 py-0.5 rounded-full uppercase">
+                  <label className="font-extrabold text-pink-600 block uppercase tracking-widest text-xs mb-1">Pilihan Warna Muslimah (Dot Warna)</label>
+                  <span className="text-xs bg-pink-100 text-pink-500 font-black px-2 py-0.5 rounded-full uppercase">
                     {getColorsByCategory(category).length} Warna
                   </span>
                 </div>
@@ -535,7 +535,7 @@ export default function ProductEditor({
                         onClick={() => setColor(c.name)}
                         className={`flex items-center gap-2 p-2 rounded-xl text-left border cursor-pointer transition-all ${
                           isSelected 
-                            ? 'bg-pink-100/80 border-[#EC4899] ring-2 ring-pink-100 font-extrabold text-pink-700' 
+                            ? 'bg-pink-100/80 border-pink-500 ring-2 ring-pink-100 font-extrabold text-pink-700' 
                             : 'bg-white border-pink-100/40 hover:bg-pink-50/30 text-gray-750 font-medium'
                         }`}
                       >
@@ -555,7 +555,7 @@ export default function ProductEditor({
 
             {/* FINANCIALS (OWNER VS ADMIN VISIBILITY) */}
             <div className="border-t border-pink-100/60 pt-3.5 space-y-2">
-              <label className="font-extrabold text-pink-600 block uppercase tracking-widest text-[9px]">SKEMA HARGA HARIAN</label>
+              <label className="font-extrabold text-pink-600 block uppercase tracking-widest text-xs">SKEMA HARGA HARIAN</label>
               <div className="grid grid-cols-1 gap-3">
                 {currentUser?.Role === 'Owner Alina' && (
                   <div className="space-y-1">
@@ -611,7 +611,7 @@ export default function ProductEditor({
 
             {/* Alert Minimal (Ditempatkan di baris tersendiri di bawahnya agar rapi) */}
             <div className="bg-amber-50/60 border border-amber-100 p-3.5 rounded-2xl space-y-1.5">
-              <label className="font-extrabold text-amber-700 block uppercase tracking-widest text-[9px]">Ambangkan Alert Minimal (Warning)</label>
+              <label className="font-extrabold text-amber-700 block uppercase tracking-widest text-xs">Ambangkan Alert Minimal (Warning)</label>
               <div className="flex flex-col sm:flex-row sm:items-center gap-3">
                 <input
                   type="number"
@@ -620,7 +620,7 @@ export default function ProductEditor({
                   onChange={(e) => setMinStock(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
                   className="w-32 bg-white border border-amber-200 rounded-xl py-2 px-3 focus:outline-none text-xs focus:border-amber-500 font-mono text-gray-800"
                 />
-                <p className="text-[10px] text-amber-800 leading-relaxed">
+                <p className="text-sm text-amber-800 leading-relaxed">
                   Sistem akan memunculkan alarm notifikasi jika stok barang ini kurang dari atau sama dengan <span className="font-black font-mono">{minStock} pcs</span>.
                 </p>
               </div>
@@ -628,8 +628,8 @@ export default function ProductEditor({
 
             {/* PREVIEW BARCODE SECTION */}
             {sku && (
-              <div className="bg-[#FFF8FB] p-4 rounded-2xl border border-pink-100 flex flex-col items-center justify-center space-y-2.5 text-center mt-3 shadow-inner">
-                <p className="font-black text-[9px] text-[#EC4899] uppercase tracking-widest flex items-center gap-1.5">
+              <div className="bg-pink-50 p-4 rounded-2xl border border-pink-100 flex flex-col items-center justify-center space-y-2.5 text-center mt-3 shadow-inner">
+                <p className="font-black text-xs text-pink-500 uppercase tracking-widest flex items-center gap-1.5">
                   <Tag className="w-3 h-3" /> QR CODE GENERATOR
                 </p>
                 
@@ -641,7 +641,7 @@ export default function ProductEditor({
                     level={"M"}
                     includeMargin={true}
                   />
-                  <p className="font-mono text-[10px] font-extrabold tracking-widest text-[#111827] mt-[4px]">
+                  <p className="font-mono text-sm font-extrabold tracking-widest text-[#111827] mt-[4px]">
                     {sku}
                   </p>
                 </div>
@@ -650,7 +650,7 @@ export default function ProductEditor({
                   <button
                     type="button"
                     onClick={() => handleDownloadBarcode(sku, prodName)}
-                    className="flex-1 bg-white hover:bg-pink-50 text-[#EC4899] border border-pink-100 font-bold py-1.5 px-3 rounded-xl text-[10px] flex items-center justify-center gap-1 transition cursor-pointer shadow-sm"
+                    className="flex-1 bg-white hover:bg-pink-50 text-pink-500 border border-pink-100 font-bold py-1.5 px-3 rounded-xl text-sm flex items-center justify-center gap-1 transition cursor-pointer shadow-sm"
                   >
                     <Download className="w-3.5 h-3.5" /> Unduh SVG
                   </button>
@@ -674,7 +674,7 @@ export default function ProductEditor({
                       Barcode: sku,
                       QR_Code: sku
                     })}
-                    className="flex-1 bg-[#111827] hover:bg-black text-white font-semibold py-1.5 px-3 rounded-xl text-[10px] flex items-center justify-center gap-1 transition cursor-pointer shadow-sm"
+                    className="flex-1 bg-[#111827] hover:bg-black text-white font-semibold py-1.5 px-3 rounded-xl text-sm flex items-center justify-center gap-1 transition cursor-pointer shadow-sm"
                   >
                     <Printer className="w-3.5 h-3.5" /> Cetak Label Gantung
                   </button>
@@ -687,7 +687,7 @@ export default function ProductEditor({
               <button
                 type="submit"
                 id="save-product-form-btn"
-                className="flex-1 bg-[#EC4899] hover:bg-[#D93B84] text-white font-bold py-2.5 px-4 rounded-xl cursor-pointer transition text-xs flex items-center justify-center gap-2 shadow-md uppercase tracking-wider"
+                className="flex-1 bg-pink-500 hover:bg-pink-600 text-white font-bold py-2.5 px-4 rounded-xl cursor-pointer transition text-xs flex items-center justify-center gap-2 shadow-md uppercase tracking-wider"
               >
                 <Save className="w-4 h-4" />
                 SIMPAN RECORD
@@ -721,19 +721,19 @@ export default function ProductEditor({
             </div>
 
             <div className="bg-red-50/50 rounded-2xl border border-red-100/50 p-4 block space-y-1.5 text-xs">
-              <div className="flex justify-between items-center text-[#991B1B] font-extrabold text-[10px] uppercase tracking-wider">
+              <div className="flex justify-between items-center text-[#991B1B] font-extrabold text-sm uppercase tracking-wider">
                 <span>SKU MASTER</span>
                 <span className="font-mono bg-[#FFECEF] px-2 py-0.5 rounded font-black text-red-600">{productToDeleteLocal.SKU}</span>
               </div>
               <p className="font-black text-gray-900 uppercase pt-1 text-[11px]">{productToDeleteLocal.Product_Name}</p>
-              <p className="text-[10px] text-gray-500 font-medium">Kategori: {productToDeleteLocal.Category} | Variant: {productToDeleteLocal.Variant || '-'}</p>
+              <p className="text-sm text-gray-500 font-medium">Kategori: {productToDeleteLocal.Category} | Variant: {productToDeleteLocal.Variant || '-'}</p>
             </div>
 
             <div className="flex gap-2 pt-2 text-xs font-bold">
               <button
                 type="button"
                 onClick={handleConfirmDelete}
-                className="flex-1 bg-red-500 hover:bg-red-600 text-white py-2.5 px-3 rounded-xl cursor-pointer transition uppercase text-center shadow-md shadow-red-500/10 tracking-widest text-[10px] font-black"
+                className="flex-1 bg-red-500 hover:bg-red-600 text-white py-2.5 px-3 rounded-xl cursor-pointer transition uppercase text-center shadow-md shadow-red-500/10 tracking-widest text-sm font-black"
                 id="btn-confirm-delete-product"
               >
                 YA, HAPUS PERMANEN
@@ -741,7 +741,7 @@ export default function ProductEditor({
               <button
                 type="button"
                 onClick={() => setProductToDeleteLocal(null)}
-                className="flex-1 bg-gray-50 hover:bg-gray-105 text-gray-600 border border-gray-200 py-2.5 px-3 rounded-xl cursor-pointer transition uppercase text-center shadow-sm text-[10px] tracking-wider"
+                className="flex-1 bg-gray-50 hover:bg-gray-105 text-gray-600 border border-gray-200 py-2.5 px-3 rounded-xl cursor-pointer transition uppercase text-center shadow-sm text-sm tracking-wider"
               >
                 TIDAK, BATALKAN
               </button>

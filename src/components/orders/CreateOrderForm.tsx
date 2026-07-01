@@ -100,7 +100,7 @@ export default function CreateOrderForm({
         </div>
 
         {/* Brand Category, Size/Variant, and Color selectors */}
-        <div className="bg-[#FFF8FB] p-3 rounded-2xl border border-pink-50 space-y-3">
+        <div className="bg-pink-50 p-3 rounded-2xl border border-pink-50 space-y-3">
           <div className="space-y-1">
             <label className="font-bold text-gray-600 block uppercase">Pilihan Kategori (Stok Ready)</label>
             <select
@@ -139,7 +139,7 @@ export default function CreateOrderForm({
                     key={`${colorObj.name}-${idx}`}
                     type="button"
                     onClick={() => setOrdColor(colorObj.name)}
-                    className={`flex items-center gap-1 px-2 py-1 rounded-full border text-[10px] font-bold transition ${
+                    className={`flex items-center gap-1 px-2 py-1 rounded-full border text-sm font-bold transition ${
                       isSelected 
                         ? 'bg-pink-100 text-pink-700 border-pink-400 shadow-sm font-extrabold' 
                         : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
@@ -157,7 +157,7 @@ export default function CreateOrderForm({
           </div>
 
           {/* SKU Match Status Area */}
-          <div className="pt-2 border-t border-pink-100/60 mt-1 flex justify-between items-center text-[10px] font-bold">
+          <div className="pt-2 border-t border-pink-100/60 mt-1 flex justify-between items-center text-sm font-bold">
             <span className="text-gray-500 uppercase">Status SKU:</span>
             {ordSku ? (
               <span className="text-emerald-700 font-mono bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200/50">
@@ -204,8 +204,8 @@ export default function CreateOrderForm({
             onClick={handleAddProductToStaging}
             className={`w-full font-bold py-2.5 px-3 rounded-xl cursor-pointer transition text-center text-xs flex items-center justify-center gap-1 border uppercase ${
               ordSku
-                ? 'bg-pink-50 border-pink-200 text-[#EC4899] hover:bg-pink-100 font-extrabold'
-                : 'bg-gray-50 border-gray-100 text-gray-400 cursor-not-allowed text-[10px]'
+                ? 'bg-pink-50 border-pink-200 text-pink-500 hover:bg-pink-100 font-extrabold'
+                : 'bg-gray-50 border-gray-100 text-gray-400 cursor-not-allowed text-sm'
             }`}
           >
             <Plus className="w-3.5 h-3.5" /> + Tambah Barang
@@ -216,22 +216,22 @@ export default function CreateOrderForm({
         {tempOrderItems.length > 0 && (
           <div className="mt-4 pt-3 border-t border-pink-100 space-y-3">
             <div className="flex justify-between items-center">
-              <span className="text-[10px] font-extrabold uppercase text-gray-400">Keranjang Transaksi:</span>
+              <span className="text-sm font-extrabold uppercase text-gray-400">Keranjang Transaksi:</span>
               <button
                 type="button"
                 onClick={() => setTempOrderItems([])}
-                className="text-[10px] text-red-500 font-bold hover:underline cursor-pointer"
+                className="text-sm text-red-500 font-bold hover:underline cursor-pointer"
               >
                 Reset Keranjang
               </button>
             </div>
             
-            <div className="bg-[#FFF8FB] border border-pink-50/50 rounded-2xl p-2.5 max-h-48 overflow-y-auto space-y-1.5">
+            <div className="bg-pink-50 border border-pink-50/50 rounded-2xl p-2.5 max-h-48 overflow-y-auto space-y-1.5">
               {tempOrderItems.map((item, idx) => (
-                <div key={idx} className="flex justify-between items-start text-[10px] font-bold border-b border-pink-100/30 pb-1.5 last:border-0 last:pb-0">
+                <div key={idx} className="flex justify-between items-start text-sm font-bold border-b border-pink-100/30 pb-1.5 last:border-0 last:pb-0">
                   <div className="space-y-0.5 pr-2">
                     <p className="text-gray-805 leading-normal">{item.Product_Name}</p>
-                    <p className="text-[9px] font-mono text-gray-400 font-normal">{item.SKU} | {item.Qty} pcs x {formatIDR(item.Price)}</p>
+                    <p className="text-xs font-mono text-gray-400 font-normal">{item.SKU} | {item.Qty} pcs x {formatIDR(item.Price)}</p>
                   </div>
                   <div className="flex items-center gap-1.5 shrink-0">
                     <span className="text-gray-900 font-mono text-right">{formatIDR(item.Total)}</span>
@@ -249,8 +249,8 @@ export default function CreateOrderForm({
             </div>
 
             <div className="flex justify-between items-center px-2.5 py-1.5 bg-pink-50/50 rounded-xl border border-pink-100/30 text-[11px] font-bold font-mono">
-              <span className="text-gray-500 uppercase text-[9px]">Grand Total ({tempOrderItems.reduce((acc, i) => acc + i.Qty, 0)} pcs):</span>
-              <span className="text-[#EC4899] font-black">
+              <span className="text-gray-500 uppercase text-xs">Grand Total ({tempOrderItems.reduce((acc, i) => acc + i.Qty, 0)} pcs):</span>
+              <span className="text-pink-500 font-black">
                 {formatIDR(tempOrderItems.reduce((acc, item) => acc + item.Total, 0))}
               </span>
             </div>
@@ -262,7 +262,7 @@ export default function CreateOrderForm({
           disabled={tempOrderItems.length === 0}
           className={`w-full font-bold py-3 px-4 rounded-xl cursor-pointer transition shadow-md uppercase text-center text-xs block ${
             tempOrderItems.length > 0
-              ? 'bg-[#EC4899] hover:bg-[#D93B84] text-white cursor-pointer'
+              ? 'bg-pink-500 hover:bg-pink-600 text-white cursor-pointer'
               : 'bg-gray-100 text-gray-400 cursor-not-allowed border border-gray-200'
           }`}
         >

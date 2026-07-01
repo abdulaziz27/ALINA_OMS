@@ -150,13 +150,13 @@ export default function OwnerFinancials({
         {/* Revenue */}
         <div className="bg-gradient-to-br from-[#FFF8FB] to-[#fff3f7] border border-pink-100 p-5 rounded-[24px] shadow-sm flex items-start justify-between relative overflow-hidden">
           <div className="space-y-1.5">
-            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Pendapatan Kotor (Omset)</p>
+            <p className="text-sm font-bold text-gray-400 uppercase tracking-widest">Pendapatan Kotor (Omset)</p>
             <h4 className="text-xl font-bold text-gray-900 tracking-tight">{formatIDR(totalRevenue)}</h4>
-            <span className="text-[10px] bg-pink-50 text-[#EC4899] px-2 py-0.5 rounded-full font-bold inline-flex items-center gap-1 border border-pink-150">
+            <span className="text-sm bg-pink-50 text-pink-500 px-2 py-0.5 rounded-full font-bold inline-flex items-center gap-1 border border-pink-150">
               <ShoppingBag className="w-2.5 h-2.5" /> {totalUnitsSold} Pcs Terjual
             </span>
           </div>
-          <div className="p-2.5 bg-pink-100 rounded-2xl text-[#EC4899]">
+          <div className="p-2.5 bg-pink-100 rounded-2xl text-pink-500">
             <DollarSign className="w-5 h-5" />
           </div>
         </div>
@@ -164,9 +164,9 @@ export default function OwnerFinancials({
         {/* Keuntungan Kotor */}
         <div className="bg-gradient-to-br from-[#F0FDF4] to-[#DCFCE7] border border-emerald-100 p-5 rounded-[24px] shadow-sm flex items-start justify-between relative overflow-hidden">
           <div className="space-y-1.5">
-            <p className="text-[10px] font-bold text-emerald-800 uppercase tracking-widest">Keuntungan Kotor</p>
+            <p className="text-sm font-bold text-emerald-800 uppercase tracking-widest">Keuntungan Kotor</p>
             <h4 className="text-xl font-bold text-emerald-950 tracking-tight">{formatIDR(grossProfit)}</h4>
-            <span className="text-[10px] bg-emerald-500 text-white px-2 py-0.5 rounded-full font-semibold inline-flex items-center gap-1">
+            <span className="text-sm bg-emerald-500 text-white px-2 py-0.5 rounded-full font-semibold inline-flex items-center gap-1">
               Margin Kotor: {grossMargin.toFixed(1)}%
             </span>
           </div>
@@ -178,9 +178,9 @@ export default function OwnerFinancials({
         {/* Keuntungan Bersih */}
         <div className="bg-gradient-to-br from-indigo-50/70 to-blue-50/50 border border-indigo-150 p-5 rounded-[24px] shadow-sm flex items-start justify-between relative overflow-hidden">
           <div className="space-y-1.5">
-            <p className="text-[10px] font-bold text-indigo-800 uppercase tracking-widest">Keuntungan Bersih</p>
+            <p className="text-sm font-bold text-indigo-800 uppercase tracking-widest">Keuntungan Bersih</p>
             <h4 className="text-xl font-bold text-indigo-950 tracking-tight">{formatIDR(netProfit)}</h4>
-            <span className="text-[10px] bg-indigo-600 text-white px-2 py-0.5 rounded-full font-bold inline-flex items-center gap-1">
+            <span className="text-sm bg-indigo-600 text-white px-2 py-0.5 rounded-full font-bold inline-flex items-center gap-1">
               Margin Bersih: {netMargin.toFixed(1)}%
             </span>
           </div>
@@ -192,13 +192,13 @@ export default function OwnerFinancials({
         {/* Inventory Value (Assets) */}
         <div className="bg-gradient-to-br from-[#FFF8FB] to-[#fff3f7] border border-pink-100 p-5 rounded-[24px] shadow-sm flex items-start justify-between relative overflow-hidden">
           <div className="space-y-1.5">
-            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Aset Inventori (HPP)</p>
+            <p className="text-sm font-bold text-gray-400 uppercase tracking-widest">Aset Inventori (HPP)</p>
             <h4 className="text-xl font-bold text-gray-950 tracking-tight">{formatIDR(totalInventoryValue)}</h4>
-            <span className="text-[10px] text-gray-500 block font-bold">
+            <span className="text-sm text-gray-500 block font-bold">
               Potensi Jual: {formatIDR(totalInventorySalesValue)}
             </span>
           </div>
-          <div className="p-2.5 bg-[#FCE7F3] rounded-2xl text-[#EC4899]">
+          <div className="p-2.5 bg-[#FCE7F3] rounded-2xl text-pink-500">
             <Layers className="w-5 h-5" />
           </div>
         </div>
@@ -212,10 +212,10 @@ export default function OwnerFinancials({
         <div className="bg-white border border-pink-100 p-5 rounded-[28px] shadow-sm space-y-4">
           <div className="flex items-center justify-between border-b border-pink-100/50 pb-2.5">
             <div className="space-y-0.5">
-              <h4 className="font-extrabold text-[#EC4899] text-xs uppercase tracking-wider">DIAGRAM BARANG PALING LAKU</h4>
-              <p className="text-[10px] font-medium text-gray-400">Peringkat 5 produk dengan akumulasi kuantiti terlaris</p>
+              <h4 className="font-extrabold text-pink-500 text-xs uppercase tracking-wider">DIAGRAM BARANG PALING LAKU</h4>
+              <p className="text-sm font-medium text-gray-400">Peringkat 5 produk dengan akumulasi kuantiti terlaris</p>
             </div>
-            <span className="text-[10px] bg-pink-100 text-[#EC4899] font-black px-2.5 py-1 rounded-full uppercase">
+            <span className="text-sm bg-pink-100 text-pink-500 font-black px-2.5 py-1 rounded-full uppercase">
               TOP 5 SKU
             </span>
           </div>
@@ -237,14 +237,14 @@ export default function OwnerFinancials({
                         <span className="font-mono font-black text-xs text-gray-900 tracking-tight block">
                           {item.sku}
                         </span>
-                        <span className="text-gray-500 text-[10px] font-bold block truncate">
+                        <span className="text-gray-500 text-sm font-bold block truncate">
                           {item.name} ({item.color})
                         </span>
                       </div>
                     </div>
                     <div className="text-right shrink-0">
-                      <span className="font-extrabold text-[#EC4899] block">{item.qty} Pcs Sold</span>
-                      <span className="text-[9px] text-gray-400 font-mono font-bold">{formatIDR(item.revenue)}</span>
+                      <span className="font-extrabold text-pink-500 block">{item.qty} Pcs Sold</span>
+                      <span className="text-xs text-gray-400 font-mono font-bold">{formatIDR(item.revenue)}</span>
                     </div>
                   </div>
 
@@ -256,7 +256,7 @@ export default function OwnerFinancials({
                         style={{ width: `${percentage}%` }}
                       >
                         <div className="absolute right-1 top-0 h-full flex items-center">
-                          <span className="text-[7px] text-white font-black">{Math.round(percentage)}%</span>
+                          <span className="text-xs text-white font-black">{Math.round(percentage)}%</span>
                         </div>
                       </div>
                     </div>
@@ -278,9 +278,9 @@ export default function OwnerFinancials({
           <div className="flex items-center justify-between border-b border-pink-100/50 pb-2.5">
             <div className="space-y-0.5">
               <h4 className="font-extrabold text-indigo-700 text-xs uppercase tracking-wider">DIAGRAM PELANGGAN TERBAYAR TERBANYAK</h4>
-              <p className="text-[10px] font-medium text-gray-400">Peringkat 5 mitra pelanggan berdasarkan akumulasi rupiah</p>
+              <p className="text-sm font-medium text-gray-400">Peringkat 5 mitra pelanggan berdasarkan akumulasi rupiah</p>
             </div>
-            <span className="text-[10px] bg-indigo-100 text-indigo-700 font-black px-2.5 py-1 rounded-full uppercase">
+            <span className="text-sm bg-indigo-100 text-indigo-700 font-black px-2.5 py-1 rounded-full uppercase">
               TOP 5 MITRA
             </span>
           </div>
@@ -302,14 +302,14 @@ export default function OwnerFinancials({
                         <span className="font-bold text-gray-900 tracking-tight block truncate">
                           {item.name}
                         </span>
-                        <span className="inline-block bg-indigo-100 text-indigo-600 font-black px-1.5 py-0.2 rounded text-[8px] uppercase font-mono mt-0.5">
+                        <span className="inline-block bg-indigo-100 text-indigo-600 font-black px-1.5 py-0.2 rounded text-xs uppercase font-mono mt-0.5">
                           {item.type}
                         </span>
                       </div>
                     </div>
                     <div className="text-right shrink-0">
                       <span className="font-mono font-extrabold text-indigo-700 block">{formatIDR(item.totalSpend)}</span>
-                      <span className="text-[9px] text-[#EC4899] font-bold">{item.totalQty} Pcs Purchased</span>
+                      <span className="text-xs text-pink-500 font-bold">{item.totalQty} Pcs Purchased</span>
                     </div>
                   </div>
 
@@ -321,7 +321,7 @@ export default function OwnerFinancials({
                         style={{ width: `${percentage}%` }}
                       >
                         <div className="absolute right-1 top-0 h-full flex items-center">
-                          <span className="text-[7px] text-white font-black">{Math.round(percentage)}%</span>
+                          <span className="text-xs text-white font-black">{Math.round(percentage)}%</span>
                         </div>
                       </div>
                     </div>
@@ -352,7 +352,7 @@ export default function OwnerFinancials({
               </span>
               <h4 className="font-bold text-gray-900 text-xs uppercase tracking-wider">FAST MOVING (SKU)</h4>
             </div>
-            <span className="text-[10px] bg-emerald-50 text-emerald-600 font-bold px-2.5 py-0.5 rounded-full">
+            <span className="text-sm bg-emerald-50 text-emerald-600 font-bold px-2.5 py-0.5 rounded-full">
               Harian Terbanyak
             </span>
           </div>
@@ -363,11 +363,11 @@ export default function OwnerFinancials({
                 <div key={idx} className="py-2.5 flex items-center justify-between text-xs">
                   <div className="space-y-0.5 max-w-[140px]">
                     <p className="font-bold text-gray-800 truncate">{p.name}</p>
-                    <p className="text-[10px] font-mono text-gray-400">{p.sku}</p>
+                    <p className="text-sm font-mono text-gray-400">{p.sku}</p>
                   </div>
                   <div className="text-right">
-                    <p className="font-bold text-[#EC4899]">{p.qtySold} Sold</p>
-                    <p className="text-[10px] text-gray-400">Stok: {p.stock}</p>
+                    <p className="font-bold text-pink-500">{p.qtySold} Sold</p>
+                    <p className="text-sm text-gray-400">Stok: {p.stock}</p>
                   </div>
                 </div>
               ))
@@ -386,7 +386,7 @@ export default function OwnerFinancials({
               </span>
               <h4 className="font-bold text-gray-900 text-xs uppercase tracking-wider">SLOW MOVING (SKU)</h4>
             </div>
-            <span className="text-[10px] bg-amber-50 text-amber-600 font-bold px-2.5 py-0.5 rounded-full">
+            <span className="text-sm bg-amber-50 text-amber-600 font-bold px-2.5 py-0.5 rounded-full">
               Kurang Diminati
             </span>
           </div>
@@ -397,11 +397,11 @@ export default function OwnerFinancials({
                 <div key={idx} className="py-2.5 flex items-center justify-between text-xs">
                   <div className="space-y-0.5 max-w-[140px]">
                     <p className="font-bold text-gray-800 truncate">{p.name}</p>
-                    <p className="text-[10px] font-mono text-gray-400">{p.sku}</p>
+                    <p className="text-sm font-mono text-gray-400">{p.sku}</p>
                   </div>
                   <div className="text-right">
                     <p className="font-bold text-amber-600">{p.qtySold} Sold</p>
-                    <p className="text-[10px] text-gray-400">Sisa Stok: {p.stock}</p>
+                    <p className="text-sm text-gray-400">Sisa Stok: {p.stock}</p>
                   </div>
                 </div>
               ))
@@ -420,7 +420,7 @@ export default function OwnerFinancials({
               </span>
               <h4 className="font-bold text-gray-900 text-xs uppercase tracking-wider">DEAD STOCK WARNING</h4>
             </div>
-            <span className="text-[10px] bg-red-100 text-red-600 font-black px-2.5 py-0.5 rounded-full animate-pulse">
+            <span className="text-sm bg-red-100 text-red-600 font-black px-2.5 py-0.5 rounded-full animate-pulse">
               ALERTI!
             </span>
           </div>
@@ -431,11 +431,11 @@ export default function OwnerFinancials({
                 <div key={idx} className="py-2.5 flex items-center justify-between text-xs">
                   <div className="space-y-0.5 max-w-[140px]">
                     <p className="font-bold text-gray-800 truncate">{p.Product_Name}</p>
-                    <p className="text-[10px] font-mono text-gray-400">{p.SKU}</p>
+                    <p className="text-sm font-mono text-gray-400">{p.SKU}</p>
                   </div>
                   <div className="text-right">
                     <p className="font-semibold text-red-600">{p.Current_Stock} Pcs di Rak</p>
-                    <p className="text-[9px] text-gray-400">Value: {formatIDR(p.Current_Stock * p.Cost_Price)}</p>
+                    <p className="text-xs text-gray-400">Value: {formatIDR(p.Current_Stock * p.Cost_Price)}</p>
                   </div>
                 </div>
               ))
@@ -464,7 +464,7 @@ export default function OwnerFinancials({
                   </div>
                   <div className="w-full bg-pink-100 rounded-full h-2">
                     <div 
-                      className="bg-[#EC4899] h-2 rounded-full" 
+                      className="bg-pink-500 h-2 rounded-full" 
                       style={{ width: `${percentage}%` }}
                     />
                   </div>
@@ -478,25 +478,25 @@ export default function OwnerFinancials({
         </div>
 
         {/* Top Performer Summaries */}
-        <div className="bg-[#FFF8FB] border border-pink-100/60 p-5 rounded-[32px] shadow-sm flex flex-col justify-between">
+        <div className="bg-pink-50 border border-pink-100/60 p-5 rounded-[32px] shadow-sm flex flex-col justify-between">
           <h4 className="font-bold text-xs uppercase tracking-wider text-gray-700 mb-4">PERFORMANCE TROPHY</h4>
           
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-white p-4 rounded-2xl border border-pink-100/40 text-center space-y-2">
-              <Award className="w-8 h-8 text-[#EC4899] mx-auto" />
-              <p className="text-[10px] font-bold text-gray-400 uppercase">BEST SKU</p>
+              <Award className="w-8 h-8 text-pink-500 mx-auto" />
+              <p className="text-sm font-bold text-gray-400 uppercase">BEST SKU</p>
               <p className="text-xs font-bold text-indigo-950 truncate">{bestSellingProduct.name}</p>
-              <span className="inline-block text-[10px] bg-pink-100 text-[#EC4899] font-bold px-3 py-0.5 rounded-full">
+              <span className="inline-block text-sm bg-pink-100 text-pink-500 font-bold px-3 py-0.5 rounded-full">
                 {bestSellingProduct.qty} Units Sold
               </span>
             </div>
 
             <div className="bg-white p-4 rounded-2xl border border-pink-100/40 text-center space-y-2">
               <Award className="w-8 h-8 text-amber-500 mx-auto" />
-              <p className="text-[10px] font-bold text-gray-400 uppercase">TOP CUSTOMER</p>
+              <p className="text-sm font-bold text-gray-400 uppercase">TOP CUSTOMER</p>
               <p className="text-xs font-bold text-gray-800 truncate">{topCustomerName}</p>
               {customerSalesMap[topCustomerName] && (
-                <span className="inline-block text-[10px] bg-amber-150 text-amber-700 font-bold px-3 py-0.5 rounded-full bg-amber-50">
+                <span className="inline-block text-sm bg-amber-150 text-amber-700 font-bold px-3 py-0.5 rounded-full bg-amber-50">
                   {formatIDR(customerSalesMap[topCustomerName].totalSpend)} ({customerSalesMap[topCustomerName].totalQty} Pcs)
                 </span>
               )}

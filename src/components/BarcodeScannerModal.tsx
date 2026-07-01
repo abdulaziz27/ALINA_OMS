@@ -294,7 +294,7 @@ export default function BarcodeScannerModal({
 
   return (
     <div id="scanner-modal-backdrop" className="fixed inset-0 bg-black/60 backdrop-blur-md z-[100] flex items-center justify-center p-4">
-      <div className="bg-[#FFF8FB] rounded-[32px] w-full max-w-md overflow-hidden shadow-2xl border border-pink-500/20">
+      <div className="bg-pink-50 rounded-[32px] w-full max-w-md overflow-hidden shadow-2xl border border-pink-500/20">
         
         {/* Header */}
         <div className="bg-gradient-to-r from-[#EC4899] to-[#F9A8D4] p-5 text-white flex justify-between items-center">
@@ -312,11 +312,11 @@ export default function BarcodeScannerModal({
         </div>
 
         {/* Tab selection */}
-        <div className="grid grid-cols-3 border-b border-pink-100 bg-[#FFF3F8]">
+        <div className="grid grid-cols-3 border-b border-pink-100 bg-pink-50">
           <button
             onClick={() => setActiveMode('simulation')}
             className={`py-3 text-xs font-semibold flex flex-col items-center gap-1 cursor-pointer transition ${
-              activeMode === 'simulation' ? 'bg-[#FFF8FB] text-[#EC4899] border-b-2 border-[#EC4899]' : 'text-gray-500 hover:text-[#EC4899]'
+              activeMode === 'simulation' ? 'bg-pink-50 text-pink-500 border-b-2 border-pink-500' : 'text-gray-500 hover:text-pink-500'
             }`}
           >
             <ClipboardList className="w-4 h-4" />
@@ -325,7 +325,7 @@ export default function BarcodeScannerModal({
           <button
             onClick={() => setActiveMode('camera')}
             className={`py-3 text-xs font-semibold flex flex-col items-center gap-1 cursor-pointer transition ${
-              activeMode === 'camera' ? 'bg-[#FFF8FB] text-[#EC4899] border-b-2 border-[#EC4899]' : 'text-gray-500 hover:text-[#EC4899]'
+              activeMode === 'camera' ? 'bg-pink-50 text-pink-500 border-b-2 border-pink-500' : 'text-gray-500 hover:text-pink-500'
             }`}
           >
             <Camera className="w-4 h-4" />
@@ -334,7 +334,7 @@ export default function BarcodeScannerModal({
           <button
             onClick={() => setActiveMode('hardware')}
             className={`py-3 text-xs font-semibold flex flex-col items-center gap-1 cursor-pointer transition ${
-              activeMode === 'hardware' ? 'bg-[#FFF8FB] text-[#EC4899] border-b-2 border-[#EC4899]' : 'text-gray-500 hover:text-[#EC4899]'
+              activeMode === 'hardware' ? 'bg-pink-50 text-pink-500 border-b-2 border-pink-500' : 'text-gray-500 hover:text-pink-500'
             }`}
           >
             <Keyboard className="w-4 h-4" />
@@ -363,10 +363,10 @@ export default function BarcodeScannerModal({
                 
                 {/* Visual guideline overlay (Full frame) */}
                 <div className="absolute inset-0 pointer-events-none flex flex-col items-center justify-center p-4">
-                  <div className="w-[80%] aspect-square max-w-[250px] border-2 border-[#EC4899]/60 rounded-lg relative flex items-center justify-center shadow-[0_0_0_999px_rgba(0,0,0,0.4)]">
+                  <div className="w-[80%] aspect-square max-w-[250px] border-2 border-pink-500/60 rounded-lg relative flex items-center justify-center shadow-[0_0_0_999px_rgba(0,0,0,0.4)]">
                     <div className="w-full h-[2px] bg-red-500/80 absolute animate-[ping_2s_infinite]" />
                   </div>
-                  <p className="text-[10px] text-white bg-black/80 px-3 py-1.5 rounded-full mt-3 z-10 font-bold tracking-widest">
+                  <p className="text-sm text-white bg-black/80 px-3 py-1.5 rounded-full mt-3 z-10 font-bold tracking-widest">
                     ARAHKAN KAMERA KE QR CODE
                   </p>
                 </div>
@@ -379,7 +379,7 @@ export default function BarcodeScannerModal({
               {/* Robust Photo Scan Fallback Divider */}
               <div className="relative my-4 flex py-2 items-center">
                 <div className="flex-grow border-t border-dashed border-pink-100"></div>
-                <span className="flex-shrink mx-4 text-[9px] uppercase tracking-widest font-bold text-pink-400 font-mono">Atau alternatif transfer</span>
+                <span className="flex-shrink mx-4 text-xs uppercase tracking-widest font-bold text-pink-400 font-mono">Atau alternatif transfer</span>
                 <div className="flex-grow border-t border-dashed border-pink-100"></div>
               </div>
 
@@ -426,7 +426,7 @@ export default function BarcodeScannerModal({
           {activeMode === 'simulation' && (
             <div className="space-y-4">
               <div className="bg-pink-50 border border-pink-100 p-4 rounded-2xl">
-                <p className="text-xs text-[#EC4899] font-medium leading-relaxed">
+                <p className="text-xs text-pink-500 font-medium leading-relaxed">
                   💡 <strong>Demo Sandbox Helper:</strong> Karena keterbatasan sandbox web, gunakan pemindai instant ini untuk memilih SKU dan menirukan penembakan sukses. Sempurna untuk demonstrasi dan QA operasional.
                 </p>
               </div>
@@ -450,7 +450,7 @@ export default function BarcodeScannerModal({
               <button
                 id="sumulate-scan-confirm-btn"
                 onClick={handleSimulateScan}
-                className="w-full bg-[#EC4899] hover:bg-[#D93B84] text-white font-bold py-3 px-4 rounded-xl cursor-pointer transition shadow-md flex items-center justify-center gap-2 text-sm"
+                className="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 px-4 rounded-xl cursor-pointer transition shadow-md flex items-center justify-center gap-2 text-sm"
               >
                 <CheckCircle2 className="w-4 h-4" />
                 SIMULATE SUCCESS SCAN
@@ -476,7 +476,7 @@ export default function BarcodeScannerModal({
                   placeholder="Scan product tag / type SKU..."
                   value={hardwareInput}
                   onChange={(e) => setHardwareInput(e.target.value)}
-                  className="w-full bg-white border border-pink-200 text-gray-800 text-sm py-2.5 px-4 rounded-xl focus:border-[#EC4899] focus:ring-1 focus:ring-[#EC4899] focus:outline-none placeholder-gray-400 font-mono tracking-wider text-center"
+                  className="w-full bg-white border border-pink-200 text-gray-800 text-sm py-2.5 px-4 rounded-xl focus:border-pink-500 focus:ring-1 focus:ring-[#EC4899] focus:outline-none placeholder-gray-400 font-mono tracking-wider text-center"
                 />
               </div>
 

@@ -20,7 +20,7 @@ export default function RestockAlertBanner({
         <AlertTriangle className="w-5 h-5 text-red-500" />
         <div>
           <p className="font-bold text-gray-900">RESTOCK FORECAST ALERT REQUIRED</p>
-          <p className="text-gray-500 font-mono text-[10px]">{restockAlertsCount} SKU diprediksi habis dalam 14 hari kedepan!</p>
+          <p className="text-gray-500 font-mono text-sm">{restockAlertsCount} SKU diprediksi habis dalam 14 hari kedepan!</p>
         </div>
       </div>
       {hasPermission('reports') && (

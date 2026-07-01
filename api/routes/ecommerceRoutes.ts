@@ -134,10 +134,23 @@ router.post('/orders', async (req, res) => {
             Qty: item.qty,
             Price: product.Retail_Price,
             Total: amount, 
-            Status: 'Pending',
+            Status: 'Ready To Ship', // Direct to ready to ship if it came from E-commerce
             Order_Date: now,
-            Channel: 'Shopee', // Default channel for ecommerce
+            Channel: orderPayload.channel || 'E-Commerce', 
             Product: product.Product_Name,
+          }
+        });
+      }
+
+      // If E-commerce passed Biteship shipping info, create shipping record immediately
+      if (orderPayload.shippingCourier && orderPayload.trackingNumber) {
+        await tx.shipping.create({
+          data: {
+            Tracking_Number: orderPayload.trackingNumber,
+            Courier: orderPayload.shippingCourier,
+            Order_Number: orderNumber,
+            Shipping_Date: now,
+            Status: 'Ready To Ship'
           }
         });
       }

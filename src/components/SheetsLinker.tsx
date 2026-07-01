@@ -170,7 +170,7 @@ function writeTableDirect(ss, sheetName, list) {
       {/* Overview Container */}
       <div className="bg-white border border-pink-100 p-5 rounded-[32px] shadow-sm flex flex-col md:flex-row items-center gap-6 justify-between">
         <div className="space-y-3 max-w-xl text-left">
-          <span className="text-[10px] bg-pink-150 text-[#EC4899] font-black tracking-widest uppercase px-3 py-1 rounded-full bg-pink-50 inline-flex items-center gap-1">
+          <span className="text-sm bg-pink-150 text-pink-500 font-black tracking-widest uppercase px-3 py-1 rounded-full bg-pink-50 inline-flex items-center gap-1">
             <Radio className="w-3 h-3 animate-ping" /> REALTIME SYNC ENGINE
           </span>
           <h2 className="text-xl font-bold text-gray-900 tracking-tight">KONEKSI GOOGLE SHEET SEBAGAI DATABASE UTAMA</h2>
@@ -178,11 +178,11 @@ function writeTableDirect(ss, sheetName, list) {
             Sinkronisasikan seluruh database inventaris, pesanan pelanggan retail/shopee/tiktok, log aktivitas audit, dan forecasting Alina secara instan tanpa perlu refresh halaman.
           </p>
         </div>
-        <div className="flex flex-col items-center justify-center p-5 bg-[#FFF8FB] rounded-2xl border border-pink-100 min-w-[200px] text-center space-y-2">
+        <div className="flex flex-col items-center justify-center p-5 bg-pink-50 rounded-2xl border border-pink-100 min-w-[200px] text-center space-y-2">
           <FileSpreadsheet className="w-10 h-10 text-emerald-500" />
           <p className="text-xs font-bold text-gray-700">Status Database</p>
-          <span className={`inline-block text-[10px] font-black px-3 py-0.5 rounded-full ${
-            config.isLinked ? 'bg-emerald-100 text-emerald-700 animate-pulse' : 'bg-pink-100 text-[#EC4899]'
+          <span className={`inline-block text-sm font-black px-3 py-0.5 rounded-full ${
+            config.isLinked ? 'bg-emerald-100 text-emerald-700 animate-pulse' : 'bg-pink-100 text-pink-500'
           }`}>
             {config.isLinked ? 'SHEET TERHUBUNG (AKTIF)' : 'TIDAK TERHUBUNG'}
           </span>
@@ -207,7 +207,7 @@ function writeTableDirect(ss, sheetName, list) {
                 placeholder="https://script.google.com/macros/s/.../exec"
                 value={scriptUrl}
                 onChange={(e) => setScriptUrl(e.target.value)}
-                className="w-full bg-[#FFF8FB] border border-pink-100 rounded-xl py-2 px-3 focus:outline-none focus:border-pink-500 text-xs font-mono"
+                className="w-full bg-pink-50 border border-pink-100 rounded-xl py-2 px-3 focus:outline-none focus:border-pink-500 text-xs font-mono"
               />
             </div>
 
@@ -220,7 +220,7 @@ function writeTableDirect(ss, sheetName, list) {
                 placeholder="Spreadsheet ID URL string..."
                 value={spreadsheetId}
                 onChange={(e) => setSpreadsheetId(e.target.value)}
-                className="w-full bg-[#FFF8FB] border border-pink-100 rounded-xl py-2 px-3 focus:outline-none focus:border-pink-500 text-xs font-mono"
+                className="w-full bg-pink-50 border border-pink-100 rounded-xl py-2 px-3 focus:outline-none focus:border-pink-500 text-xs font-mono"
               />
             </div>
 
@@ -230,7 +230,7 @@ function writeTableDirect(ss, sheetName, list) {
                 id="auto-sync-checkbox"
                 checked={autoSync}
                 onChange={(e) => setAutoSync(e.target.checked)}
-                className="w-4 h-4 text-[#EC4899] border-gray-300 rounded focus:ring-pink-500"
+                className="w-4 h-4 text-pink-500 border-gray-300 rounded focus:ring-pink-500"
               />
               <label htmlFor="auto-sync-checkbox" className="font-bold text-gray-600 cursor-pointer">
                 Auto Sync (Otomatis push di background setelah transaksi)
@@ -251,7 +251,7 @@ function writeTableDirect(ss, sheetName, list) {
                 id="sync-now-btn"
                 disabled={loading}
                 onClick={handleTriggerNow}
-                className="bg-[#EC4899] hover:bg-[#D93B84] text-white font-bold py-2.5 px-4 rounded-xl cursor-pointer transition text-xs flex items-center justify-center gap-1.5 shadow-md"
+                className="bg-pink-500 hover:bg-pink-600 text-white font-bold py-2.5 px-4 rounded-xl cursor-pointer transition text-xs flex items-center justify-center gap-1.5 shadow-md"
               >
                 <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
                 Force Sync
@@ -295,7 +295,7 @@ function writeTableDirect(ss, sheetName, list) {
             </button>
           </div>
 
-          <div className="space-y-2 text-[10px] text-gray-300 leading-relaxed bg-white/5 p-4 rounded-2xl border border-white/10 font-sans">
+          <div className="space-y-2 text-sm text-gray-300 leading-relaxed bg-white/5 p-4 rounded-2xl border border-white/10 font-sans">
             <p className="font-bold text-pink-300 text-xs uppercase mb-1">🛠️ Langkah Penyebaran (Deployment Steps):</p>
             <ol className="list-decimal pl-4 space-y-1 text-gray-400">
               <li>Buat Google Spreadsheet baru di Drive Anda.</li>
@@ -307,7 +307,7 @@ function writeTableDirect(ss, sheetName, list) {
             </ol>
           </div>
 
-          <div className="max-h-56 overflow-y-auto bg-black/60 p-4 rounded-2xl text-[10px] text-gray-400 border border-white/5 whitespace-pre">
+          <div className="max-h-56 overflow-y-auto bg-black/60 p-4 rounded-2xl text-sm text-gray-400 border border-white/5 whitespace-pre">
             {googleAppsScriptCode}
           </div>
         </div>
@@ -320,7 +320,7 @@ function writeTableDirect(ss, sheetName, list) {
       {showConfirmModal && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-fade-in" id="confirm-sheet-modal">
           <div className="bg-white rounded-[32px] p-6 max-w-md w-full border border-pink-100 shadow-2xl space-y-5 text-center animate-scale-up">
-            <div className="mx-auto w-14 h-14 bg-pink-50 rounded-full flex items-center justify-center text-[#EC4899]">
+            <div className="mx-auto w-14 h-14 bg-pink-50 rounded-full flex items-center justify-center text-pink-500">
               <Link2 className="w-7 h-7" />
             </div>
             
@@ -329,8 +329,8 @@ function writeTableDirect(ss, sheetName, list) {
               <p className="text-xs text-gray-500 leading-relaxed">
                 Apakah Anda yakin ingin menghubungkan database Alina Enterprise System dengan Google Sheets menggunakan kredensial ini?
               </p>
-              <div className="p-3 bg-pink-50/50 rounded-2xl border border-pink-100/50 text-[10px] text-left space-y-1">
-                <span className="font-bold text-[#EC4899] block">💡 Catatan Sinkronisasi:</span>
+              <div className="p-3 bg-pink-50/50 rounded-2xl border border-pink-100/50 text-sm text-left space-y-1">
+                <span className="font-bold text-pink-500 block">💡 Catatan Sinkronisasi:</span>
                 <p className="text-gray-500">
                   Pastikan spreadsheet Anda telah memiliki sheet dengan nama yang sesuai dan script Apps Script dideploy sebagai Web App yang diakses oleh 'Anyone'.
                 </p>
@@ -372,7 +372,7 @@ function writeTableDirect(ss, sheetName, list) {
               <p className="text-xs text-gray-500 leading-relaxed">
                 Koneksi Google Sheets berhasil disimpan dan diaktifkan. Alina Enterprise System sekarang berjalan dalam sinkronisasi waktu nyata (real-time).
               </p>
-              <div className="p-3 bg-emerald-50/30 rounded-2xl border border-emerald-100/50 text-[10px] text-emerald-800 text-left">
+              <div className="p-3 bg-emerald-50/30 rounded-2xl border border-emerald-100/50 text-sm text-emerald-800 text-left">
                 <strong>✓ Sinkronisasi Aktif:</strong> Setiap perubahan inventaris, pesanan retail, dan log audit akan dipush otomatis ke Spreadsheet Anda.
               </div>
             </div>

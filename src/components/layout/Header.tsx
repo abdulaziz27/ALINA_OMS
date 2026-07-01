@@ -31,15 +31,15 @@ export default function Header({
           ) : (
             <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#EC4899] via-pink-400 to-white p-[1px] shadow-md flex items-center justify-center transform hover:rotate-6 transition-all select-none">
               <div className="w-full h-full rounded-full bg-white flex flex-col items-center justify-center font-sans">
-                <span className="text-[7px] font-black tracking-tighter bg-gradient-to-r from-[#EC4899] to-pink-400 bg-clip-text text-transparent leading-none">Alina</span>
-                <span className="text-[4px] font-bold text-[#EC4899] uppercase leading-none" style={{ fontSize: '4px' }}>Official</span>
+                <span className="text-xs font-black tracking-tighter bg-gradient-to-r from-[#EC4899] to-pink-400 bg-clip-text text-transparent leading-none">Alina</span>
+                <span className="text-xs font-bold text-pink-500 uppercase leading-none">Official</span>
               </div>
             </div>
           )}
           <div className="text-left">
             <h1 className="text-xs sm:text-sm font-extrabold text-gray-900 tracking-tight leading-none">{currentTheme.brandName}</h1>
-            <p className={`text-[9px] ${currentTheme.text} font-black font-mono tracking-wider mt-0.5 uppercase`}>
-              {currentUser?.Role} PORTAL {currentTheme.deco && <span className="inline-block animate-bounce">{currentTheme.deco}</span>}
+            <p className={`text-xs ${currentTheme.text} font-black font-mono tracking-wider mt-0.5 uppercase`}>
+              {currentUser?.Role} PORTAL {currentTheme.deco && <span className="inline-block">{currentTheme.deco}</span>}
             </p>
           </div>
         </div>
@@ -47,7 +47,7 @@ export default function Header({
         <div className="flex items-center gap-3">
           <div className="text-right hidden md:block">
             <p className="text-xs font-bold text-gray-950">{currentUser?.Full_Name}</p>
-            <p className="text-[9px] text-gray-400 font-mono select-none flex items-center gap-1 justify-end">
+            <p className="text-xs text-gray-400 font-mono select-none flex items-center gap-1 justify-end">
               <span className={`w-1.5 h-1.5 rounded-full inline-block ${isOfflineMode ? 'bg-amber-500 animate-pulse' : 'bg-emerald-500'}`}></span>
               {isOfflineMode ? 'Mode Offline-First' : (currentTheme.petSpeech ? currentTheme.petSpeech : 'Koneksi Server Aktif')}
             </p>
@@ -55,7 +55,7 @@ export default function Header({
           
           <button
             onClick={handleLogoutAction}
-            className={`${currentTheme.buttonSecondary} transition-all font-bold px-3 py-1.5 rounded-xl text-[10px] sm:text-xs flex items-center gap-1.5 cursor-pointer`}
+            className={`${currentTheme.buttonSecondary} transition-all font-bold px-3 py-1.5 rounded-xl text-sm sm:text-xs flex items-center gap-1.5 cursor-pointer`}
           >
             <LogOut className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Sign Out</span>
