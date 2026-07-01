@@ -17,10 +17,10 @@ router.use(requireApiKey);
  *       200:
  *         description: A list of products.
  */
-// 1. GET /products: Sync catalog
+// 1. GET /products: Sinkronisasi katalog
 router.get('/products', async (req, res) => {
   try {
-    // Return only active products and omit cost price for security
+    // Kembalikan hanya produk aktif dan sembunyikan harga modal untuk keamanan
     const activeProducts = await prisma.product.findMany({
       where: { Status: 'Active' },
       select: {
@@ -41,8 +41,8 @@ router.get('/products', async (req, res) => {
       
     res.json({ success: true, count: activeProducts.length, data: activeProducts });
   } catch (error) {
-    console.error('Error fetching products for ecommerce:', error);
-    res.status(500).json({ success: false, error: 'Internal Server Error' });
+    console.error('Gagal mengambil produk untuk e-commerce:', error);
+    res.status(500).json({ success: false, error: 'Terjadi Kesalahan Internal Server' });
   }
 });
 
@@ -62,7 +62,7 @@ router.get('/stock/:sku', async (req, res) => {
     });
     
     if (!product) {
-      return res.status(404).json({ success: false, error: 'Product not found' });
+      return res.status(404).json({ success: false, error: 'Produk tidak ditemukan' });
     }
 
     res.json({ 
@@ -71,8 +71,8 @@ router.get('/stock/:sku', async (req, res) => {
       current_stock: product.Current_Stock 
     });
   } catch (error) {
-    console.error('Error fetching stock for ecommerce:', error);
-    res.status(500).json({ success: false, error: 'Internal Server Error' });
+    console.error('Gagal mengambil stok untuk e-commerce:', error);
+    res.status(500).json({ success: false, error: 'Terjadi Kesalahan Internal Server' });
   }
 });
 
@@ -80,7 +80,7 @@ router.get('/stock/:sku', async (req, res) => {
  * @swagger
  * /orders:
  *   post:
- *     summary: Inject a new paid order
+ *     summary: Masukkan pesanan baru yang sudah dibayar
  */
 // 3. POST /orders: Inject new paid order
 router.post('/orders', async (req, res) => {
@@ -88,10 +88,10 @@ router.post('/orders', async (req, res) => {
     const orderPayload = req.body;
     
     if (!orderPayload || !Array.isArray(orderPayload.items) || orderPayload.items.length === 0) {
-      return res.status(400).json({ success: false, error: 'Invalid order payload' });
+      return res.status(400).json({ success: false, error: 'Data pesanan tidak valid' });
     }
 
-    // Validate stock for all items before processing
+    // Validasi stok untuk semua barang sebelum diproses
     const products = await prisma.product.findMany({
       where: { SKU: { in: orderPayload.items.map((i: any) => i.sku) } }
     });
@@ -111,21 +111,35 @@ router.post('/orders', async (req, res) => {
     const now = new Date().toISOString();
     const orderNumber = orderPayload.orderNumber || `ECOMM-${Date.now()}`;
 
-    // Use transaction to ensure data integrity
+    // PENGECEKAN IDEMPOTENSI: Jika pesanan sudah ada, kembalikan status sukses untuk mencegah pemotongan ganda saat dicoba ulang
+    if (orderPayload.orderNumber) {
+      const existingOrder = await prisma.order.findFirst({
+        where: { Order_Number: orderPayload.orderNumber }
+      });
+      if (existingOrder) {
+        return res.json({ 
+          success: true, 
+          message: 'Pesanan sudah diproses (Respon Idempoten)',
+          orderNumber: orderPayload.orderNumber
+        });
+      }
+    }
+
+    // Gunakan transaksi untuk memastikan integritas data
     await prisma.$transaction(async (tx) => {
       for (const item of orderPayload.items) {
         const product: any = productMap.get(item.sku);
         
-        // Deduct stock
+        // Potong stok
         await tx.product.update({
           where: { SKU: item.sku },
           data: { Current_Stock: { decrement: item.qty } }
         });
         
-        // Calculate amount
+        // Hitung jumlah
         const amount = product.Retail_Price * item.qty;
 
-        // Create order entry
+        // Buat entri pesanan
         await tx.order.create({
           data: {
             Order_Number: orderNumber,
@@ -134,7 +148,7 @@ router.post('/orders', async (req, res) => {
             Qty: item.qty,
             Price: product.Retail_Price,
             Total: amount, 
-            Status: 'Ready To Ship', // Direct to ready to ship if it came from E-commerce
+            Status: 'Ready To Ship', // Langsung ke status siap kirim jika berasal dari E-commerce
             Order_Date: now,
             Channel: orderPayload.channel || 'E-Commerce', 
             Product: product.Product_Name,
@@ -142,7 +156,7 @@ router.post('/orders', async (req, res) => {
         });
       }
 
-      // If E-commerce passed Biteship shipping info, create shipping record immediately
+      // Jika E-commerce mengirimkan info pengiriman Biteship, segera buat rekam pengiriman
       if (orderPayload.shippingCourier && orderPayload.trackingNumber) {
         await tx.shipping.create({
           data: {
@@ -158,12 +172,12 @@ router.post('/orders', async (req, res) => {
 
     res.json({ 
       success: true, 
-      message: 'Order successfully injected and stock deducted',
+      message: 'Pesanan berhasil dimasukkan dan stok telah dipotong',
       orderNumber: orderNumber
     });
   } catch (error) {
-    console.error('Error injecting order from ecommerce:', error);
-    res.status(500).json({ success: false, error: 'Internal Server Error' });
+    console.error('Gagal memasukkan pesanan dari e-commerce:', error);
+    res.status(500).json({ success: false, error: 'Terjadi Kesalahan Internal Server' });
   }
 });
 
@@ -171,26 +185,26 @@ router.post('/orders', async (req, res) => {
  * @swagger
  * /orders/{orderNumber}/status:
  *   get:
- *     summary: Get order and shipping status
+ *     summary: Ambil status pesanan dan pengiriman
  */
 // 4. GET /orders/:orderNumber/status: Order Tracking & Status
 router.get('/orders/:orderNumber/status', async (req, res) => {
   try {
     const { orderNumber } = req.params;
     
-    // Find the order
+    // Cari pesanan
     const orderItems = await prisma.order.findMany({
       where: { Order_Number: orderNumber }
     });
     
     if (orderItems.length === 0) {
-      return res.status(404).json({ success: false, error: 'Order not found' });
+      return res.status(404).json({ success: false, error: 'Pesanan tidak ditemukan' });
     }
 
-    // Since items in the same order usually share the same status, just grab the first one
+    // Karena barang dalam pesanan yang sama biasanya memiliki status yang sama, ambil yang pertama saja
     const mainStatus = orderItems[0].Status;
 
-    // Look for shipping info
+    // Cari info pengiriman
     const shippingRecord = await prisma.shipping.findFirst({
       where: { Order_Number: orderNumber }
     });
@@ -207,8 +221,8 @@ router.get('/orders/:orderNumber/status', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error fetching order status for ecommerce:', error);
-    res.status(500).json({ success: false, error: 'Internal Server Error' });
+    console.error('Gagal mengambil status pesanan untuk e-commerce:', error);
+    res.status(500).json({ success: false, error: 'Terjadi Kesalahan Internal Server' });
   }
 });
 
@@ -216,7 +230,7 @@ router.get('/orders/:orderNumber/status', async (req, res) => {
  * @swagger
  * /products/{sku}/image:
  *   patch:
- *     summary: Update product image URL
+ *     summary: Perbarui URL gambar produk
  */
 // 5. PATCH /products/:sku/image: Update product image
 router.patch('/products/:sku/image', async (req, res) => {
@@ -225,7 +239,7 @@ router.patch('/products/:sku/image', async (req, res) => {
     const { imageUrl } = req.body;
     
     if (!imageUrl) {
-      return res.status(400).json({ success: false, error: 'imageUrl is required' });
+      return res.status(400).json({ success: false, error: 'imageUrl wajib diisi' });
     }
 
     const product = await prisma.product.findUnique({
@@ -233,7 +247,7 @@ router.patch('/products/:sku/image', async (req, res) => {
     });
 
     if (!product) {
-      return res.status(404).json({ success: false, error: 'Product not found' });
+      return res.status(404).json({ success: false, error: 'Produk tidak ditemukan' });
     }
 
     await prisma.product.update({
@@ -241,10 +255,73 @@ router.patch('/products/:sku/image', async (req, res) => {
       data: { Image_URL: imageUrl }
     });
 
-    res.json({ success: true, message: 'Image URL updated successfully' });
+    res.json({ success: true, message: 'URL Gambar berhasil diperbarui' });
   } catch (error) {
-    console.error('Error updating product image:', error);
-    res.status(500).json({ success: false, error: 'Internal Server Error' });
+    console.error('Gagal memperbarui gambar produk:', error);
+    res.status(500).json({ success: false, error: 'Terjadi Kesalahan Internal Server' });
+  }
+});
+
+/**
+ * @swagger
+ * /orders/{orderNumber}/cancel:
+ *   post:
+ *     summary: Batalkan pesanan dan kembalikan stok
+ *     description: Digunakan oleh e-commerce ketika pelanggan gagal membayar atau membatalkan pesanan.
+ */
+// 6. POST /orders/:orderNumber/cancel: Batalkan pesanan & kembalikan stok
+router.post('/orders/:orderNumber/cancel', async (req, res) => {
+  try {
+    const { orderNumber } = req.params;
+    
+    // Cari semua barang di dalam pesanan
+    const orderItems = await prisma.order.findMany({
+      where: { Order_Number: orderNumber }
+    });
+    
+    if (orderItems.length === 0) {
+      return res.status(404).json({ success: false, error: 'Pesanan tidak ditemukan' });
+    }
+
+    // Pengecekan pembatalan idempoten
+    if (orderItems[0].Status === 'Cancelled') {
+      return res.json({ 
+        success: true, 
+        message: 'Pesanan sudah dibatalkan (Respon Idempoten)',
+        orderNumber 
+      });
+    }
+
+    await prisma.$transaction(async (tx) => {
+      // 1. Kembalikan stok
+      for (const item of orderItems) {
+        await tx.product.update({
+          where: { SKU: item.SKU },
+          data: { Current_Stock: { increment: item.Qty } }
+        });
+      }
+
+      // 2. Ubah Status Pesanan menjadi Dibatalkan
+      await tx.order.updateMany({
+        where: { Order_Number: orderNumber },
+        data: { Status: 'Cancelled' }
+      });
+
+      // 3. Ubah Status Pengiriman menjadi Dibatalkan (jika ada)
+      await tx.shipping.updateMany({
+        where: { Order_Number: orderNumber },
+        data: { Status: 'Cancelled' }
+      });
+    });
+
+    res.json({ 
+      success: true, 
+      message: 'Pesanan berhasil dibatalkan dan stok telah dikembalikan',
+      orderNumber 
+    });
+  } catch (error) {
+    console.error('Gagal membatalkan pesanan:', error);
+    res.status(500).json({ success: false, error: 'Terjadi Kesalahan Internal Server' });
   }
 });
 
