@@ -202,7 +202,9 @@ export default function ProductEditor({
   const [size, setSize] = useState('All Size');
   const [costPrice, setCostPrice] = useState<number | string>('');
   const [sellingPrice, setSellingPrice] = useState<number | string>('');
+  const [marketerPrice, setMarketerPrice] = useState<number | string>('');
   const [resellerPrice, setResellerPrice] = useState<number | string>('');
+  const [agenPrice, setAgenPrice] = useState<number | string>('');
   const [distributorPrice, setDistributorPrice] = useState<number | string>('');
   const [minStock, setMinStock] = useState<number | string>(10);
   const [currentStock, setCurrentStock] = useState<number | string>('');
@@ -227,7 +229,9 @@ export default function ProductEditor({
       setSize(selectedProduct.Size);
       setCostPrice(selectedProduct.Cost_Price);
       setSellingPrice(selectedProduct.Retail_Price);
+        setMarketerPrice(selectedProduct.Marketer_Price || '');
         setResellerPrice(selectedProduct.Reseller_Price || '');
+        setAgenPrice(selectedProduct.Agen_Price || '');
         setDistributorPrice(selectedProduct.Distributor_Price || '');
       setMinStock(selectedProduct.Minimum_Stock);
       setCurrentStock(selectedProduct.Current_Stock);
@@ -240,7 +244,9 @@ export default function ProductEditor({
       setColor('Hitam');
       setCostPrice('');
       setSellingPrice('');
+      setMarketerPrice('');
       setResellerPrice('');
+      setAgenPrice('');
       setDistributorPrice('');
       setMinStock(10);
       setCurrentStock('');
@@ -312,7 +318,9 @@ export default function ProductEditor({
       Size: size,
       Cost_Price: Number(costPrice),
       Retail_Price: Number(sellingPrice),
+      Marketer_Price: Number(marketerPrice),
       Reseller_Price: Number(resellerPrice),
+      Agen_Price: Number(agenPrice),
       Distributor_Price: Number(distributorPrice),
       Current_Stock: Number(currentStock),
       Minimum_Stock: Number(minStock),
@@ -666,7 +674,9 @@ export default function ProductEditor({
                       Size: size,
                       Cost_Price: Number(costPrice),
                       Retail_Price: Number(sellingPrice),
+                      Marketer_Price: Number(marketerPrice),
                       Reseller_Price: Number(resellerPrice),
+                      Agen_Price: Number(agenPrice),
                       Distributor_Price: Number(distributorPrice),
                       Current_Stock: Number(currentStock),
                       Minimum_Stock: Number(minStock),

@@ -34,7 +34,9 @@ model Product {
   Size          String
   Cost_Price        Int      @default(0)
   Retail_Price      Int      @default(0)
+  Marketer_Price    Int      @default(0)
   Reseller_Price    Int      @default(0)
+  Agen_Price        Int      @default(0)
   Distributor_Price Int      @default(0)
   Current_Stock Int
   Minimum_Stock Int

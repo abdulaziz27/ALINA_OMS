@@ -30,7 +30,9 @@ export interface Product {
   Size: string;
   Cost_Price: number;
   Retail_Price: number;
+  Marketer_Price: number;
   Reseller_Price: number;
+  Agen_Price: number;
   Distributor_Price: number;
   Current_Stock: number;
   Minimum_Stock: number;
